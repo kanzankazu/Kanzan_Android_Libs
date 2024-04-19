@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="camera_action_margin_1">47dp</dimen>
+    <dimen name="camera_action_margin_2">55dp</dimen>
+    <dimen name="camera_horizontal_padding">21dp</dimen>
+
+    <dimen name="camera_guideline_padding_bottom">22dp</dimen>
+
+    <dimen name="activity_margin_zero">0dp</dimen>
+    <dimen name="activity_margin_duo">2dp</dimen>
+    <dimen name="activity_margin_quarter">4dp</dimen>
+    <dimen name="activity_margin_quarter_up">6dp</dimen>
+    <dimen name="activity_margin_half">8dp</dimen>
+    <dimen name="activity_margin_half_up">12dp</dimen>
+    <dimen name="activity_margin">16dp</dimen>
+    <dimen name="activity_margin_up">24dp</dimen>
+    <dimen name="activity_margin_double">32dp</dimen>
+    <dimen name="activity_margin_double_up">48dp</dimen>
+    <dimen name="activity_margin_triple">64dp</dimen>
+
+    <integer name="transition_duration">250</integer>
+
+    <dimen name="small_xx_font">7sp</dimen>
+    <dimen name="small_x_font">10sp</dimen>
+    <dimen name="small_font">12.5sp</dimen>
+    <dimen name="normal_font">15sp</dimen>
+    <dimen name="big_font">17sp</dimen>
+    <dimen name="big_x_font">20sp</dimen>
+    <dimen name="big_xx_font">25sp</dimen>
+    <dimen name="big_xxx_font">30sp</dimen>
+
+</resources>

@@ -1,0 +1,3 @@
+rootProject.name = "Kanzan Base"
+include ':kanzankazuLibs'
+include ':kanzankazuSample'

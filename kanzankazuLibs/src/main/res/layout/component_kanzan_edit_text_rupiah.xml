@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/component_kanzan_edit_rupiah_text_til"
+        style="@style/TextInputLayoutRounded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.kanzankazu.kanzanwidget.EditTextRupiah
+            android:id="@+id/component_kanzan_edit_rupiah_text_et"
+            style="@style/EtNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:hint="{HINT}"
+            tools:ignore="HardcodedText"
+            tools:text="0" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</FrameLayout>

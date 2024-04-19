@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toastLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/activity_margin"
+    android:background="@drawable/bg_white_round_16"
+    android:backgroundTint="@color/baseColorTwitter"
+    android:gravity="center_vertical"
+    android:padding="16dp">
+
+    <!-- Tambahkan tampilan (misalnya, TextView) yang ingin Anda tampilkan dalam toast -->
+    <TextView
+        android:id="@+id/toastText"
+        style="@style/TvStandartBold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        tools:text="@tools:sample/lorem" />
+
+</LinearLayout>

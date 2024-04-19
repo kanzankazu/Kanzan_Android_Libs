@@ -1,0 +1,139 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_component_kanzan_edit_text_2_title"
+        style="@style/TvStandartBold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/activity_margin_up"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpUsage"
+        tools:text="{title}"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_component_kanzan_edit_text_2_prefix"
+        style="@style/TvStandartBold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/activity_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/til_component_kanzan_edit_text_2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/til_component_kanzan_edit_text_2"
+        tools:text="{prefix}"
+        tools:visibility="visible" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_component_kanzan_edit_text_2"
+        style="@style/TextInputLayoutRounded"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        app:layout_constraintEnd_toStartOf="@+id/lay_component_kanzan_edit_text_2_support"
+        app:layout_constraintStart_toEndOf="@id/tv_component_kanzan_edit_text_2_prefix"
+        app:layout_constraintTop_toBottomOf="@id/tv_component_kanzan_edit_text_2_title"
+        app:layout_goneMarginEnd="0dp"
+        app:layout_goneMarginStart="0dp"
+        app:layout_goneMarginTop="0dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_component_kanzan_edit_text_2"
+            style="@style/EtNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:hint="{HINT}"
+            tools:ignore="HardcodedText" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_component_kanzan_edit_text_2_support"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_margin"
+        android:animateLayoutChanges="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/til_component_kanzan_edit_text_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/til_component_kanzan_edit_text_2"
+        app:layout_constraintTop_toTopOf="@id/til_component_kanzan_edit_text_2"
+        app:layout_goneMarginStart="0dp">
+
+        <ImageView
+            android:id="@+id/iv_component_kanzan_edit_text_2_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_clear"
+            android:tint="@color/baseBlack"
+            tools:ignore="ContentDescription,UseAppTint" />
+
+        <ImageView
+            android:id="@+id/iv_component_kanzan_edit_text_2_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_margin"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ccp_down_arrow" />
+
+        <ImageView
+            android:id="@+id/iv_component_kanzan_edit_text_2_success"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_margin"
+            android:src="@drawable/ic_check_circle_filled"
+            android:tint="@color/baseGreen"
+            tools:ignore="ContentDescription,UseAppTint" />
+
+        <ProgressBar
+            android:id="@+id/pb_component_kanzan_edit_text_2"
+            android:layout_width="@dimen/activity_margin_double"
+            android:layout_height="@dimen/activity_margin_double"
+            android:layout_marginStart="@dimen/activity_margin" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_component_kanzan_edit_text_2_error"
+        style="@style/TvStandart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        android:gravity="center"
+        android:textColor="@color/baseRed"
+        android:textSize="@dimen/activity_margin"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_component_kanzan_edit_text_2"
+        app:layout_goneMarginTop="0dp"
+        tools:text="{error}"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_component_kanzan_edit_text_2_success"
+        style="@style/TvStandart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        android:gravity="center"
+        android:textColor="@color/baseGreen"
+        android:textSize="@dimen/activity_margin"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_component_kanzan_edit_text_2_error"
+        app:layout_goneMarginTop="0dp"
+        tools:text="{success}"
+        tools:visibility="visible" />
+</androidx.constraintlayout.widget.ConstraintLayout>

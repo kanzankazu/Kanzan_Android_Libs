@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:background="@drawable/ic_arrow_head_left"
+        android:padding="@dimen/activity_vertical_margin"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/ivImagePreview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:scaleType="fitCenter"
+        tools:ignore="ContentDescription" />
+
+
+    <LinearLayout
+        android:id="@+id/layNavPreview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal"
+        android:padding="@dimen/camera_guideline_padding_bottom"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btRetake"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
+            android:text="@string/label_retry"
+            android:textColor="@color/baseWhite"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/btNext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
+            android:foreground="?selectableItemBackground"
+            android:text="@string/label_save"
+            android:textAllCaps="false"
+            android:textColor="@color/baseWhite"
+            tools:ignore="ButtonStyle,UnusedAttribute"
+            tools:targetApi="m" />
+    </LinearLayout>
+</RelativeLayout>

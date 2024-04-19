@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="BgCard">
+        <item name="android:background">@drawable/bg_white_round_16_card</item>
+        <item name="android:layout_marginEnd">@dimen/activity_margin_half</item>
+        <item name="android:layout_marginStart">@dimen/activity_margin_half</item>
+        <item name="android:layout_marginTop">@dimen/activity_margin_half</item>
+        <item name="android:layout_marginBottom">@dimen/activity_margin_half</item>
+        <item name="android:padding">@dimen/activity_margin_half</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="android:elevation" tools:ignore="NewApi">@dimen/activity_margin_quarter</item>
+    </style>
+
+    <style name="CardViewStandart">
+        <item name="android:layout_marginLeft">@dimen/activity_margin_half</item>
+        <item name="android:layout_marginRight">@dimen/activity_margin_half</item>
+        <item name="android:layout_marginTop">@dimen/activity_margin_half</item>
+        <item name="android:layout_marginBottom">@dimen/activity_margin_half</item>
+        <item name="cardElevation">@dimen/activity_margin_quarter</item>
+        <item name="cardCornerRadius">@dimen/activity_margin_half</item>
+        <item name="cardPreventCornerOverlap">true</item>
+    </style>
+
+    <style name="CardViewStandartButton" parent="CardViewStandart">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?selectableItemBackground</item>
+    </style>
+
+    <style name="CardViewStandartDialog">
+        <item name="android:layout_margin">0dp</item>
+        <item name="cardElevation">@dimen/activity_margin_quarter</item>
+        <item name="cardCornerRadius">@dimen/activity_margin_half</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardPreventCornerOverlap">true</item>
+    </style>
+
+    <style name="CardViewStandartPaddingCompat" parent="CardViewStandart">
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+
+    <style name="CollapsingToolbarStandart">
+        <item name="contentScrim">@color/baseWhite</item>
+        <item name="collapsedTitleGravity">top</item>
+        <item name="layout_scrollFlags">scroll|exitUntilCollapsed|snap</item>
+    </style>
+
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="DialogBackgroundTransparent">
+        <item name="background">@color/baseTransparent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="DialogStyle">
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+    </style>
+
+    <style name="FullWidth_Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="dialog_animation_shrinkfade">
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/shrinkfade_out</item>
+    </style>
+
+</resources>

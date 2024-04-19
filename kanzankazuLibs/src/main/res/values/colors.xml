@@ -1,0 +1,36 @@
+<resources>
+    <color name="colorPrimaryDark">#f09438</color>
+    <color name="colorPrimary">#fbbd2b</color>
+    <color name="colorAccent">#046448</color>
+
+    <color name="colorPrimaryDarkItungItungan">#FFE422</color>
+    <color name="colorPrimaryItungItungan">#FBE85F</color>
+    <color name="colorPrimaryLightItungItungan">#FFF5A9</color>
+    <color name="colorAccentItungItungan">#EDBC4D</color>
+
+    <color name="baseWhite">#FFFFFF</color>
+    <color name="baseGreyLight">#EFEFEF</color>
+    <color name="baseGrey">#848484</color>
+    <color name="baseGreyDark">#4A4A4A</color>
+    <color name="baseBlack">#000000</color>
+    <color name="baseOrange">#FF6D00</color>
+    <color name="baseYellow">#FFD600</color>
+    <color name="baseGreen">#00C853</color>
+    <color name="baseCyan">#00B8D4</color>
+    <color name="baseBlue">#2962FF</color>
+    <color name="basePurple">#6200EA</color>
+    <color name="basePink">#C51162</color>
+    <color name="baseRed">#D50000</color>
+    <color name="baseTransparent">#00000000</color>
+
+    <color name="baseColorBlueFacebook">#3B5998</color>
+    <color name="baseColorBlueFacebookSelected">#adb9d3</color>
+    <color name="baseColorBlueFacebookDisable">#1F3565</color>
+
+    <color name="baseColorTwitter">#08a0e9</color>
+    <color name="baseColorTwitterSelected">#ebf5fd</color>
+    <color name="baseColorTwitterDisable">#0084b4</color>
+
+    <color name="baseColorAndroidDark">#316E63</color>
+    <color name="baseColorAndroidLight">#6DDA8A</color>
+</resources>

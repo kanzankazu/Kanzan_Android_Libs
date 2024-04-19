@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="title" format="string" />
+    <attr name="value" format="string" />
+    <attr name="hint" format="string" />
+    <attr name="prefix" format="string" />
+    <attr name="regex" format="string" />
+    <attr name="digits" format="string" />
+    <attr name="enable" format="boolean" />
+    <attr name="isAllCaps" format="boolean" />
+    <attr name="isShowClearButton" format="boolean" />
+    <attr name="imageRight" format="reference" />
+    <attr name="maxLenght" format="integer" />
+    <attr name="input_types" format="enum">
+        <enum name="text" value="1" />
+        <enum name="price" value="2" />
+        <enum name="number" value="3" />
+        <enum name="disable" value="4" />
+        <enum name="textAllCapital" value="5" />
+        <enum name="multiline" value="6" />
+    </attr>
+
+    <declare-styleable name="KanzanRecyclerviewComponent">
+        <attr name="KRVCAnim" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="KanzanToolbarOnly">
+        <attr name="KTTitle" format="string" />
+        <attr name="KTSubTitle" format="string" />
+        <attr name="KTBackground" format="color" />
+    </declare-styleable>
+    <declare-styleable name="MultiStateView">
+        <attr name="msv_loadingView" format="reference" />
+        <attr name="msv_emptyView" format="reference" />
+        <attr name="msv_errorView" format="reference" />
+        <attr name="msv_viewState" format="enum">
+            <enum name="content" value="0" />
+            <enum name="error" value="1" />
+            <enum name="empty" value="2" />
+            <enum name="loading" value="3" />
+        </attr>
+        <attr name="msv_animateViewChanges" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="KanzanEditTextComponent">
+        <attr name="ket_title" format="string" />
+        <attr name="ket_titleColor" format="reference" />
+        <attr name="ket_hint" format="string" />
+    </declare-styleable>
+    <declare-styleable name="KanzanEditTextRupiahComponent">
+        <attr name="ketr_title" format="string" />
+        <attr name="ketr_titleColor" format="reference" />
+        <attr name="ketr_hint" format="string" />
+    </declare-styleable>
+    <declare-styleable name="KanzanToolbarComponent">
+        <attr name="ktc_navColor" format="reference" />
+        <attr name="ktc_navBackgroundColor" format="reference" />
+        <attr name="ktc_navigationIcon" format="reference" />
+        <attr name="ktc_subTitleFontStyle" format="reference" />
+        <attr name="ktc_titleFontStyle" format="reference" />
+        <attr name="ktc_subTitleColor" format="reference" />
+        <attr name="ktc_titleColor" format="reference" />
+        <attr name="ktc_isSubtitleCentered" format="boolean" />
+        <attr name="ktc_isTitleCentered" format="boolean" />
+        <attr name="ktc_subTitle" format="string" />
+        <attr name="ktc_title" format="string" />
+    </declare-styleable>
+    <declare-styleable name="KanzanToolbarTabLayoutComponent">
+        <attr name="ktc_navColor" />
+        <attr name="ktc_navBackgroundColor" />
+        <attr name="ktc_navigationIcon" />
+        <attr name="ktc_subTitleFontStyle" />
+        <attr name="ktc_titleFontStyle" />
+        <attr name="ktc_subTitleColor" />
+        <attr name="ktc_titleColor" />
+        <attr name="ktc_isSubtitleCentered" />
+        <attr name="ktc_isTitleCentered" />
+        <attr name="ktc_subTitle" />
+        <attr name="ktc_title" />
+    </declare-styleable>
+    <declare-styleable name="KanzanEditText">
+        <attr name="title" />
+        <attr name="value" />
+        <attr name="hint" />
+        <attr name="prefix" />
+        <attr name="enable" />
+        <attr name="isAllCaps" />
+        <attr name="imageRight" />
+        <attr name="regex" />
+        <attr name="maxLenght" />
+        <attr name="input_types" />
+        <attr name="isShowClearButton" />
+        <attr name="digits" />
+    </declare-styleable>
+</resources>
