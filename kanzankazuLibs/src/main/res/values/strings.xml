@@ -1,0 +1,34 @@
+<resources>
+    <string name="camera_permission_denied">This feature requires your permission to access the camera</string>
+    <string name="dialog_message_confirm_continue_process">Apakah kamu ingin menajutkan proses ini?</string>
+    <string name="dialog_title_confirm">Konfirmasi</string>
+    <string name="error_apps_not_found">Application not found</string>
+    <string name="error_internet_no_connection">Tidak Ada Internet</string>
+    <string name="error_internet_no_network">No internet available</string>
+    <string name="error_internet_not_stable">Internet Not Stable</string>
+    <string name="error_message_image_get_failed">Terjadi kesalahan saat memproses gambar Anda</string>
+    <string name="error_message_picture_failed">Terjadi kesalahan saat memproses gambar Anda, Silahkan coba lagi</string>
+    <string name="error_permission_denied">Permission Denied</string>
+    <string name="label_camera">Camera</string>
+    <string name="label_close">Close</string>
+    <string name="label_close_apps">Close Apps</string>
+    <string name="label_confirmation">Confirmation</string>
+    <string name="label_example_IP4V">XXX.XXX.XXX.XXX</string>
+    <string name="label_gallery">Gallery</string>
+    <string name="label_maintenance_desc">Maintenance in progress, Please wait…</string>
+    <string name="label_maintenance_title">Maintenance</string>
+    <string name="label_no">No</string>
+    <string name="label_ok">OK</string>
+    <string name="label_please_wait_">Please Wait…</string>
+    <string name="label_retry">Retry</string>
+    <string name="label_save">Save</string>
+    <string name="label_take_picture">Take Picture</string>
+    <string name="label_take_picture_content">Ambil foto baru atau ambil dari galeri</string>
+    <string name="label_tidak">Tidak</string>
+    <string name="label_update">Update</string>
+    <string name="label_warning">Warning</string>
+    <string name="label_ya">Ya</string>
+    <string name="label_yes">Yes</string>
+    <string name="text_error_connection">Koneksi terputus. Cek sinyal kamu dan coba lagi, ya.</string>
+    <string name="text_error_server">Terjadi kesalahan server. Coba beberapa saat lagi, ya.</string>
+</resources>

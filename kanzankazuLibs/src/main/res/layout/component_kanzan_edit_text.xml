@@ -1,0 +1,15 @@
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/component_kanzan_edit_text_til"
+    style="@style/TextInputLayoutRounded"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/component_kanzan_edit_text_et"
+        style="@style/EtText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:hint="{HINT}"
+        tools:text="{TEXT}" />
+</com.google.android.material.textfield.TextInputLayout>

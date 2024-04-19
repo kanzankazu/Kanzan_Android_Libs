@@ -1,0 +1,150 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/DialogBackgroundTransparent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layDialogInfoParent"
+        style="@style/BgCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_margin"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_google"
+        android:orientation="vertical"
+        android:padding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_margin_half">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvDialogInfoImageParent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/activity_margin_half"
+                android:layout_marginTop="@dimen/activity_margin_half"
+                app:cardCornerRadius="@dimen/activity_margin_half"
+                app:cardElevation="@dimen/activity_margin_quarter"
+                app:layout_constraintBottom_toTopOf="@id/tvDialogInfoTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/ivDialogInfoImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    tools:ignore="ContentDescription"
+                    tools:src="@tools:sample/backgrounds/scenic" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvDialogInfoTitle"
+                style="@style/TvStandartBold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/activity_margin_half"
+                android:layout_marginTop="@dimen/activity_margin_half"
+                android:gravity="center"
+                android:textColor="@color/baseBlack"
+                android:textSize="@dimen/big_font"
+                app:layout_constraintBottom_toTopOf="@+id/svDialogInfoDesc"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cvDialogInfoImageParent"
+                tools:text="Title" />
+
+            <ScrollView
+                android:id="@+id/svDialogInfoDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/activity_margin_half"
+                android:layout_marginTop="@dimen/activity_margin_half"
+                android:layout_weight="1"
+                android:fadeScrollbars="false"
+                app:layout_constraintBottom_toTopOf="@+id/layDialogInfoBtnParent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvDialogInfoTitle">
+
+                <TextView
+                    android:id="@+id/tvDialogInfoDesc"
+                    style="@style/TvStandartBold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:textAlignment="center"
+                    tools:text="@tools:sample/lorem[30]" />
+
+            </ScrollView>
+
+            <LinearLayout
+                android:id="@+id/layDialogInfoBtnParent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/activity_margin_half"
+                android:layout_marginTop="@dimen/activity_margin_half"
+                android:animateLayoutChanges="true"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/svDialogInfoDesc"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvDialogInfoBtn1"
+                    style="@style/TvButtonGoogle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:text="@string/label_yes"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tvDialogInfoBtn2"
+                    style="@style/TvButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_margin_half"
+                    android:textColor="@color/baseGrey"
+                    android:visibility="gone"
+                    tools:text="@string/label_no"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivDialogInfoCloseBtn"
+                style="@style/TvButtonImageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="@dimen/activity_margin_half"
+                android:elevation="@dimen/activity_margin_quarter"
+                android:src="@drawable/ic_clear"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/baseBlack"
+                tools:ignore="ContentDescription"
+                tools:targetApi="lollipop" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

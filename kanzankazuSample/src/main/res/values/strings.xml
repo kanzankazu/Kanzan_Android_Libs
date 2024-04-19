@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Sample</string>
+    <string name="label_daftar">Daftar</string>
+    <string name="label_masuk">Masuk</string>
+    <string name="error_field_empty">Masih Kosong</string>
+    <string name="cancel">cancel</string>
+</resources>

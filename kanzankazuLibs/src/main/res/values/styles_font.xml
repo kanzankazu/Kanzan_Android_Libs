@@ -1,0 +1,109 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="tv" />
+
+    <style name="tv.bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="tv.center">
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="tv.center.single" parent="tv.single" />
+
+    <style name="tv.marquee">
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+    </style>
+
+    <style name="tv.single">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="TextInputLayoutRounded" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_height">?actionBarSize</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/activity_margin_half</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/activity_margin_half</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/activity_margin_half</item>
+        <item name="boxCornerRadiusTopStart">@dimen/activity_margin_half</item>
+    </style>
+
+    <style name="TvButton" parent="TvStandartBold">
+        <item name="android:padding">@dimen/activity_margin</item>
+        <item name="android:background">@drawable/bg_light_round_selector</item>
+        <item name="android:textColor">@drawable/bg_light_round_selector_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TvButtonBottom" parent="TvButton">
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/bg_light_rec_selector</item>
+        <item name="android:textColor">@drawable/bg_light_rec_selector_text</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TvButtonDark" parent="TvButton">
+        <item name="android:background">@drawable/bg_dark_round_selector</item>
+        <item name="android:textColor">@drawable/bg_dark_round_selector_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TvButtonFacebook" parent="TvButton">
+        <item name="android:background">@drawable/bg_facebook_selector</item>
+        <item name="android:textColor">@drawable/bg_light_round_selector_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TvButtonGoogle" parent="TvButton">
+        <item name="android:background">@drawable/bg_google_selector</item>
+        <item name="android:textColor">@drawable/bg_light_round_selector_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TvButtonImageView" parent="TvButton">
+        <item name="android:tint">@color/baseBlack</item>
+        <item name="android:padding">@dimen/activity_margin_half</item>
+        <item name="android:height">?actionBarSize</item>
+    </style>
+
+    <style name="TvStandart">
+        <item name="android:fontFamily">@font/nunito_regular</item>
+        <item name="android:imeOptions">actionNext</item>
+        <item name="android:drawableTint" tools:ignore="NewApi">@color/baseBlack</item>
+    </style>
+
+    <style name="TvStandartBold">
+        <item name="android:fontFamily">@font/nunito_bold</item>
+        <item name="android:imeOptions">actionNext</item>
+    </style>
+
+    <style name="TvStandartBoldCenter" parent="TvStandartBold">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="TvStandartCenter" parent="TvStandart">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="TvStandartCenterMarquee" parent="TvStandartCenter">
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+    </style>
+
+    <style name="TvStandartCenterSingle" parent="TvStandartCenter">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+    </style>
+</resources>

@@ -1,0 +1,62 @@
+https://developer.android.com/training/dependency-injection/hilt-android#kotlin
+
+//ADD THIS IN build.gradle (.your_root_package)
+buildscript {
+    ...
+    dependencies {
+        ...
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.38.1'
+    }
+}
+
+//ADD THIS IN build.gradle (.your_app_module)
+plugins {
+  id 'kotlin-kapt'
+  id 'dagger.hilt.android.plugin'
+}
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation "com.google.dagger:hilt-android:2.38.1"
+    kapt "com.google.dagger:hilt-compiler:2.38.1"
+}
+
+//Hilt Anotation Processor
+@HiltAndroidApp -> add in your ... : Application()
+@AndroidEntryPoint -> add in your ... : AppCompatActivity()
+@HiltViewModel -> add in your ... : ViewModel()
+
+* how use @Inject
+- init variable =
+@AndroidEntryPoint
+class ExampleActivity : AppCompatActivity() {
+
+  @Inject lateinit var analytics: AnalyticsAdapter
+  ...
+}
+- inject constructor =
+class AnalyticsAdapter @Inject constructor(
+  private val service: AnalyticsService
+) { ... }
+
+* How install module
+@Module
+@InstallIn(ActivityComponent::class)
+object AnalyticsModule {
+
+  @Provides
+  fun provideAnalyticsService(
+    // Potential dependencies of this type
+  ): AnalyticsService {
+      return Retrofit.Builder()
+               .baseUrl("https://example.com")
+               .build()
+               .create(AnalyticsService::class.java)
+  }
+}

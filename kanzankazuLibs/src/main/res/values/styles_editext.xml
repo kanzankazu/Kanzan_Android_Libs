@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="EtClickable" parent="TvStandart">
+        <item name="android:inputType">none</item>
+        <item name="android:focusable">false</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="EtMultiline" parent="TvStandart">
+        <item name="android:inputType">textMultiLine</item>
+        <item name="android:minLines">2</item>
+        <item name="android:gravity">top</item>
+        <item name="android:lineSpacingExtra">@dimen/activity_margin_quarter</item>
+    </style>
+
+    <style name="EtNumber" parent="TvStandart">
+        <item name="android:inputType">number</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="EtText" parent="TvStandart">
+        <item name="android:inputType">text</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:imeOptions">actionNext</item>
+    </style>
+
+    <style name="EtTextDisable" parent="TvStandart">
+        <item name="android:enabled">false</item>
+        <item name="android:clickable">false</item>
+        <item name="android:inputType">text</item>
+        <item name="android:focusable">false</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="EtTextEmail" parent="TvStandart">
+        <item name="android:inputType">textEmailAddress</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="EtTextNonEditable" parent="TvStandart">
+        <item name="android:editable">false</item>
+        <item name="android:inputType">none</item>
+        <item name="android:focusable">false</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="EtTextPassword" parent="TvStandart">
+        <item name="android:inputType">textPassword</item>
+        <item name="android:singleLine">true</item>
+    </style>
+</resources>
