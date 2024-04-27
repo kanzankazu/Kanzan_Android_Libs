@@ -1,3 +1,5 @@
 package com.kanzankazu.kanzanutil.kanzanextension
 
-fun isDebug(): Boolean = true
+import com.kanzankazu.BuildConfig
+
+fun isDebug(): Boolean = BuildConfig.DEBUG
