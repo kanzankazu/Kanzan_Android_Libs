@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 fun String.debugMessage() {
-    isDebug().ifn { Log.i("Lihat DebugMessage", this) }
+    isDebug().ifn { Log.d("Lihat DebugMessage", this) }
 }
 
 fun String.debugMessageWarning() {

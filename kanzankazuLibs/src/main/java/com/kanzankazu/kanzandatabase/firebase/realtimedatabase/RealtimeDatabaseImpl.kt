@@ -12,7 +12,6 @@ import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.handleBaseRespon
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.handleBaseResponseConvertToObject
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.toBaseResponseSuccess
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.toError
-import com.kanzankazu.kanzanutil.kanzanextension.isDebug
 import com.kanzankazu.kanzanutil.kanzanextension.toObject
 import com.kanzankazu.kanzanutil.kanzanextension.toObjectList
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
@@ -154,7 +153,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 it.toObject(targetClass)?.let { t ->
                     BaseResponse.Success(t)
                 } ?: kotlin.run {
-                    BaseResponse.Error(if (isDebug()) "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse : Error Convert" else "Error Convert")
+                    BaseResponse.Error("Error Convert")
                 }
             })
         }

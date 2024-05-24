@@ -124,9 +124,10 @@ dependencies {
     api "com.google.android.play:core-ktx:1.8.1"
 
     /*Play_Service*/
-    api "com.google.android.gms:play-services-ads:19.4.0"
-    api "com.google.android.gms:play-services-auth:20.4.1"
-    api "com.google.android.gms:play-services-maps:17.0.0"
+    api "com.google.android.gms:play-services-ads:23.1.0"
+    api 'com.google.android.gms:play-services-ads-lite:23.1.0'
+    api "com.google.android.gms:play-services-auth:21.2.0"
+    api "com.google.android.gms:play-services-maps:18.2.0"
 
     /*Firebase*/
     //api "com.google.firebase:firebase-appcheck-safetynet:"
@@ -221,7 +222,7 @@ dependencies {
     api "id.zelory:compressor:2.1.0"
     api "io.fotoapparat:fotoapparat:2.7.0"
     api "it.xabaras.android:recyclerview-swipedecorator:1.2.3"
-    api "org.greenrobot:eventbus:3.1.1"
+    api "org.greenrobot:eventbus:3.3.1"
     api "org.jsoup:jsoup:1.11.2"
 
     /*compose*/

@@ -1,10 +1,8 @@
 package com.kanzankazu.kanzanbase
 
-import android.util.Log
 import com.kanzankazu.kanzannetwork.response.BaseApiResponse
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.BaseResponse
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.toError
-import com.kanzankazu.kanzanutil.kanzanextension.isDebug
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -32,10 +30,6 @@ abstract class BaseRepository {
                 return@withContext endpoint().handleResponse(listener)
             } catch (e: Exception) {
                 val toError = e.toError()
-                if (isDebug()) Log.d(
-                    "Lihat KanzanKazu",
-                    "handleFullResponse MoladinBaseRepository ${toError.message}"
-                )
                 toError
             }
         }
