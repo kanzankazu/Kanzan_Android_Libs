@@ -1,6 +1,5 @@
 package com.kanzankazu.kanzanwidget.compose
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -69,7 +68,7 @@ fun BottomBarWithFabDem() {
             )
         }
     ) {
-        SampleMainScreenNavigation(navController, it)
+        SampleMainScreenNavigation(navController)
     }
 }
 
@@ -138,7 +137,7 @@ fun BottomNav(navController: NavController, screens: List<Screen>) {
 }
 
 @Composable
-fun SampleMainScreenNavigation(navController: NavHostController, paddingValues: PaddingValues) {
+fun SampleMainScreenNavigation(navController: NavHostController) {
     NavHost(navController, startDestination = Screen.Profile.route) {
         composable(Screen.Profile.route) {
         }

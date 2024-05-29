@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.kanzankazu.kanzanwidget.multistateview
 
 import android.animation.Animator

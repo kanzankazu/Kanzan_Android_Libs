@@ -37,24 +37,24 @@ fun MaterialToolbar.setupToolbar(
 }
 
 fun Toolbar.setupToolbar(
-    _title: CharSequence,
-    _subtitle: CharSequence = "",
-    _isTitleCentered: Boolean = false,
-    _isSubtitleCentered: Boolean = false,
-    _titleColor: Int = R.color.baseBlack,
-    _subTitleColor: Int = R.color.baseBlack,
-    _navColor: Int = R.color.baseBlack,
-    _titleFontStyle: Int = R.style.TvStandart,
-    _SubTitleFontStyle: Int = R.style.TvStandart,
-    _listener: View.OnClickListener,
+    mTitle: CharSequence,
+    mSubtitle: CharSequence = "",
+    mIsTitleCentered: Boolean = false,
+    mIsSubtitleCentered: Boolean = false,
+    mTitleColor: Int = R.color.baseBlack,
+    mSubTitleColor: Int = R.color.baseBlack,
+    mNavColor: Int = R.color.baseBlack,
+    mTitleFontStyle: Int = R.style.TvStandart,
+    mSubTitleFontStyle: Int = R.style.TvStandart,
+    mListener: View.OnClickListener,
 ) {
-    title = _title
-    setTitleTextAppearance(this.context, _titleFontStyle)
-    setTitleTextColor(ContextCompat.getColor(this.context, _titleColor))
+    title = mTitle
+    setTitleTextAppearance(this.context, mTitleFontStyle)
+    setTitleTextColor(ContextCompat.getColor(this.context, mTitleColor))
 
-    subtitle = _subtitle
-    setSubtitleTextAppearance(this.context, _SubTitleFontStyle)
-    setSubtitleTextColor(ContextCompat.getColor(this.context, _subTitleColor))
+    subtitle = mSubtitle
+    setSubtitleTextAppearance(this.context, mSubTitleFontStyle)
+    setSubtitleTextColor(ContextCompat.getColor(this.context, mSubTitleColor))
 
-    setNavigationOnClickListener(_listener)
+    setNavigationOnClickListener(mListener)
 }

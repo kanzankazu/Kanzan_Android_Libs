@@ -95,14 +95,14 @@ internal class CameraActivity : BaseCameraActivityBindingView<ActivityCameraBind
         bind.ivTakePicture.isEnabled = true
         if (resultCode == Activity.RESULT_OK) {
 
-            if (requestCode == CameraConst.GALERY_ACTIVITY) {
+            if (requestCode == CameraConst.GALLERY_ACTIVITY) {
                 onPictureTaken(CameraFetchPath.getFilePathFromUri(this, data?.data!!))
             } else {
                 //onActivityResult(requestCode, resultCode, data)
                 val picturePath = data?.extras?.getString(CameraConst.PARAM_PICTURE)
                 onSubmitPicture(picturePath)
             }
-        } else if (resultCode == Activity.RESULT_CANCELED && mode == CameraConst.GALERY_ACTIVITY && requestCode == CameraConst.GALERY_ACTIVITY) {
+        } else if (resultCode == Activity.RESULT_CANCELED && mode == CameraConst.GALLERY_ACTIVITY && requestCode == CameraConst.GALLERY_ACTIVITY) {
             setResult(Activity.RESULT_CANCELED)
             finish()
         }
@@ -144,7 +144,7 @@ internal class CameraActivity : BaseCameraActivityBindingView<ActivityCameraBind
     override fun setData() {
         intent.extras?.let {
             mode = it.getInt(CameraConst.PARAM_CAMERA_MODE)
-            if (mode == CameraConst.GALERY_ACTIVITY) openGallery()
+            if (mode == CameraConst.GALLERY_ACTIVITY) openGallery()
             if (it.getBoolean(CameraConst.PARAM_CAMERA_SHOW_GUIDELINE, false)) showGuideline(mode)
         }
     }
@@ -214,7 +214,7 @@ internal class CameraActivity : BaseCameraActivityBindingView<ActivityCameraBind
         val getIntent = Intent(Intent.ACTION_PICK)
         getIntent.type = "image/*"
 
-        startActivityForResult(getIntent, CameraConst.GALERY_ACTIVITY)
+        startActivityForResult(getIntent, CameraConst.GALLERY_ACTIVITY)
     }
 
     private fun showPermissionDeniedAlert() {

@@ -1,4 +1,4 @@
-@file:Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+@file:Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "DEPRECATION")
 
 package com.kanzankazu.kanzanutil.kanzanextension.type
 
@@ -247,16 +247,16 @@ fun String.int() = when {
 
 fun String.removeLastChar() = substring(0, length - 1)
 
-fun getUniquePsuedoID(): String {
-    val mSzdevidshort = "35" + Build.BOARD.length % 10 + Build.BRAND.length % 10 + Build.CPU_ABI.length % 10 + Build.DEVICE.length % 10 + Build.MANUFACTURER.length % 10 + Build.MODEL.length % 10 + Build.PRODUCT.length % 10
+fun getUniquePseudoID(): String {
+    val mShortsighted = "35" + Build.BOARD.length % 10 + Build.BRAND.length % 10 + Build.CPU_ABI.length % 10 + Build.DEVICE.length % 10 + Build.MANUFACTURER.length % 10 + Build.MODEL.length % 10 + Build.PRODUCT.length % 10
     var serial: String
     try {
         serial = Build::class.java.getField("SERIAL")[null].toString()
-        return UUID(mSzdevidshort.hashCode().toLong(), serial.hashCode().toLong()).toString()
+        return UUID(mShortsighted.hashCode().toLong(), serial.hashCode().toLong()).toString()
     } catch (exception: java.lang.Exception) {
         serial = "serial" // some value
     }
-    return UUID(mSzdevidshort.hashCode().toLong(), serial.hashCode().toLong()).toString()
+    return UUID(mShortsighted.hashCode().toLong(), serial.hashCode().toLong()).toString()
 }
 
 fun convertToKm(km: String): String {

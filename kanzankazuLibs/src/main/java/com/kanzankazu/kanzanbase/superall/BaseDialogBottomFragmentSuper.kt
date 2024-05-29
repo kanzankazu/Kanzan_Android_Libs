@@ -7,11 +7,13 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.kanzankazu.R
 import com.kanzankazu.kanzanbase.BaseAdmob
+import com.kanzankazu.kanzanutil.kanzanextension.getLifeCycleOwner
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
 
@@ -37,6 +39,15 @@ abstract class BaseDialogBottomFragmentSuper : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
         if (isFullScreen()) setStyle(STYLE_NORMAL, R.style.BaseTheme_Fullscreen3)
         else if (isTransparent()) setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        requireActivity().onBackPressedDispatcher.addCallback(getLifeCycleOwner(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                (requireActivity() as? BaseActivitySuper)?.onBackPressedListener()
+            }
+        })
+        super.onViewCreated(view, savedInstanceState)
     }
 
     /*override fun getTheme(): Int {

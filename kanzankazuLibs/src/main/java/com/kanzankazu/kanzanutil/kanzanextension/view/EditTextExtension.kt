@@ -157,7 +157,7 @@ fun EditText.clickSearch(onClickNext: (String) -> Unit) {
 }
 
 fun EditText.clickIme(onEnter: (String) -> Unit) {
-    setOnEditorActionListener { _, actionId, _ ->
+    setOnEditorActionListener { _, _, _ ->
         onEnter(this.string())
         false
     }

@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.kanzankazu.kanzanwidget.recyclerview.genericadapter
 
 import android.view.LayoutInflater
@@ -15,7 +17,7 @@ class GenericAdapter<T : Equatable>(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), AutoUpdatable {
 
     private var items: List<Equatable> by Delegates.observable(emptyList()) { _, old, new ->
-        autoNotify(old, new) { old, new, _ -> old == new }
+        autoNotify(old, new) { old1, new1, _ -> old1 == new1 }
     }
 
     var onBind: View.(position: Int, item: T) -> Unit = { _, _ -> }
