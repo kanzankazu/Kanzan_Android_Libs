@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "DEPRECATION", "SameParameterValue", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "unused")
+@file:Suppress("MemberVisibilityCanBePrivate", "DEPRECATION", "SameParameterValue", "unused")
 
 package com.kanzankazu.kanzanutil
 

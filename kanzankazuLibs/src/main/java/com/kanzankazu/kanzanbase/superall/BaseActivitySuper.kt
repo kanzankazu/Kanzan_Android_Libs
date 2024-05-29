@@ -1,12 +1,15 @@
 package com.kanzankazu.kanzanbase.superall
 
 import android.content.Context
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
@@ -14,6 +17,7 @@ import com.kanzankazu.R
 import com.kanzankazu.kanzanbase.BaseAdmob
 import com.kanzankazu.kanzannetwork.NetworkLiveData
 import com.kanzankazu.kanzannetwork.NetworkStatus
+import com.kanzankazu.kanzanutil.kanzanextension.getLifeCycleOwner
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseInfoDialog
@@ -45,7 +49,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
     /**example MenuItem xxx = menu.findItem(R.id.xxx);*/
     open fun setOptionMenuValidation(menu: Menu) {}
 
-    open fun onBackPressedListener(): Boolean = false
+    open fun onBackPressedListener() {}
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (setOptionMenu() != -1) menuInflater.inflate(setOptionMenu(), menu)
@@ -63,10 +67,13 @@ abstract class BaseActivitySuper : AppCompatActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onBackPressed() {
-        if (!onBackPressedListener()) {
-            super.onBackPressed()
-        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        OnBackPressedDispatcher().addCallback(getLifeCycleOwner(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBackPressedListener()
+            }
+        })
     }
 
     fun toast(
