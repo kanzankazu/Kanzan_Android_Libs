@@ -12,6 +12,10 @@ object BaseConst {
     const val DATE_FORMAT_STD_TIME = "kk:mm:ss"
     const val DATE_FORMAT_DD = "dd"
 
+    const val TYPE_IMAGE_ALL = "image/*"
+    const val TYPE_IMAGE_PNG = "image/png"
+    const val TYPE_APPLICATION_PDF = "application/pdf"
+
     val REGEX_ALPHABETH_LO_UP = Regex("[a-zA-Z]+")
     val REGEX_ALPHABETH_LO = Regex("[a-z]+")
     val REGEX_ALPHABETH_UP = Regex("[A-Z]+")

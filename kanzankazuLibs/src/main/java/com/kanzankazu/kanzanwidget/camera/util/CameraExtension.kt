@@ -2,23 +2,19 @@
 
 package com.kanzankazu.kanzanwidget.camera.util
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.kanzankazu.R
-import com.kanzankazu.kanzanwidget.camera.ui.CameraActivity
+import com.kanzankazu.kanzanutil.BaseConst
 import com.kanzankazu.kanzanwidget.camera.ui.CameraModel
 import com.kanzankazu.kanzanwidget.camera.ui.CameraProperty
-import com.kanzankazu.kanzanwidget.camera.ui.MediaDialog
 import com.kanzankazu.kanzanwidget.camera.ui.MediaView
 import com.kanzankazu.kanzanwidget.camera.util.CameraFetchPath.getFilePathFromUri
 import id.zelory.compressor.Compressor
@@ -58,66 +54,10 @@ fun requestOptionStandardNoSaveCache(placeholder: Int = placeholderImage): Reque
     return requestOptions
 }
 
-fun Activity.takePicture(requestCode: Int, showGuideline: Boolean = true) {
-    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(
-            this, arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ), 2
-        )
-    } else {
-        val dialog = MediaDialog(this)
-        dialog.setOnCameraClicked { this.openCamera(requestCode, showGuideline) }
-        dialog.setOnGalleryClicked { this.openGallery(requestCode) }
-        //dialog.setOnGalleryClicked { this.openCamera(CameraConst.GALERY_ACTIVITY, showGuideline) }
-        dialog.show()
-    }
-}
-
-fun Fragment.takePicture(requestCode: Int, showGuideline: Boolean = true) {
-    if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(
-            requireActivity(), arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ), 2
-        )
-    } else {
-        val dialog = MediaDialog(requireActivity())
-        dialog.setOnCameraClicked { this.openCamera(requestCode, showGuideline) }
-        dialog.setOnGalleryClicked { this.openGallery(requestCode) }
-        dialog.show()
-    }
-}
-
-/**
- * @param requestCode default CameraConst.TAKE_PICTURE
- */
-fun Activity.openCamera(requestCode: Int = CameraConst.TAKE_FROM_CAMERA, showGuideline: Boolean = false) {
-    val bundle = Bundle()
-    bundle.putInt(CameraConst.PARAM_CAMERA_MODE, requestCode)
-    bundle.putBoolean(CameraConst.PARAM_CAMERA_SHOW_GUIDELINE, showGuideline)
-    changePageForResult<CameraActivity>(requestCode, bundle)
-}
-
-/**
- * @param requestCode default CameraConst.TAKE_PICTURE
- */
-fun Fragment.openCamera(requestCode: Int = CameraConst.TAKE_FROM_CAMERA, showGuideline: Boolean = false) {
-    //fun androidx.fragment.app.Fragment.openCamera(mode: Int, showGuideline: Boolean = false) {
-    val bundle = Bundle()
-    bundle.putInt(CameraConst.PARAM_CAMERA_MODE, requestCode)
-    bundle.putBoolean(CameraConst.PARAM_CAMERA_SHOW_GUIDELINE, showGuideline)
-    changePageForResult<CameraActivity>(requestCode, bundle)
-}
-
 fun Activity.openGallery(mode: Int) {
     if (this is MediaView) {
         val photoPickerIntent = Intent(Intent.ACTION_PICK)
-        photoPickerIntent.type = "image/*"
+        photoPickerIntent.type = BaseConst.TYPE_IMAGE_ALL
 
         val picture = CameraModel()
         picture.mode = mode
@@ -130,7 +70,7 @@ fun Activity.openGallery(mode: Int) {
 fun Fragment.openGallery(mode: Int) {
     if (this is MediaView) {
         val photoPickerIntent = Intent(Intent.ACTION_PICK)
-        photoPickerIntent.type = "image/*"
+        photoPickerIntent.type = BaseConst.TYPE_IMAGE_ALL
 
         val picture = CameraModel()
         picture.mode = mode
@@ -142,11 +82,11 @@ fun Fragment.openGallery(mode: Int) {
 
 /**
  * @param requestCode
- * @param arrayOfMimeType ("image/*", "application/pdf")
-*/*/
+ * @param arrayOfMimeType (BaseConst.TYPE_IMAGE_ALL, BaseConst.TYPE_APPLICATION_PDF)
+*/
 fun Activity.openGallery2(
     requestCode: Int = CameraConst.TAKE_FROM_GALLERY,
-    arrayOfMimeType: Array<String> = arrayOf("image/*", "application/pdf"),
+    arrayOfMimeType: Array<String> = arrayOf(BaseConst.TYPE_IMAGE_ALL, BaseConst.TYPE_APPLICATION_PDF),
     fragment: Fragment? = null,
 ) {
     val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -160,11 +100,11 @@ fun Activity.openGallery2(
 
 /**
  * @param requestCode
- * @param arrayOfMimeType ("image/*", "application/pdf")
-*/*/
+ * @param arrayOfMimeType (BaseConst.TYPE_IMAGE_ALL, BaseConst.TYPE_APPLICATION_PDF)
+*/
 fun Fragment.openGallery2(
     requestCode: Int = CameraConst.TAKE_FROM_GALLERY,
-    arrayOfMimeType: Array<String> = arrayOf("image/*", "application/pdf"),
+    arrayOfMimeType: Array<String> = arrayOf(BaseConst.TYPE_IMAGE_ALL, BaseConst.TYPE_APPLICATION_PDF),
 ) {
     requireActivity().openGallery2(requestCode, arrayOfMimeType, this)
 }
@@ -181,45 +121,49 @@ fun Context.onCameraActivityResult(
     val isFromCameraLocal: Boolean
     val pathFile = data?.data?.path
     if (requestCode == CameraConst.TAKE_FROM_GALLERY) {
-        imagePath = if (pathFile is String && pathFile.isNotEmpty()) {
-            isFromCameraLocal = false
-            val uri = data.data
-            val url = uri?.let { getFilePathFromUri(this, it) }
-            url?.let { onGetImage(it) }
-            url ?: ""
-        } else {
-            isFromCameraLocal = false
-            if (cameraProperty?.pictUrl.isNullOrEmpty()) {
-                ""
-            } else {
-                cameraProperty?.pictUrl?.let { onGetImage(it) }
-                ""
+        imagePath = when {
+            pathFile is String && pathFile.isNotEmpty() -> {
+                isFromCameraLocal = false
+                val uri = data.data
+                val url = uri?.let { getFilePathFromUri(this, it) }
+                url?.let { onGetImage(it) }
+                url ?: ""
+            }
+            else -> {
+                isFromCameraLocal = false
+                validationPicUrlIsEmpty(cameraProperty, onGetImage)
             }
         }
     } else {
         val path = data?.extras?.getString(CameraConst.PARAM_PICTURE)
-        imagePath = if (path is String && path.isNotEmpty()) {
-            isFromCameraLocal = true
-            onGetImage(path)
-            path
-        } else if (pathFile is String && pathFile.isNotEmpty()) {
-            isFromCameraLocal = false
-            val uri = data.data
-            val url = uri?.let { getFilePathFromUri(this, it) }
-            url?.let { onGetImage(it) }
-            url ?: ""
-        } else {
-            isFromCameraLocal = false
-            if (cameraProperty?.pictUrl.isNullOrEmpty()) {
-                ""
-            } else {
-                cameraProperty?.pictUrl?.let { onGetImage(it) }
-                ""
+        imagePath = when {
+            path is String && path.isNotEmpty() -> {
+                isFromCameraLocal = true
+                onGetImage(path)
+                path
+            }
+            pathFile is String && pathFile.isNotEmpty() -> {
+                isFromCameraLocal = false
+                val uri = data.data
+                val url = uri?.let { getFilePathFromUri(this, it) }
+                url?.let { onGetImage(it) }
+                url ?: ""
+            }
+            else -> {
+                isFromCameraLocal = false
+                validationPicUrlIsEmpty(cameraProperty, onGetImage)
             }
         }
     }
     onEndResult(isFromCameraLocal)
     return imagePath
+}
+
+private fun validationPicUrlIsEmpty(cameraProperty: CameraProperty?, onGetImage: (String) -> Unit) = if (cameraProperty?.pictUrl.isNullOrEmpty()) {
+    ""
+} else {
+    cameraProperty?.pictUrl?.let { onGetImage(it) }
+    ""
 }
 
 /**
