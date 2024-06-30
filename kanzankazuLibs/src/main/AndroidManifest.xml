@@ -22,7 +22,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
-        <activity android:name="com.kanzankazu.kanzanwidget.camera.ui.CameraActivity" />
         <activity android:name="com.kanzankazu.kanzanwidget.camera.ui.PicturePreviewActivity" />
 
         <provider
