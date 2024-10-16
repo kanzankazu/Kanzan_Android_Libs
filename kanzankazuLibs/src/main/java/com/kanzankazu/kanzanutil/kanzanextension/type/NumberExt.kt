@@ -49,3 +49,5 @@ fun Number?.toRupiahFormat(
 
     return if (!useCurrencySymbol) formattedValue.replace("Rp ", "") else formattedValue
 }
+
+fun Number.ifZero(listener: () -> Number) = if (this != 0) this else listener.invoke()

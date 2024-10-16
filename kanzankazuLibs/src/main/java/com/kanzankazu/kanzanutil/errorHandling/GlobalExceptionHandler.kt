@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.google.gson.Gson
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import kotlin.system.exitProcess
 
 /**
@@ -32,7 +32,7 @@ class GlobalExceptionHandler private constructor(
             launchActivity(applicationContext, activityToBeLaunched, p1)
             exitProcess(0)
         } catch (e: Exception) {
-            "Exception - $e".debugMessage()
+            "Exception - $e".debugMessageDebug()
             defaultHandler.uncaughtException(p0, p1)
         }
     }

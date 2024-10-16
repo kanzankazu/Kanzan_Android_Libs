@@ -11,7 +11,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.type.toIntOrDefault
 
 /**
@@ -40,7 +40,7 @@ class RemoteConfig(private var activity: Activity, onFirebaseRemoteConfig: (Fire
             remoteConfig.setDefaultsAsync(R.xml.remote_config_default)
             onFirebaseRemoteConfig(remoteConfig)
         } catch (e: Exception) {
-            e.message.toString().debugMessage()
+            e.message.toString().debugMessageDebug()
             e.printStackTrace()
         }
     }
@@ -64,15 +64,15 @@ class RemoteConfig(private var activity: Activity, onFirebaseRemoteConfig: (Fire
             }
         }
 
-        "RC VALIDATION : $deviceVerCode $minVer $currVer".debugMessage()
+        "RC VALIDATION : $deviceVerCode $minVer $currVer".debugMessageDebug()
         if (isMaintenance) {
             listenerUpdate.onMaintenance()
         } else if (deviceVerCode < minVer) {
-            "RC FORCE : $deviceVerCode < $minVer".debugMessage()
+            "RC FORCE : $deviceVerCode < $minVer".debugMessageDebug()
             listenerUpdate.onUpdateForce()
         } else if (deviceVerCode < currVer) {
             if (activity is T) {
-                "RC SUGGEST : $deviceVerCode < $currVer".debugMessage()
+                "RC SUGGEST : $deviceVerCode < $currVer".debugMessageDebug()
                 listenerUpdate.onUpdateSuggest()
             } else listenerUpdate.onNoUpdate("")
         } else listenerUpdate.onNoUpdate("")

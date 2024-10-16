@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 
@@ -23,6 +24,10 @@ fun FragmentActivity.addFragment(fragment: Fragment, targetViewId: Int, tag: Str
 
 fun Fragment.addFragment(fragment: Fragment, targetViewId: Int, tags: String?, isAddToBackStack: Boolean = false) =
     childFragmentManager.addFragment(fragment, targetViewId, tags, isAddToBackStack)
+
+fun FragmentContainerView.addFragment(fragmentManager: FragmentManager, fragment: Fragment, tag: String?, isAddToBackStack: Boolean = false) {
+    fragmentManager.addFragment(fragment, this.id, tag, isAddToBackStack)
+}
 
 /**Replace Fragment*/
 fun FragmentTransaction.replaceFragment(fragment: Fragment, targetViewId: Int, tag: String?, isAddToBackStack: Boolean = false) {

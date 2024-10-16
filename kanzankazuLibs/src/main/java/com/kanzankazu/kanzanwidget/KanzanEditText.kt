@@ -176,6 +176,23 @@ class KanzanEditText @JvmOverloads constructor(context: Context, attrs: Attribut
         set()
     }
 
+    private fun initView() {
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        inflater.inflate(R.layout.component_kanzan_edit_text_2, this).apply {
+            tvComponentKanzanEditText2Title = findViewById(R.id.tv_component_kanzan_edit_text_2_title)
+            tvComponentKanzanEditText2Prefix = findViewById(R.id.tv_component_kanzan_edit_text_2_prefix)
+            tilComponentKanzanEditText2 = findViewById(R.id.til_component_kanzan_edit_text_2)
+            etComponentKanzanEditText2 = findViewById(R.id.et_component_kanzan_edit_text_2)
+            ivComponentKanzanEditText2Clear = findViewById(R.id.iv_component_kanzan_edit_text_2_clear)
+            ivComponentKanzanEditText2Right = findViewById(R.id.iv_component_kanzan_edit_text_2_right)
+            ivComponentKanzanEditText2Success = findViewById(R.id.iv_component_kanzan_edit_text_2_success)
+            pbComponentKanzanEditText2 = findViewById(R.id.pb_component_kanzan_edit_text_2)
+            tvComponentKanzanEditText2Error = findViewById(R.id.tv_component_kanzan_edit_text_2_error)
+            tvComponentKanzanEditText2Success = findViewById(R.id.tv_component_kanzan_edit_text_2_success)
+            layComponentKanzanEditText2Support = findViewById(R.id.lay_component_kanzan_edit_text_2_support)
+        }
+    }
+
     private fun extractAttributes(attributes: AttributeSet) {
         val typedArray = context.obtainStyledAttributes(attributes, R.styleable.KanzanEditText, 0, 0)
         try {
@@ -194,23 +211,6 @@ class KanzanEditText @JvmOverloads constructor(context: Context, attrs: Attribut
             digits = typedArray.getString(R.styleable.KanzanEditText_digits) ?: digits
         } finally {
             typedArray.recycle()
-        }
-    }
-
-    private fun initView() {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(R.layout.component_kanzan_edit_text_2, this).apply {
-            tvComponentKanzanEditText2Title = findViewById(R.id.tv_component_kanzan_edit_text_2_title)
-            tvComponentKanzanEditText2Prefix = findViewById(R.id.tv_component_kanzan_edit_text_2_prefix)
-            tilComponentKanzanEditText2 = findViewById(R.id.til_component_kanzan_edit_text_2)
-            etComponentKanzanEditText2 = findViewById(R.id.et_component_kanzan_edit_text_2)
-            ivComponentKanzanEditText2Clear = findViewById(R.id.iv_component_kanzan_edit_text_2_clear)
-            ivComponentKanzanEditText2Right = findViewById(R.id.iv_component_kanzan_edit_text_2_right)
-            ivComponentKanzanEditText2Success = findViewById(R.id.iv_component_kanzan_edit_text_2_success)
-            pbComponentKanzanEditText2 = findViewById(R.id.pb_component_kanzan_edit_text_2)
-            tvComponentKanzanEditText2Error = findViewById(R.id.tv_component_kanzan_edit_text_2_error)
-            tvComponentKanzanEditText2Success = findViewById(R.id.tv_component_kanzan_edit_text_2_success)
-            layComponentKanzanEditText2Support = findViewById(R.id.lay_component_kanzan_edit_text_2_support)
         }
     }
 

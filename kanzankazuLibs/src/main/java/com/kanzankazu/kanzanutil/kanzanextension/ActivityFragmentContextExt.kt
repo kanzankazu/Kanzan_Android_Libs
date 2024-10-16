@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -79,7 +79,7 @@ fun hasStableInternetConnection(): Single<Boolean> {
 
             true
         } catch (e: IOException) {
-            "hasStableInternetConnection ${e.message}".debugMessage()
+            "hasStableInternetConnection ${e.message}".debugMessageDebug()
             false
         }
     }

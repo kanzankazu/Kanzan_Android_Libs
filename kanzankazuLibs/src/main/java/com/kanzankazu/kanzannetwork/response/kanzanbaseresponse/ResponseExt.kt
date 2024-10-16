@@ -9,6 +9,18 @@ fun initBaseResponseEmpty() = BaseResponse.Empty
 fun <T> T.toBaseResponseSuccess() = BaseResponse.Success(this)
 fun String.toBaseResponseError(errorMessage: String = "") = BaseResponse.Error(errorMessage.ifEmpty { this })
 
+fun <T> BaseResponse<T>.onLoading(listener: (Boolean) -> Unit): BaseResponse<T> {
+    if (this is BaseResponse.Loading) listener.invoke(true)
+    else listener.invoke(false)
+    return this
+}
+
+fun <T> BaseResponse<T>.onEmpty(listener: (Boolean) -> Unit): BaseResponse<T> {
+    if (this is BaseResponse.Empty) listener.invoke(true)
+    else listener.invoke(false)
+    return this
+}
+
 fun <T> BaseResponse<T>.onSuccess(listener: (T) -> Unit): BaseResponse<T> {
     if (this is BaseResponse.Success) listener.invoke(this.data)
     return this

@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 class TextViewNoPadding : AppCompatTextView {
     private var mAdditionalPadding = 0
@@ -58,7 +58,7 @@ class TextViewNoPadding : AppCompatTextView {
         val measuredHeight = textView.measuredHeight
         if (measuredHeight - textSize > 0) {
             mAdditionalPadding = (measuredHeight - textSize).toInt()
-            "onMeasure: height=$measuredHeight textSize=$textSize mAdditionalPadding=$mAdditionalPadding".debugMessage()
+            "onMeasure: height=$measuredHeight textSize=$textSize mAdditionalPadding=$mAdditionalPadding".debugMessageDebug()
         }
         return mAdditionalPadding
     }

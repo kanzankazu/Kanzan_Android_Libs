@@ -18,7 +18,7 @@ import com.kanzankazu.kanzanbase.BaseAdmob
 import com.kanzankazu.kanzannetwork.NetworkLiveData
 import com.kanzankazu.kanzannetwork.NetworkStatus
 import com.kanzankazu.kanzanutil.kanzanextension.getLifeCycleOwner
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseInfoDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
@@ -81,7 +81,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
         duration: Int = Toast.LENGTH_LONG,
     ) {
         if (message.isNotEmpty()) Toast.makeText(this, message, duration).show()
-        else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessage()
+        else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessageDebug()
     }
 
     fun snackBar(
@@ -98,7 +98,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
                 snackbar.setAction(actionText, actionListener)
             }
             snackbar.show()
-        } else "showSnackbar BaseActivity message.isNullOrEmpty()".debugMessage()
+        } else "showSnackbar BaseActivity message.isNullOrEmpty()".debugMessageDebug()
     }
 
     fun snackBarNoConnection(

@@ -14,18 +14,19 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.kanzankazu.kanzanutil.kanzanextension.isNull
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import com.kanzankazu.kanzanutil.kanzanextension.view.visible
 
 /**
  * Created by Faisal Bahri on 2020-02-11.
  */
 class BaseAdmob(private val activity: Activity) {
-    var isCloseApps = false
-    var isRewardVideoComplete = false
-    var idInterstitialAd: String = ""
-    var idAdsRewardVideo: String = ""
+    private var reSetupRewardVideoLegacyApi = 0
+
+    private var idAdsRewardVideo = ""
+    private var isRewardVideoComplete = false
+
     var mInterstitialAd: InterstitialAd? = null
     var mRewardedAd: RewardedAd? = null
 
@@ -42,98 +43,106 @@ class BaseAdmob(private val activity: Activity) {
         }
     }
 
-    fun setupInterstitialAds(idInterstitialAd: String): InterstitialAd? {
-        this.idInterstitialAd = idInterstitialAd
-        MobileAds.initialize(activity)
-
+    fun setupInterstitialAds(idInterstitialAd: String) {
         val adRequest = AdRequest.Builder().build()
 
-        InterstitialAd.load(activity, this.idInterstitialAd, adRequest, object : InterstitialAdLoadCallback() {
-            override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                mInterstitialAd = interstitialAd
-            }
+        InterstitialAd.load(
+            /* context = */ activity,
+            /* adUnitId = */ idInterstitialAd,
+            /* adRequest = */ adRequest,
+            /* loadCallback = */ object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                    interstitialAd.debugMessageDebug("BaseAdmob - onAdLoaded - setupInterstitialAds")
+                }
 
-            override fun onAdFailedToLoad(adError: LoadAdError) {
-                "onAdFailedToLoad BaseAdmob $adError".debugMessage()
-                mInterstitialAd = null
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    "BaseAdmob - onAdFailedToLoad - setupInterstitialAds - $adError".debugMessageDebug()
+                    mInterstitialAd = null
+                }
             }
-        })
-
-        return mInterstitialAd
+        )
     }
 
     fun showInterstitialAds(mInterstitialAd: InterstitialAd?) {
         if (mInterstitialAd != null) {
             mInterstitialAd.show(activity)
-            setupInterstitialAds(mInterstitialAd.adUnitId)
-        } else "showInterstitialAds BaseAdmob The interstitial wasn't loaded yet.".debugMessage()
+            setupInterstitialAds(
+                idInterstitialAd = mInterstitialAd.adUnitId
+            )
+        } else {
+            "showInterstitialAds BaseAdmob The interstitial wasn't loaded yet.".debugMessageDebug()
+        }
     }
 
-    fun setupRewardVideoLegacyApi(idAdsRewardVideo: String): RewardedAd? {
+    fun setupRewardVideoLegacyApi(idAdsRewardVideo: String, listener: (isReadyToLoad: Boolean) -> Unit = {}): RewardedAd? {
         this.idAdsRewardVideo = idAdsRewardVideo
-        MobileAds.initialize(activity)
 
-        loadRewardedVideoAds()
+        if (idAdsRewardVideo.isNotEmpty()) {
+            RewardedAd.load(
+                /* context = */ activity,
+                /* adUnitId = */ idAdsRewardVideo,
+                /* adRequest = */ AdRequest.Builder().build(),
+                /* loadCallback = */ object : RewardedAdLoadCallback() {
+                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                        loadAdError.debugMessageDebug("BaseAdmob - onAdFailedToLoad - setupRewardVideoLegacyApi")
+                        mRewardedAd = null
+                        listener.invoke(false)
+                    }
 
-        mRewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdClicked() {
-                // Called when a click is recorded for an ad.
-                "BaseAdmob - onAdClicked".debugMessage()
-            }
+                    override fun onAdLoaded(rewardedAd: RewardedAd) {
+                        rewardedAd.debugMessageDebug("BaseAdmob - onAdLoaded - setupRewardVideoLegacyApi")
+                        mRewardedAd = rewardedAd
+                        mRewardedAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+                            override fun onAdClicked() {
+                                "BaseAdmob - onAdClicked".debugMessageDebug()
+                            }
 
-            override fun onAdDismissedFullScreenContent() {
-                // Called when ad is dismissed.
-                // Set the ad reference to null so you don't show the ad a second time.
-                "BaseAdmob - onAdDismissedFullScreenContent".debugMessage()
-                mRewardedAd = null
-            }
+                            override fun onAdDismissedFullScreenContent() {
+                                "BaseAdmob - onAdDismissedFullScreenContent".debugMessageDebug()
+                                mRewardedAd = null
+                            }
 
-            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                // Called when ad fails to show.
-                "BaseAdmob - onAdFailedToShowFullScreenContent".debugMessage()
-                mRewardedAd = null
-            }
+                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                "BaseAdmob - onAdFailedToShowFullScreenContent".debugMessageDebug()
+                                mRewardedAd = null
+                            }
 
-            override fun onAdImpression() {
-                // Called when an impression is recorded for an ad.
-                "BaseAdmob - onAdImpression".debugMessage()
-            }
+                            override fun onAdImpression() {
+                                "BaseAdmob - onAdImpression".debugMessageDebug()
+                            }
 
-            override fun onAdShowedFullScreenContent() {
-                // Called when ad is shown.
-                "BaseAdmob - onAdShowedFullScreenContent".debugMessage()
-            }
+                            override fun onAdShowedFullScreenContent() {
+                                "BaseAdmob - onAdShowedFullScreenContent".debugMessageDebug()
+                            }
+                        }
+                        listener.invoke(true)
+                    }
+                }
+            )
+        } else {
+            "setupRewardVideoLegacyApi BaseAdmob not yet setupRewardVideoLegacyApi".debugMessageError("BaseAdmob - setupRewardVideoLegacyApi")
         }
-
         return mRewardedAd
     }
 
-    fun loadRewardedVideoAds() {
-        if (idAdsRewardVideo.isNotEmpty()) {
-            RewardedAd.load(activity, this.idAdsRewardVideo, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
-                override fun onAdLoaded(p0: RewardedAd) {
-                    mRewardedAd = p0
-                }
-
-                override fun onAdFailedToLoad(p0: LoadAdError) {
-                    "onAdFailedToLoad BaseAdmob $p0".debugMessage()
-                    mRewardedAd = null
-                }
-            })
-        } else "loadRewardedVideoAds BaseAdmob not yet setupRewardVideoLegacyApi".debugMessage()
-    }
-
-    fun showRewardedVideoAds(isCloseApp: Boolean?) {
-        if (!mRewardedAd.isNull()) {
-            isCloseApps = isCloseApp!!
-            mRewardedAd?.show(activity) {
+    fun     showRewardedVideoAds(isFinishClose: Boolean, onRetryShow: (Int) -> Unit = {}) {
+        mRewardedAd?.let { rewardedAd ->
+            rewardedAd.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardedAd")
+            rewardedAd.show(activity) { rewardItem ->
+                rewardItem.type.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardItem")
+                rewardItem.amount.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardItem")
+                rewardItem.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardItem")
                 isRewardVideoComplete = true
-                if (isCloseApps) {
-                    activity.finish()
-                }
+                if (isFinishClose) activity.finish()
             }
-        } else {
-            "showRewardedVideoAds BaseAdmob The reward video wasn't loaded yet.".debugMessage()
+        } ?: run {
+            "showRewardedVideoAds BaseAdmob The reward video wasn't loaded yet.".debugMessageError("BaseAdmob - showRewardedVideoAds")
+            if (idAdsRewardVideo.isNotEmpty() && reSetupRewardVideoLegacyApi <= 3) {
+                reSetupRewardVideoLegacyApi++
+                onRetryShow.invoke(reSetupRewardVideoLegacyApi)
+                setupRewardVideoLegacyApi(idAdsRewardVideo = idAdsRewardVideo)
+            }
         }
     }
 }

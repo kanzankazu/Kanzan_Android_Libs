@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.Window
 import com.kanzankazu.R
 import com.kanzankazu.databinding.LayoutAlertDialogBinding
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.view.setOnSingleClickListener
 import com.kanzankazu.kanzanutil.kanzanextension.view.visibleView
 
@@ -20,9 +20,9 @@ class BaseAlertDialog {
         message: String,
         rightActionLabel: String = mActivity.getString(R.string.label_ok),
     ) {
-        "BaseAlertDialog - showDialog".debugMessage()
-        "$message BaseAlertDialog - showDialog".debugMessage()
-        "$rightActionLabel BaseAlertDialog - showDialog".debugMessage()
+        "BaseAlertDialog - showDialog".debugMessageDebug()
+        "$message BaseAlertDialog - showDialog".debugMessageDebug()
+        "$rightActionLabel BaseAlertDialog - showDialog".debugMessageDebug()
         try {
             if (!mActivity.isFinishing) {
                 mDialog = Dialog(mActivity)

@@ -10,7 +10,7 @@ import android.view.Window
 import androidx.core.content.ContextCompat
 import com.kanzankazu.R
 import com.kanzankazu.databinding.LayoutProgressDialogBinding
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 class BaseProgressDialog {
     private var color: Int = -1
@@ -18,7 +18,7 @@ class BaseProgressDialog {
 
     /**@param color example(R.color.baseBlack)*/
     fun showDialog(context: Context, color: Int = R.color.baseBlack, message: String = "") {
-        "BaseProgressDialog - showDialog".debugMessage()
+        "BaseProgressDialog - showDialog".debugMessageDebug()
         if (!isShowingDialog()) {
             this.color = color
             try {

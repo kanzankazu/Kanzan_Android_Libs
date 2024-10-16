@@ -6,7 +6,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 fun ViewPager2.setViewPager(
     fragmentStateAdapter: FragmentStateAdapter,
@@ -32,18 +32,18 @@ fun ViewPager2.listenerWithBottomNavView(bottomNavigationView: BottomNavigationV
     this.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            "onPageScrolled,$position,$positionOffset,$positionOffsetPixels".debugMessage()
+            "onPageScrolled,$position,$positionOffset,$positionOffsetPixels".debugMessageDebug()
         }
 
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            "onPageSelected,$position".debugMessage()
+            "onPageSelected,$position".debugMessageDebug()
             bottomNavigationView.selectedItemId = arrayOfMenuId[position]
         }
 
         override fun onPageScrollStateChanged(state: Int) {
             super.onPageScrollStateChanged(state)
-            "onPageScrollStateChanged,$state".debugMessage()
+            "onPageScrollStateChanged,$state".debugMessageDebug()
         }
     })
 }
@@ -51,16 +51,16 @@ fun ViewPager2.listenerWithBottomNavView(bottomNavigationView: BottomNavigationV
 fun ViewPager.listenerWithBottomNavView(bottomNavigationView: BottomNavigationView, arrayOfMenuId: ArrayList<Int>) {
     this.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            "onPageScrolled,$position,$positionOffset,$positionOffsetPixels".debugMessage()
+            "onPageScrolled,$position,$positionOffset,$positionOffsetPixels".debugMessageDebug()
         }
 
         override fun onPageSelected(position: Int) {
-            "onPageSelected,$position".debugMessage()
+            "onPageSelected,$position".debugMessageDebug()
             bottomNavigationView.selectedItemId = arrayOfMenuId[position]
         }
 
         override fun onPageScrollStateChanged(state: Int) {
-            "onPageScrollStateChanged,$state".debugMessage()
+            "onPageScrollStateChanged,$state".debugMessageDebug()
         }
     })
 }

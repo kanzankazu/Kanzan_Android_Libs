@@ -21,9 +21,11 @@ import androidx.fragment.app.Fragment
 import java.io.File
 import java.io.FileOutputStream
 
-fun Intent.addClearTaskNewTask(): Intent {
-    return addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-}
+fun Intent.addActionView() = apply { action = Intent.ACTION_VIEW }
+
+fun Intent.addClearTaskNewTask() = addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+
+fun Intent.addFlagClearSingleTop() = addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
 fun Intent.changePageFromIntent(activity: ComponentActivity, bundle: Bundle? = null, finish: Boolean = false) {
     if (bundle != null) putExtras(bundle)
@@ -31,11 +33,7 @@ fun Intent.changePageFromIntent(activity: ComponentActivity, bundle: Bundle? = n
     if (finish) activity.finish()
 }
 
-fun Intent.changePageFromIntent(
-    fragment: Fragment,
-    bundle: Bundle? = null,
-    finish: Boolean = false,
-) {
+fun Intent.changePageFromIntent(fragment: Fragment, bundle: Bundle? = null, finish: Boolean = false) {
     fragment.activity?.let {
         if (bundle != null) putExtras(bundle)
         it.startActivity(this)
@@ -60,24 +58,14 @@ fun Intent?.isTypeImage() =
 
 inline fun <reified T> Context.makeIntent() = Intent(this, T::class.java)
 
-inline fun <reified T> Activity.changePage(
-    bundle: Bundle? = null,
-    finish: Boolean = false,
-    intent: Intent? = null,
-    optionBundle: Bundle? = null,
-) {
+inline fun <reified T> Activity.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null) {
     val newIntent = intent ?: Intent(this, T::class.java)
     if (bundle != null) newIntent.putExtras(bundle)
     startActivity(newIntent, optionBundle)
     if (finish) finish()
 }
 
-inline fun <reified T> Fragment.changePage(
-    bundle: Bundle? = null,
-    finish: Boolean = false,
-    intent: Intent? = null,
-    optionBundle: Bundle? = null,
-) {
+inline fun <reified T> Fragment.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null) {
     val newIntent = intent ?: Intent(activity, T::class.java)
     if (bundle != null) newIntent.putExtras(bundle)
     startActivity(newIntent, optionBundle)

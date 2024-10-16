@@ -47,10 +47,10 @@ fun Context.phoneHandler(phone: String) {
 }
 
 fun Context.clipboardCopy(textToCopy: CharSequence) {
+    simpleToast("$textToCopy copied")
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("RANDOM UUID", textToCopy)
     clipboard.setPrimaryClip(clip)
-    simpleToast("copied")
 }
 
 fun Context.clipboardPaste(paste: (String) -> Unit) {
