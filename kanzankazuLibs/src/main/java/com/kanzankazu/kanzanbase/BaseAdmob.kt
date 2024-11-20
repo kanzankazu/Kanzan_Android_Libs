@@ -22,13 +22,14 @@ import com.kanzankazu.kanzanutil.kanzanextension.view.visible
  * Created by Faisal Bahri on 2020-02-11.
  */
 class BaseAdmob(private val activity: Activity) {
-    private var reSetupRewardVideoLegacyApi = 0
-
-    private var idAdsRewardVideo = ""
-    private var isRewardVideoComplete = false
-
     var mInterstitialAd: InterstitialAd? = null
     var mRewardedAd: RewardedAd? = null
+
+    private var idRewardAd = ""
+
+    var onRewardAdLoading: (isLoading: Boolean) -> Unit = {}
+    var onRewardAdReady: (isReady: Boolean) -> Unit = {}
+    var onRewardAdFinish: () -> Unit = {}
 
     fun setupBannerAds(adView: AdView) {
         MobileAds.initialize(activity)
@@ -75,8 +76,9 @@ class BaseAdmob(private val activity: Activity) {
         }
     }
 
-    fun setupRewardVideoLegacyApi(idAdsRewardVideo: String, listener: (isReadyToLoad: Boolean) -> Unit = {}): RewardedAd? {
-        this.idAdsRewardVideo = idAdsRewardVideo
+    fun setupRewardAd(idAdsRewardVideo: String): RewardedAd? {
+        onRewardAdLoading.invoke(true)
+        this.idRewardAd = idAdsRewardVideo
 
         if (idAdsRewardVideo.isNotEmpty()) {
             RewardedAd.load(
@@ -85,63 +87,66 @@ class BaseAdmob(private val activity: Activity) {
                 /* adRequest = */ AdRequest.Builder().build(),
                 /* loadCallback = */ object : RewardedAdLoadCallback() {
                     override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                        loadAdError.debugMessageDebug("BaseAdmob - onAdFailedToLoad - setupRewardVideoLegacyApi")
+                        loadAdError.debugMessageDebug("BaseAdmob - setupRewardVideoLegacyApi - onAdFailedToLoad")
+                        onRewardAdLoading.invoke(false)
                         mRewardedAd = null
-                        listener.invoke(false)
+                        onRewardAdReady.invoke(false)
                     }
 
                     override fun onAdLoaded(rewardedAd: RewardedAd) {
-                        rewardedAd.debugMessageDebug("BaseAdmob - onAdLoaded - setupRewardVideoLegacyApi")
+                        rewardedAd.debugMessageDebug("BaseAdmob - setupRewardVideoLegacyApi - onAdLoaded")
+                        onRewardAdLoading.invoke(false)
                         mRewardedAd = rewardedAd
                         mRewardedAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
-                            override fun onAdClicked() {
-                                "BaseAdmob - onAdClicked".debugMessageDebug()
-                            }
-
-                            override fun onAdDismissedFullScreenContent() {
-                                "BaseAdmob - onAdDismissedFullScreenContent".debugMessageDebug()
-                                mRewardedAd = null
-                            }
-
                             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                                "BaseAdmob - onAdFailedToShowFullScreenContent".debugMessageDebug()
+                                "BaseAdmob - setupRewardVideoLegacyApi - onAdFailedToShowFullScreenContent".debugMessageDebug()
                                 mRewardedAd = null
-                            }
-
-                            override fun onAdImpression() {
-                                "BaseAdmob - onAdImpression".debugMessageDebug()
+                                onRewardAdReady.invoke(false)
                             }
 
                             override fun onAdShowedFullScreenContent() {
-                                "BaseAdmob - onAdShowedFullScreenContent".debugMessageDebug()
+                                "BaseAdmob - setupRewardVideoLegacyApi - onAdShowedFullScreenContent".debugMessageDebug()
+                            }
+
+                            override fun onAdClicked() {
+                                "BaseAdmob - setupRewardVideoLegacyApi - onAdClicked".debugMessageDebug()
+                            }
+
+                            override fun onAdImpression() {
+                                "BaseAdmob - setupRewardVideoLegacyApi - onAdImpression".debugMessageDebug()
+                            }
+
+                            override fun onAdDismissedFullScreenContent() {
+                                "BaseAdmob - setupRewardVideoLegacyApi - onAdDismissedFullScreenContent".debugMessageDebug()
+                                mRewardedAd = null
+                                onRewardAdReady.invoke(false)
+                                onRewardAdFinish.invoke()
                             }
                         }
-                        listener.invoke(true)
+                        onRewardAdReady.invoke(true)
                     }
                 }
             )
         } else {
             "setupRewardVideoLegacyApi BaseAdmob not yet setupRewardVideoLegacyApi".debugMessageError("BaseAdmob - setupRewardVideoLegacyApi")
+            onRewardAdLoading.invoke(false)
         }
         return mRewardedAd
     }
 
-    fun     showRewardedVideoAds(isFinishClose: Boolean, onRetryShow: (Int) -> Unit = {}) {
+    fun showRewardAd(isFinishClose: Boolean, onRetryShowRewardAd: () -> Unit = {}) {
         mRewardedAd?.let { rewardedAd ->
             rewardedAd.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardedAd")
             rewardedAd.show(activity) { rewardItem ->
                 rewardItem.type.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardItem")
                 rewardItem.amount.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardItem")
-                rewardItem.debugMessageDebug("BaseAdmob - showRewardedVideoAds - rewardItem")
-                isRewardVideoComplete = true
                 if (isFinishClose) activity.finish()
             }
         } ?: run {
             "showRewardedVideoAds BaseAdmob The reward video wasn't loaded yet.".debugMessageError("BaseAdmob - showRewardedVideoAds")
-            if (idAdsRewardVideo.isNotEmpty() && reSetupRewardVideoLegacyApi <= 3) {
-                reSetupRewardVideoLegacyApi++
-                onRetryShow.invoke(reSetupRewardVideoLegacyApi)
-                setupRewardVideoLegacyApi(idAdsRewardVideo = idAdsRewardVideo)
+            if (idRewardAd.isNotEmpty()) {
+                onRetryShowRewardAd.invoke()
+                setupRewardAd(idAdsRewardVideo = idRewardAd)
             }
         }
     }
