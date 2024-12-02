@@ -7,14 +7,14 @@ import android.os.Build
 import android.text.Spanned
 import android.util.Log
 import androidx.core.text.HtmlCompat
-import com.amulyakhare.textdrawable.TextDrawable
-import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.kanzankazu.kanzanutil.BaseConst
-import com.kanzankazu.kanzanutil.kanzanextension.isDebug
+import com.kanzankazu.kanzanutil.kanzanextension.isDebugPublic
 import com.kanzankazu.kanzanutil.kanzanextension.toDateFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toDigits
 import com.kanzankazu.kanzanutil.kanzanextension.toRupiahFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toStringFormat
+import com.kanzankazu.kanzanwidget.textdrawable.ColorGenerator
+import com.kanzankazu.kanzanwidget.textdrawable.TextDrawable
 import org.json.JSONObject
 import java.math.BigInteger
 import java.text.NumberFormat
@@ -33,7 +33,7 @@ enum class DebugType {
 @SuppressLint("LogNotTimber")
 fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
     if (log != null) {
-        if (isDebug()) {
+        if (isDebugPublic()) {
             val maxLogSize = 4000
             repeat(log.toString().chunked(maxLogSize).size) { i ->
                 when (debugType) {

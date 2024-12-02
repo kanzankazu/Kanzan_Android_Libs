@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.kanzankazu.kanzanutil.kanzanextension
 
 import androidx.fragment.app.Fragment
@@ -177,7 +179,7 @@ fun <R> List<MutableLiveData<*>>.toMediator(isWithDistinct: Boolean = true, onCh
 }
 
 fun List<MutableLiveData<*>>.debugMessageLivedata() {
-    if (isDebug()) {
+    if (isDebugPublic()) {
         "==========START==========".debugMessageDebug()
         forEachIndexed { index, mutableLiveData ->
             "index $index, ${mutableLiveData::class.simpleName} = ${mutableLiveData.value}".debugMessageDebug()
