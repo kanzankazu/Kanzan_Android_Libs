@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.kanzankazu.kanzanbase.BaseAdmob
@@ -32,6 +33,8 @@ abstract class BaseFragmentSuper : Fragment() {
     protected abstract fun setContent()
     protected open fun setListener() {}
     protected open fun getData() {}
+
+    open fun onBackPressedListener() {}
 
     protected open fun onRestart() {}
 

@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
+import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
@@ -23,6 +24,7 @@ import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseInfoDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
 
+
 /**
  * Created by Faisal Bahri on 2020-02-11.
  */
@@ -31,6 +33,8 @@ abstract class BaseActivitySuper : AppCompatActivity() {
     val baseAlertDialog by lazy { BaseAlertDialog() }
     val baseAdmob by lazy { BaseAdmob(this) }
     val networkLiveData by lazy { NetworkLiveData(this) }
+
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
     protected open fun setActivityResult() {}
     protected open fun setSubscribeToLiveData() {}
@@ -51,6 +55,11 @@ abstract class BaseActivitySuper : AppCompatActivity() {
 
     open fun onBackPressedListener() {}
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        onBackPressedListener()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (setOptionMenu() != -1) menuInflater.inflate(setOptionMenu(), menu)
         return super.onCreateOptionsMenu(menu)
@@ -69,11 +78,6 @@ abstract class BaseActivitySuper : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        OnBackPressedDispatcher().addCallback(getLifeCycleOwner(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                onBackPressedListener()
-            }
-        })
     }
 
     fun toast(

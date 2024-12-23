@@ -1,4 +1,4 @@
-package com.kanzankazu.kanzanwidget.compose
+package com.kanzankazu.kanzanwidget.compose.widget
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api

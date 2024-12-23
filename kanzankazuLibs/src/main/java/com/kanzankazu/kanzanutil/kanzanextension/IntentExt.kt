@@ -10,14 +10,28 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
 import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.kanzankazu.kanzanutil.image.FileManager
+import com.kanzankazu.kanzanutil.image.ImageCompressor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -205,3 +219,34 @@ fun Context.handleSendMultipleImages(intent: Intent) =
         }
         files
     } ?: arrayListOf()
+
+fun AppCompatActivity.intentPickVisualMediaInit(): ActivityResultLauncher<PickVisualMediaRequest> {
+    val imageCompressor =   ImageCompressor(context = applicationContext)
+    val fileManager =   FileManager(context = applicationContext)
+
+    val scope = CoroutineScope(this.lifecycleScope.coroutineContext)
+
+    return registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { contentUri ->
+        if (contentUri == null) return@registerForActivityResult
+
+        val mimeType = contentResolver.getType(contentUri)
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+        scope.launch {
+            fileManager.saveImage(
+                contentUri = contentUri,
+                fileName = "uncompressed.$extension"
+            )
+        }
+
+        scope.launch {
+            val compressedImage = imageCompressor.compressImage(
+                contentUri = contentUri,
+                compressionThreshold = 200 * 1024L
+            )
+            fileManager.saveImage(
+                bytes = compressedImage ?: return@launch,
+                fileName = "compressed.$extension"
+            )
+        }
+    }
+}
