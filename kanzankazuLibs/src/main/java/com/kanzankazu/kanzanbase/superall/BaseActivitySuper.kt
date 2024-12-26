@@ -9,8 +9,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
@@ -18,7 +16,7 @@ import com.kanzankazu.R
 import com.kanzankazu.kanzanbase.BaseAdmob
 import com.kanzankazu.kanzannetwork.NetworkLiveData
 import com.kanzankazu.kanzannetwork.NetworkStatus
-import com.kanzankazu.kanzanutil.kanzanextension.getLifeCycleOwner
+import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseInfoDialog
@@ -53,11 +51,8 @@ abstract class BaseActivitySuper : AppCompatActivity() {
     /**example MenuItem xxx = menu.findItem(R.id.xxx);*/
     open fun setOptionMenuValidation(menu: Menu) {}
 
-    open fun onBackPressedListener() {}
-
     override fun onBackPressed() {
         super.onBackPressed()
-        onBackPressedListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -84,7 +79,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
         message: CharSequence,
         duration: Int = Toast.LENGTH_LONG,
     ) {
-        if (message.isNotEmpty()) Toast.makeText(this, message, duration).show()
+        if (message.isNotEmpty()) this.simpleToast(message, duration)
         else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessageDebug()
     }
 

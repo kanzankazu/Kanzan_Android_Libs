@@ -115,6 +115,5 @@ private fun getDeepChildOffset(mainParent: ViewGroup, parent: ViewParent, child:
         getDeepChildOffset(mainParent, parentGroup.parent, parentGroup, accumulatedOffset)
     } catch (e: Exception) {
         e.fillInStackTrace().sendCrashlytics()
-        FirebaseCrashlytics.getInstance().recordException(e.fillInStackTrace())
     }
 }

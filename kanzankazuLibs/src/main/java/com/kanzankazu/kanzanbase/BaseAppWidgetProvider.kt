@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.Toast
+import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
 
 abstract class BaseAppWidgetProvider : AppWidgetProvider() {
 
@@ -58,6 +59,6 @@ abstract class BaseAppWidgetProvider : AppWidgetProvider() {
     }
 */
     fun makeToast(context: Context, text: CharSequence, isShort: Boolean = true) {
-        Toast.makeText(context, text, if (isShort) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
+        context.simpleToast(text, if (isShort) Toast.LENGTH_SHORT else Toast.LENGTH_LONG)
     }
 }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.kanzankazu.databinding.ActivityCameraPreviewBinding
+import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
 import com.kanzankazu.kanzanutil.kanzanextension.view.loadImage
 import com.kanzankazu.kanzanwidget.camera.base.BaseCameraActivityBindingView
 import com.kanzankazu.kanzanwidget.camera.util.CameraConst
@@ -98,6 +99,6 @@ class PicturePreviewActivity : BaseCameraActivityBindingView<ActivityCameraPrevi
     }
 
     override fun onUploadFailed(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        this.simpleToast(message, Toast.LENGTH_SHORT)
     }
 }

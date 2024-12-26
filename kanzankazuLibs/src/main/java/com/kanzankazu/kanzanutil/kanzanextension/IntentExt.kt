@@ -105,7 +105,7 @@ fun Fragment.changePageForResultInit(result: (result: ActivityResult) -> Unit) =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result(it) }
 } catch (e: Exception) {
     e.printStackTrace()
-    Toast.makeText(this.requireContext(), e.message, Toast.LENGTH_LONG).show()
+    this.requireContext().simpleToast(e.message.toString())
     null
 }
 

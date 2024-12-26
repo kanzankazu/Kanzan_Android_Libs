@@ -11,6 +11,8 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.annotation.IdRes
@@ -20,6 +22,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.kanzankazu.R
 import java.io.ByteArrayOutputStream
 import java.io.File
+
 
 fun Context.getColorFromResource(colorId: Int): Int =
     ContextCompat.getColor(this, colorId)
@@ -59,8 +62,19 @@ fun Context.clipboardPaste(paste: (String) -> Unit) {
     clipData?.apply { paste(getItemAt(0).toString().trim()) }
 }
 
-fun Context.simpleToast(text: CharSequence) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+fun Context.simpleToast(text: CharSequence, duration: Int = Toast.LENGTH_LONG): Toast {
+    val toast = Toast.makeText(this, text, duration)
+    toast.show()
+    return toast
+}
+
+fun Context.dynamicToast(text: CharSequence, delayMillis: Long = 500) {
+    val toast = simpleToast(text, Toast.LENGTH_LONG)
+
+    if (delayMillis < 3500) {
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({ toast.cancel() }, delayMillis)
+    }
 }
 
 fun Context.isConnect(onConnect: () -> Unit, onNotConnect: (String) -> Unit = {}): Boolean {
@@ -260,3 +274,17 @@ fun Context.convertUrlToUri(filesPath: ArrayList<String>): ArrayList<Uri> {
 
 @SuppressLint("ResourceType")
 fun Context.getIntDimens(@IdRes idRes: Int): Int = resources.getDimension(idRes).toInt()
+
+fun Context.doubleExit(doubleBackToExitPressedOnce: Boolean, listener: () -> Unit = {}): Boolean {
+    var newDoubleBackToExitPressedOnce: Boolean
+    if (doubleBackToExitPressedOnce) {
+        listener.invoke()
+        newDoubleBackToExitPressedOnce = false
+    } else {
+        simpleToast("Please click BACK again to exit", Toast.LENGTH_SHORT)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable { newDoubleBackToExitPressedOnce = false }, 2000)
+        newDoubleBackToExitPressedOnce = true
+    }
+
+    return newDoubleBackToExitPressedOnce
+}

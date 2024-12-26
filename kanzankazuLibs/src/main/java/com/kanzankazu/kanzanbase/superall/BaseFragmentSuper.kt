@@ -34,8 +34,6 @@ abstract class BaseFragmentSuper : Fragment() {
     protected open fun setListener() {}
     protected open fun getData() {}
 
-    open fun onBackPressedListener() {}
-
     protected open fun onRestart() {}
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

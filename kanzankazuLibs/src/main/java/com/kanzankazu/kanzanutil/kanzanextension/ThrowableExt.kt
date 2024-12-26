@@ -4,18 +4,16 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 fun Throwable.sendCrashlytics(
     userid: String = "",
-    userName: String = "",
-    userEmail: String = "",
+    isLog: Boolean = false,
 ) {
     FirebaseCrashlytics.getInstance().apply {
 
-        if (userid.isNotEmpty()) {
-            setUserId(userid)
-            setCustomKey("userId", userid)
-        }
-        if (userName.isNotEmpty()) setCustomKey("userName", userName)
-        if (userEmail.isNotEmpty()) setCustomKey("userEmail", userEmail)
-        recordException(this@sendCrashlytics)
+        if (userid.isNotEmpty()) setUserId(userid)
+        if (userid.isNotEmpty()) setCustomKey("userId", userid)
+
+        if (isLog) log(this@sendCrashlytics.stackTraceToString())
+        else recordException(this@sendCrashlytics)
+
         sendUnsentReports()
     }
 }

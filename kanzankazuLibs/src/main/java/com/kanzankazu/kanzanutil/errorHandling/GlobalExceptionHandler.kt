@@ -8,17 +8,14 @@ import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import kotlin.system.exitProcess
 
 /**
- * [applicationContext]: Diperlukan untuk meluncurkan aktivitas.
+ * Konteks aplikasi diperlukan untuk meluncurkan aktivitas.
  *
- * [defaultHandler]:
- * Jika terjadi kesalahan saat meluncurkan [activityToBeLaunched],
- * [Thread.UncaughtExceptionHandler] default akan dipicu. Akibatnya,
- * Dialog Crash default Android akan muncul.
+ * DefaultHandler digunakan jika terjadi kesalahan saat meluncurkan aktivitas.
+ * Jika terjadi kesalahan, maka default Thread.UncaughtExceptionHandler akan dijalankan.
+ * Sebagai hasilnya, dialog crash default Android akan muncul.
  *
- * [activityToBeLaunched]: Aktivitas yang akan diluncurkan :D,
- * data Exception akan dimasukkan sebagai string JSON. Ini bisa
- * dengan mudah dikonversi kembali ke kelas [Throwable] menggunakan fungsi
- * ```Gson().fromJson(str, Throwable::class.java)```.
+ * Aktivitas yang akan diluncurkan :D, data pengecualian akan disimpan sebagai string JSON.
+ * Dapat dengan mudah dikonversi kembali menjadi [Throwable] dengan [Gson.fromJson].
  */
 
 class GlobalExceptionHandler private constructor(

@@ -24,10 +24,6 @@ fun Activity.getArrayStringsToList(@ArrayRes int: Int): List<String> = resources
 
 fun Fragment.getArrayStringsToList(@ArrayRes int: Int): List<String> = activity?.getArrayStringsToList(int)!!
 
-/*fun Context.simpleToast(text: CharSequence) {
-    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
-}*/
-
 fun Activity.simpleSnackbar(text: CharSequence, isForEver: Boolean = false) {
     if (isForEver) Snackbar
         .make(findViewById(android.R.id.content), text, if (isForEver) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_SHORT)

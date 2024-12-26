@@ -5,7 +5,6 @@ package com.kanzankazu.kanzanutil.kanzanextension.type
 import android.annotation.SuppressLint
 import android.os.Build
 import android.text.Spanned
-import android.util.Log
 import androidx.core.text.HtmlCompat
 import com.kanzankazu.kanzanutil.BaseConst
 import com.kanzankazu.kanzanutil.kanzanextension.isDebugPublic
@@ -16,6 +15,7 @@ import com.kanzankazu.kanzanutil.kanzanextension.toStringFormat
 import com.kanzankazu.kanzanwidget.textdrawable.ColorGenerator
 import com.kanzankazu.kanzanwidget.textdrawable.TextDrawable
 import org.json.JSONObject
+import timber.log.Timber
 import java.math.BigInteger
 import java.text.NumberFormat
 import java.text.ParseException
@@ -37,28 +37,28 @@ fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debug
             val maxLogSize = 4000
             repeat(log.toString().chunked(maxLogSize).size) { i ->
                 when (debugType) {
-                    DebugType.DEBUG -> Log.d("Lihat", if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.INFO -> Log.i("Lihat", if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.ERROR -> Log.e("Lihat", if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.WARNING -> Log.w("Lihat", if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.VERBOSE -> Log.v("Lihat", if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.DEBUG -> Timber.tag("Lihat").d(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.INFO -> Timber.tag("Lihat").i(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.ERROR -> Timber.tag("Lihat").e(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.WARNING -> Timber.tag("Lihat").w(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.VERBOSE -> Timber.tag("Lihat").v(if (i == 0) "$i == $location >> $log" else "$log")
                 }
             }
         }
     } else {
-        Log.e("Lihat", "$location >> log is null")
+        Timber.tag("Lihat").e("$location >> log is null")
     }
 }
 
-fun Any?.debugMessageDebug(location: String="StringExt - debugMessage - debug") {
+fun Any?.debugMessageDebug(location: String = "StringExt - debugMessage - debug") {
     debugMessage(this, location, DebugType.DEBUG)
 }
 
-fun Any?.debugMessageWarning(location: String="StringExt - debugMessage - warning") {
+fun Any?.debugMessageWarning(location: String = "StringExt - debugMessage - warning") {
     debugMessage(this, location, DebugType.WARNING)
 }
 
-fun Any?.debugMessageError(location: String="StringExt - debugMessage - error") {
+fun Any?.debugMessageError(location: String = "StringExt - debugMessage - error") {
     debugMessage(this, location, DebugType.ERROR)
 }
 
