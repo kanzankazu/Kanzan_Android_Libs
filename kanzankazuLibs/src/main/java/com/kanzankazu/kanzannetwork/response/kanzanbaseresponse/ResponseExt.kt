@@ -83,25 +83,26 @@ fun <T, R> BaseResponse<T>.handleBaseResponseConvertData(
     is BaseResponse.Error -> BaseResponse.Error(onError.invoke("").ifEmpty { this.message })
 }
 
-fun <T, R, Y> BaseResponse<T>.handleBaseResponseCombineData(
-    other: BaseResponse<R>,
+fun <T, R, Y> handleBaseResponseCombineData(
+    mainBaseResponse: BaseResponse<T>,
+    secondBaseResponse: BaseResponse<R>,
     onError: (String) -> String = { "" },
     isStillShowSuccess: Boolean = false,
     onSuccess: (T?, R?) -> Y,
 ): BaseResponse<Y> {
     return if (isStillShowSuccess) {
         when {
-            this is BaseResponse.Success && other is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(this.data, other.data))
-            this is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(this.data, null))
-            other is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(null, other.data))
-            this is BaseResponse.Error && other is BaseResponse.Error -> BaseResponse.Error(onError.invoke("").ifEmpty { this.message })
+            mainBaseResponse is BaseResponse.Success && secondBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(mainBaseResponse.data, secondBaseResponse.data))
+            mainBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(mainBaseResponse.data, null))
+            secondBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(null, secondBaseResponse.data))
+            mainBaseResponse is BaseResponse.Error && secondBaseResponse is BaseResponse.Error -> BaseResponse.Error(onError.invoke("").ifEmpty { mainBaseResponse.message })
             else -> BaseResponse.Empty
         }
     } else {
         when {
-            this is BaseResponse.Error -> BaseResponse.Error("Receive error: ${onError.invoke("").ifEmpty { this.message }}")
-            other is BaseResponse.Error -> BaseResponse.Error("Other error: ${onError.invoke("").ifEmpty { other.message }}")
-            this is BaseResponse.Success && other is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(this.data, other.data))
+            mainBaseResponse is BaseResponse.Error -> BaseResponse.Error("Receive error: ${onError.invoke("").ifEmpty { mainBaseResponse.message }}")
+            secondBaseResponse is BaseResponse.Error -> BaseResponse.Error("Other error: ${onError.invoke("").ifEmpty { secondBaseResponse.message }}")
+            mainBaseResponse is BaseResponse.Success && secondBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(mainBaseResponse.data, secondBaseResponse.data))
             else -> BaseResponse.Empty
         }
     }
