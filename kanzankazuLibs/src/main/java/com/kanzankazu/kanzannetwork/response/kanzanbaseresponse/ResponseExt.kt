@@ -83,15 +83,6 @@ fun <T, R> BaseResponse<T>.handleBaseResponseConvertData(
     is BaseResponse.Error -> BaseResponse.Error(onError.invoke("").ifEmpty { this.message })
 }
 
-/**
- * Fungsi ini menggabungkan dua BaseResponse dan menghasilkan BaseResponse baru berdasarkan kondisi tertentu.
- *
- * @param other BaseResponse kedua yang akan digabungkan dengan BaseResponse saat ini.
- * @param onError Fungsi lambda yang mengembalikan pesan kesalahan jika terjadi error.
- * @param isStillShowSuccess Bendera yang menentukan apakah akan menampilkan sukses meskipun salah satu BaseResponse adalah error.
- * @param onSuccess Fungsi lambda yang dieksekusi jika kedua BaseResponse berhasil atau jika salah satu sukses tergantung pada isStillShowSuccess.
- * @return BaseResponse baru yang merupakan hasil dari penggabungan kedua BaseResponse.
- */
 fun <T, R, Y> BaseResponse<T>.handleBaseResponseCombineData(
     other: BaseResponse<R>,
     onError: (String) -> String = { "" },
