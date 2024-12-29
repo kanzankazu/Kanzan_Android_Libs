@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -23,10 +23,6 @@ import java.net.URL
 fun Activity.getArrayStringsToList(@ArrayRes int: Int): List<String> = resources.getStringArray(int).toList()
 
 fun Fragment.getArrayStringsToList(@ArrayRes int: Int): List<String> = activity?.getArrayStringsToList(int)!!
-
-/*fun Context.simpleToast(text: CharSequence) {
-    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
-}*/
 
 fun Activity.simpleSnackbar(text: CharSequence, isForEver: Boolean = false) {
     if (isForEver) Snackbar
@@ -79,7 +75,7 @@ fun hasStableInternetConnection(): Single<Boolean> {
 
             true
         } catch (e: IOException) {
-            "hasStableInternetConnection ${e.message}".debugMessage()
+            "hasStableInternetConnection ${e.message}".debugMessageDebug()
             false
         }
     }

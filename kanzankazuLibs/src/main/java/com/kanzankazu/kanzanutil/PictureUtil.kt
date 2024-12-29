@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import id.zelory.compressor.Compressor
 import java.io.File
 import java.io.IOException
@@ -54,7 +54,7 @@ class PictureUtil {
 
     fun chooseGetImageDialog() {
         val items = arrayOf("Pilih foto dari kamera", "Pilih foto dari galeri")
-        "PictureUtil - chooseGetImageDialog".debugMessage()
+        "PictureUtil - chooseGetImageDialog".debugMessageDebug()
         val chooseImageDialog = AlertDialog.Builder(mActivity)
         chooseImageDialog.setItems(items) { _: DialogInterface?, i: Int ->
             if (items[i] == "Pilih foto dari kamera") openCamera()

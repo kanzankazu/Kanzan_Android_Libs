@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import com.kanzankazu.R
 import com.kanzankazu.databinding.DialogBaseInfoBinding
 import com.kanzankazu.kanzanbase.dialog.standart.BaseDialogFragmentView
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.view.isVisible
 import com.kanzankazu.kanzanutil.kanzanextension.view.visibleView
 
@@ -36,7 +36,7 @@ open class BaseInfoDialog : BaseDialogFragmentView<DialogBaseInfoBinding>() {
         get() = DialogBaseInfoBinding::inflate
 
     override fun setContent(): Unit = with(bind) {
-        "BaseInfoDialog - setContent".debugMessage()
+        "BaseInfoDialog - setContent".debugMessageDebug()
         activity?.let { ivDialogInfoImage.visibleView(it, imageUrl, imageAsset) }
         cvDialogInfoImageParent.visibleView(ivDialogInfoImage.isVisible())
         ivDialogInfoCloseBtn.visibleView(_isCancelableDialog)
@@ -92,9 +92,9 @@ open class BaseInfoDialog : BaseDialogFragmentView<DialogBaseInfoBinding>() {
         }
 
         fun newInstanceBaseInfoDialogYesNo(fm: FragmentManager, activity: Activity, title: String, message: String, btn1Listener: () -> Unit = {}, btn2Listener: () -> Unit = {}) {
-            "newInstanceBaseInfoDialogYesNo".debugMessage()
-            title.debugMessage()
-            message.debugMessage()
+            "newInstanceBaseInfoDialogYesNo".debugMessageDebug()
+            title.debugMessageDebug()
+            message.debugMessageDebug()
             newInstanceBaseInfoDialog(
                 fm,
                 activity,
@@ -108,9 +108,9 @@ open class BaseInfoDialog : BaseDialogFragmentView<DialogBaseInfoBinding>() {
         }
 
         fun newInstanceBaseInfoDialogOk(fm: FragmentManager, activity: Activity, title: String, message: String, btn1Listener: () -> Unit = {}) {
-            "newInstanceBaseInfoDialogOk".debugMessage()
-            title.debugMessage()
-            message.debugMessage()
+            "newInstanceBaseInfoDialogOk".debugMessageDebug()
+            title.debugMessageDebug()
+            message.debugMessageDebug()
             newInstanceBaseInfoDialog(
                 fm,
                 activity,

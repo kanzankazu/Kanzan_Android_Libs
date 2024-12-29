@@ -9,6 +9,18 @@ fun initBaseResponseEmpty() = BaseResponse.Empty
 fun <T> T.toBaseResponseSuccess() = BaseResponse.Success(this)
 fun String.toBaseResponseError(errorMessage: String = "") = BaseResponse.Error(errorMessage.ifEmpty { this })
 
+fun <T> BaseResponse<T>.onLoading(listener: (Boolean) -> Unit): BaseResponse<T> {
+    if (this is BaseResponse.Loading) listener.invoke(true)
+    else listener.invoke(false)
+    return this
+}
+
+fun <T> BaseResponse<T>.onEmpty(listener: (Boolean) -> Unit): BaseResponse<T> {
+    if (this is BaseResponse.Empty) listener.invoke(true)
+    else listener.invoke(false)
+    return this
+}
+
 fun <T> BaseResponse<T>.onSuccess(listener: (T) -> Unit): BaseResponse<T> {
     if (this is BaseResponse.Success) listener.invoke(this.data)
     return this
@@ -69,6 +81,31 @@ fun <T, R> BaseResponse<T>.handleBaseResponseConvertData(
     is BaseResponse.Empty -> BaseResponse.Empty
     is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(this.data))
     is BaseResponse.Error -> BaseResponse.Error(onError.invoke("").ifEmpty { this.message })
+}
+
+fun <T, R, Y> handleBaseResponseCombineData(
+    mainBaseResponse: BaseResponse<T>,
+    secondBaseResponse: BaseResponse<R>,
+    onError: (String) -> String = { "" },
+    isStillShowSuccess: Boolean = false,
+    onSuccess: (T?, R?) -> Y,
+): BaseResponse<Y> {
+    return if (isStillShowSuccess) {
+        when {
+            mainBaseResponse is BaseResponse.Success && secondBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(mainBaseResponse.data, secondBaseResponse.data))
+            mainBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(mainBaseResponse.data, null))
+            secondBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(null, secondBaseResponse.data))
+            mainBaseResponse is BaseResponse.Error && secondBaseResponse is BaseResponse.Error -> BaseResponse.Error(onError.invoke("").ifEmpty { mainBaseResponse.message })
+            else -> BaseResponse.Empty
+        }
+    } else {
+        when {
+            mainBaseResponse is BaseResponse.Error -> BaseResponse.Error("Receive error: ${onError.invoke("").ifEmpty { mainBaseResponse.message }}")
+            secondBaseResponse is BaseResponse.Error -> BaseResponse.Error("Other error: ${onError.invoke("").ifEmpty { secondBaseResponse.message }}")
+            mainBaseResponse is BaseResponse.Success && secondBaseResponse is BaseResponse.Success -> BaseResponse.Success(onSuccess.invoke(mainBaseResponse.data, secondBaseResponse.data))
+            else -> BaseResponse.Empty
+        }
+    }
 }
 
 fun <T> BaseResponse<DataSnapshot?>.handleBaseResponseConvertToObject(

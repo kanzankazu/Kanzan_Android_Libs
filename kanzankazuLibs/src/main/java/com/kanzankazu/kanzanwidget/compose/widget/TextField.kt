@@ -1,4 +1,4 @@
-package com.kanzankazu.kanzanwidget.compose
+package com.kanzankazu.kanzanwidget.compose.widget
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes

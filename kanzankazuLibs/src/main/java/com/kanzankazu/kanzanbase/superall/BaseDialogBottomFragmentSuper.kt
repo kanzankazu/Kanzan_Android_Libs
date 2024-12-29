@@ -42,11 +42,11 @@ abstract class BaseDialogBottomFragmentSuper : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        requireActivity().onBackPressedDispatcher.addCallback(getLifeCycleOwner(), object : OnBackPressedCallback(true) {
+        /*requireActivity().onBackPressedDispatcher.addCallback(getLifeCycleOwner(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                (requireActivity() as? BaseActivitySuper)?.onBackPressedListener()
+                (requireActivity() as? BaseActivitySuper)?.onBackPressed()
             }
-        })
+        })*/
         super.onViewCreated(view, savedInstanceState)
     }
 

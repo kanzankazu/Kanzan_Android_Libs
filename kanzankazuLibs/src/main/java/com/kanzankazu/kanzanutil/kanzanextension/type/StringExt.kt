@@ -5,32 +5,61 @@ package com.kanzankazu.kanzanutil.kanzanextension.type
 import android.annotation.SuppressLint
 import android.os.Build
 import android.text.Spanned
-import android.util.Log
 import androidx.core.text.HtmlCompat
-import com.amulyakhare.textdrawable.TextDrawable
-import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.kanzankazu.kanzanutil.BaseConst
-import com.kanzankazu.kanzanutil.kanzanextension.isDebug
+import com.kanzankazu.kanzanutil.kanzanextension.isDebugPublic
 import com.kanzankazu.kanzanutil.kanzanextension.toDateFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toDigits
 import com.kanzankazu.kanzanutil.kanzanextension.toRupiahFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toStringFormat
+import com.kanzankazu.kanzanwidget.textdrawable.ColorGenerator
+import com.kanzankazu.kanzanwidget.textdrawable.TextDrawable
+import org.json.JSONObject
+import timber.log.Timber
 import java.math.BigInteger
 import java.text.NumberFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun String.debugMessage() {
-    isDebug().ifn { Log.d("Lihat DebugMessage", this) }
+enum class DebugType {
+    VERBOSE,
+    DEBUG,
+    ERROR,
+    INFO,
+    WARNING
 }
 
-fun String.debugMessageWarning() {
-    isDebug().ifn { Log.w("Lihat debugMessageWarning", this) }
+@SuppressLint("LogNotTimber")
+fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
+    if (log != null) {
+        if (isDebugPublic()) {
+            val maxLogSize = 4000
+            repeat(log.toString().chunked(maxLogSize).size) { i ->
+                when (debugType) {
+                    DebugType.DEBUG -> Timber.tag("Lihat").d(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.INFO -> Timber.tag("Lihat").i(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.ERROR -> Timber.tag("Lihat").e(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.WARNING -> Timber.tag("Lihat").w(if (i == 0) "$i == $location >> $log" else "$log")
+                    DebugType.VERBOSE -> Timber.tag("Lihat").v(if (i == 0) "$i == $location >> $log" else "$log")
+                }
+            }
+        }
+    } else {
+        Timber.tag("Lihat").e("$location >> log is null")
+    }
 }
 
-fun String.debugMessageError() {
-    isDebug().ifn { Log.e("Lihat DebugMessageError", this) }
+fun Any?.debugMessageDebug(location: String = "StringExt - debugMessage - debug") {
+    debugMessage(this, location, DebugType.DEBUG)
+}
+
+fun Any?.debugMessageWarning(location: String = "StringExt - debugMessage - warning") {
+    debugMessage(this, location, DebugType.WARNING)
+}
+
+fun Any?.debugMessageError(location: String = "StringExt - debugMessage - error") {
+    debugMessage(this, location, DebugType.ERROR)
 }
 
 fun String.equalIgnoreCase(other: String?) = equals(other = other, true)
@@ -164,6 +193,7 @@ fun String.betweenDate(): String {
     }
 }
 
+@SuppressLint("SimpleDateFormat")
 fun String.countdown(): Long {
     val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     return try {
@@ -243,6 +273,12 @@ fun String.int() = when {
     all { it.isDigit() } -> this.toIntOrDefault()
     any { it.isDigit() } -> this.filter { it.isDigit() }.toIntOrDefault()
     else -> 0
+}
+
+fun String.long() = when {
+    all { it.isDigit() } -> this.toLongOrDefault()
+    any { it.isDigit() } -> this.filter { it.isDigit() }.toLongOrDefault()
+    else -> 0L
 }
 
 fun String.removeLastChar() = substring(0, length - 1)
@@ -351,4 +387,13 @@ fun getStringVarArg(condition: (String?) -> Boolean, vararg s: String?): String 
         }
     }
     return s1
+}
+
+fun String.isRemoteFeatureFlag(keyName: String): Boolean {
+    return try {
+        val jsonObject = JSONObject(this)
+        return jsonObject.getBoolean(keyName)
+    } catch (e: Exception) {
+        false
+    }
 }

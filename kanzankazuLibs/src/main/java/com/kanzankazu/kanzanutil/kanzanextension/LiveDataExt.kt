@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.kanzankazu.kanzanutil.kanzanextension
 
 import androidx.fragment.app.Fragment
@@ -10,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.distinctUntilChanged
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.type.isNullOrZero
 
 fun <T> MutableLiveData<T>.toLiveData(): LiveData<T> = this
@@ -177,12 +179,12 @@ fun <R> List<MutableLiveData<*>>.toMediator(isWithDistinct: Boolean = true, onCh
 }
 
 fun List<MutableLiveData<*>>.debugMessageLivedata() {
-    if (isDebug()) {
-        "==========START==========".debugMessage()
+    if (isDebugPublic()) {
+        "==========START==========".debugMessageDebug()
         forEachIndexed { index, mutableLiveData ->
-            "index $index, ${mutableLiveData::class.simpleName} = ${mutableLiveData.value}".debugMessage()
+            "index $index, ${mutableLiveData::class.simpleName} = ${mutableLiveData.value}".debugMessageDebug()
         }
-        "**********END**********".debugMessage()
+        "**********END**********".debugMessageDebug()
     }
 }
 

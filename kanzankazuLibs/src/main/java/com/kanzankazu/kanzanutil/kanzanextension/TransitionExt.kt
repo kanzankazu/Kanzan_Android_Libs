@@ -8,30 +8,13 @@ import androidx.annotation.TransitionRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
-import androidx.fragment.app.Fragment
 
-fun Activity.makeSceneTransition(pair: Pair<View, String>): Bundle? {
-    return ActivityOptionsCompat.makeSceneTransitionAnimation(this, pair).toBundle()
+fun View.pairViewCreate(keyTransition: String): Pair<View, String> {
+    return Pair.create(this, keyTransition)
 }
 
-fun Activity.makeSceneTransition(view: View, transitionName: String): Bundle? {
-    return ActivityOptionsCompat.makeSceneTransitionAnimation(this, view, transitionName).toBundle()
-}
-
-fun Activity.setTransition(view: View, transitionName: String) {
-    ViewCompat.setTransitionName(view, transitionName)
-}
-
-fun Fragment.makeSceneTransition(pair: Pair<View, String>): Bundle? {
-    return ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), pair).toBundle()
-}
-
-fun Fragment.makeSceneTransition(view: View, transitionName: String): Bundle? {
-    return ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view, transitionName).toBundle()
-}
-
-fun Fragment.setTransition(view: View, transitionName: String) {
-    ViewCompat.setTransitionName(view, transitionName)
+fun View.setViewCreate(keyTransition: String) {
+    ViewCompat.setTransitionName(this, keyTransition)
 }
 
 fun Activity.enterTransition(@TransitionRes transitionRes: Int) {
@@ -42,20 +25,16 @@ fun Activity.exitTransition(@TransitionRes transitionRes: Int) {
     window.sharedElementExitTransition = TransitionInflater.from(this).inflateTransition(transitionRes)
 }
 
-fun Fragment.enterTransition(@TransitionRes transitionRes: Int) {
-    requireActivity().window.sharedElementEnterTransition = TransitionInflater.from(requireActivity()).inflateTransition(transitionRes)
+fun Activity.pairViewCreateJoinToBundle(vararg pairs: Pair<View, String>): Bundle? {
+    return ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs).toBundle()
 }
 
-fun Fragment.exitTransition(@TransitionRes transitionRes: Int) {
-    requireActivity().window.sharedElementExitTransition = TransitionInflater.from(requireActivity()).inflateTransition(transitionRes)
-}
-
-fun Activity.startTransition(transitionRes: Int, pair: Pair<View, String>) {
+fun Activity.startTransition(@TransitionRes transitionRes: Int, vararg pairs: Pair<View, String>): Bundle? {
     enterTransition(transitionRes)
-    makeSceneTransition(pair)
+    return pairViewCreateJoinToBundle(*pairs)
 }
 
-fun Activity.endTransition(transitionRes: Int, pair: Pair<View, String>) {
+fun Activity.endTransition(@TransitionRes transitionRes: Int, vararg pairs: Pair<View, String>) {
     exitTransition(transitionRes)
-    makeSceneTransition(pair)
+    pairs.forEach { it.first.setViewCreate(it.second) }
 }

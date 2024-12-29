@@ -10,7 +10,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
 fun isTiramisuAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
@@ -59,7 +59,7 @@ fun FragmentActivity.checkPermissions(
     activityResultLauncher: ActivityResultLauncher<Array<String>>,
     isWithDialog: Boolean = true,
 ) {
-    "checkPermissions".debugMessage()
+    "checkPermissions".debugMessageDebug()
 
     val isRationale =
         permissions.all { ActivityCompat.shouldShowRequestPermissionRationale(this, it) }

@@ -1,4 +1,4 @@
-package com.kanzankazu.kanzanwidget.compose
+package com.kanzankazu.kanzanwidget.compose.widget
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.CircleShape

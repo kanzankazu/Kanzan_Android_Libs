@@ -16,7 +16,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 /**
 implementation("com.google.android.play:core:1.10.0")
@@ -38,47 +38,47 @@ class InAppUpdate(val activity: Activity) {
         val installStateUpdatedListener = InstallStateUpdatedListener { state ->
             when {
                 state.installStatus() == InstallStatus.CANCELED -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.CANCELED"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.CANCELED"}".debugMessageDebug()
                 }
 
                 state.installStatus() == InstallStatus.DOWNLOADED -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.DOWNLOADED"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.DOWNLOADED"}".debugMessageDebug()
                     updateCompleteSnackbarAction()
                 }
 
                 state.installStatus() == InstallStatus.DOWNLOADING -> {
                     val bytesDownloaded = state.bytesDownloaded()
                     val totalBytesToDownload = state.totalBytesToDownload()
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.DOWNLOADING $bytesDownloaded $totalBytesToDownload"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.DOWNLOADING $bytesDownloaded $totalBytesToDownload"}".debugMessageDebug()
                 }
 
                 state.installStatus() == InstallStatus.FAILED -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.FAILED"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.FAILED"}".debugMessageDebug()
                 }
 
                 state.installStatus() == InstallStatus.INSTALLED -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.INSTALLED"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.INSTALLED"}".debugMessageDebug()
                 }
 
                 state.installStatus() == InstallStatus.INSTALLING -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.INSTALLING"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.INSTALLING"}".debugMessageDebug()
                 }
 
                 state.installStatus() == InstallStatus.PENDING -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.PENDING"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.PENDING"}".debugMessageDebug()
                 }
 
                 state.installStatus() == InstallStatus.UNKNOWN -> {
-                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.UNKNOWN"}".debugMessage()
+                    "setupInAppUpdate InstallStateUpdatedListener ${"state.installStatus() == InstallStatus.UNKNOWN"}".debugMessageDebug()
                 }
             }
         }
 
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            "setupInAppUpdate $appUpdateInfo".debugMessage()
+            "setupInAppUpdate $appUpdateInfo".debugMessageDebug()
             when (appUpdateInfo.installStatus()) {
                 InstallStatus.DOWNLOADED -> {
-                    "setupInAppUpdate ${"InstallStatus.DOWNLOADED"}".debugMessage()
+                    "setupInAppUpdate ${"InstallStatus.DOWNLOADED"}".debugMessageDebug()
                     updateCompleteSnackbarAction()
                 }
 
@@ -130,15 +130,15 @@ class InAppUpdate(val activity: Activity) {
         if (requestCode == REQUEST_CODE_IN_APP_UPDATE) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
-                    "onActivityResult validateOnActivityResult ${"Ok"}".debugMessage()
+                    "onActivityResult validateOnActivityResult ${"Ok"}".debugMessageDebug()
                 }
 
                 Activity.RESULT_CANCELED -> {
-                    "onActivityResult validateOnActivityResult ${"Cancel"}".debugMessage()
+                    "onActivityResult validateOnActivityResult ${"Cancel"}".debugMessageDebug()
                 }
 
                 ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> {
-                    "onActivityResult validateOnActivityResult ${"Update Failed"}".debugMessage()
+                    "onActivityResult validateOnActivityResult ${"Update Failed"}".debugMessageDebug()
                 }
             }
         }

@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import java.util.Collections
 
 class PermissionUtil {
@@ -96,7 +96,7 @@ class PermissionUtil {
             }
             val frequency1 = Collections.frequency(listStat, "1")
             if (frequency1 != grantResults.size) {
-                "PermissionUtil - onRequestPermissionsResult".debugMessage()
+                "PermissionUtil - onRequestPermissionsResult".debugMessageDebug()
                 val alertDialogBuilder = AlertDialog.Builder(activity)
                 alertDialogBuilder.setMessage("you denied some permission, you must give all permission to next proccess?")
                 alertDialogBuilder.setCancelable(false)

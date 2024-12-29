@@ -4,6 +4,7 @@ import android.text.SpannedString
 import android.view.View
 import android.widget.EditText
 import androidx.annotation.StringRes
+import com.kanzankazu.kanzanutil.MessageType
 
 interface BaseView {
 
@@ -14,13 +15,13 @@ interface BaseView {
     fun isLoading(): Boolean
 
     /** @param type 0=Toast, 1=Snackbar*/
-    fun showMessage(message: String, type: Int = 0, actionListener: View.OnClickListener = View.OnClickListener { })
+    fun showMessage(message: String, type: MessageType = MessageType.TOAST, actionListener: View.OnClickListener = View.OnClickListener { })
 
     /** @param type 0=Toast, 1=Snackbar*/
-    fun showMessage(message: SpannedString, type: Int = 0, actionListener: View.OnClickListener = View.OnClickListener { })
+    fun showMessage(message: SpannedString, type: MessageType = MessageType.TOAST, actionListener: View.OnClickListener = View.OnClickListener { })
 
     /** @param type 0=Toast, 1=Snackbar*/
-    fun showMessage(@StringRes message: Int, type: Int = 0, actionListener: View.OnClickListener = View.OnClickListener { })
+    fun showMessage(@StringRes message: Int, type: MessageType = MessageType.TOAST, actionListener: View.OnClickListener = View.OnClickListener { })
 
     fun showAlert(message: String)
 

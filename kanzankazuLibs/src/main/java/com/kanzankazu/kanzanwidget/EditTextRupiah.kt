@@ -53,90 +53,66 @@ class EditTextRupiah @JvmOverloads constructor(context: Context?, attrs: Attribu
     }
 
     inner class CurrencyTextWatcher(private val editText: EditText, private val prefix: String) : TextWatcher {
+        private var isEditing: Boolean = false
         private var previousCleanString: String? = null
-        private var initialEditText: String? = null
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            initialEditText = s.toString()
-        }
+
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(editable: Editable) {
-            if (editable.toString().startsWith("Rp ") && !editable.toString().contains("Rp 0") && !editable.toString().contains("Rp .")) {
-                val str = editable.toString().replace("\\.".toRegex(), ",")
-                if (str.length < prefix.length) {
+            // Mencegah loop rekursif
+            if (isEditing) return
+
+            val input = editable.toString()
+
+            // Pastikan input dimulai dengan prefix
+            if (input.startsWith(prefix)) {
+                val cleanString = input.replace(prefix, "").replace(".", "").replace(",", "")
+
+                // Jika string kosong, reset ke prefix
+                if (cleanString.isEmpty()) {
+                    isEditing = true
                     editText.setText(prefix)
                     editText.setSelection(prefix.length)
-                    return
-                }
-                if (str == prefix) {
-                    editText.setSelection(prefix.length)
+                    isEditing = false
                     return
                 }
 
-                // cleanString this the string which not contain prefix and ,
-                val cleanString = str.replace(prefix, "").replace(",".toRegex(), "")
-                // for prevent afterTextChanged recursive call
-                if (cleanString == previousCleanString || cleanString.isEmpty()) return
+                // Hindari proses jika string sama dengan sebelumnya
+                if (cleanString == previousCleanString) return
                 previousCleanString = cleanString
-                var formattedString: String = if (cleanString.contains(".")) {
-                    formatDecimal(cleanString)
-                } else {
-                    formatInteger(cleanString)
+
+                isEditing = true
+                try {
+                    // Format string
+                    val formattedString = formatCurrency(cleanString)
+                    editText.setText(formattedString)
+                    editText.setSelection(formattedString.length)
+                    onTextChanges.invoke(formattedString)
+                } finally {
+                    isEditing = false
                 }
-                formattedString = formattedString.replace(",".toRegex(), ".")
-                editText.removeTextChangedListener(this) // Remove listener
-                editText.setText(formattedString)
-                onTextChanges.invoke(formattedString)
-                handleSelection()
-                editText.addTextChangedListener(this) // Add back the listener
             } else {
-                editText.setText(initialEditText)
-                onTextChanges.invoke(initialEditText ?: "")
+                // Reset ke state sebelumnya jika tidak dimulai dengan prefix
+                isEditing = true
+                try {
+                    editText.setText("$prefix${previousCleanString ?: ""}")
+                    editText.setSelection(editText.text.length)
+                } finally {
+                    isEditing = false
+                }
             }
         }
 
-        private fun formatInteger(str: String): String {
-            val parsed = BigDecimal(str)
+        private fun formatCurrency(cleanString: String): String {
+            val parsed = try {
+                BigDecimal(cleanString)
+            } catch (e: NumberFormatException) {
+                BigDecimal.ZERO
+            }
             val formatter = DecimalFormat("$prefix#,###", DecimalFormatSymbols(Locale.US))
             return formatter.format(parsed)
-        }
-
-        private fun formatDecimal(str: String): String {
-            if (str == ".") {
-                return "$prefix."
-            }
-            val parsed = BigDecimal(str)
-            // example pattern VND #,###.00
-            val formatter = DecimalFormat(
-                prefix + "#,###." + getDecimalPattern(str),
-                DecimalFormatSymbols(Locale.US)
-            )
-            formatter.roundingMode = RoundingMode.DOWN
-            return formatter.format(parsed)
-        }
-
-        /**
-         * It will return suitable pattern for format decimal
-         * For example: 10.2 -> return 0 | 10.23 -> return 00, | 10.235 -> return 000
-         */
-        private fun getDecimalPattern(str: String): String {
-            val decimalCount = str.length - str.indexOf(".") - 1
-            val decimalPattern = StringBuilder()
-            var i = 0
-            while (i < decimalCount && i < MAX_DECIMAL) {
-                decimalPattern.append("0")
-                i++
-            }
-            return decimalPattern.toString()
-        }
-
-        private fun handleSelection() {
-            if (editText.text.length <= MAX_LENGTH) {
-                editText.setSelection(editText.text.length)
-            } else {
-                editText.setSelection(MAX_LENGTH)
-            }
         }
     }
 

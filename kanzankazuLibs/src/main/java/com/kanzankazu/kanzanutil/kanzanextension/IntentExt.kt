@@ -10,20 +10,36 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
 import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.kanzankazu.kanzanutil.image.FileManager
+import com.kanzankazu.kanzanutil.image.ImageCompressor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
-fun Intent.addClearTaskNewTask(): Intent {
-    return addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-}
+fun Intent.addActionView() = apply { action = Intent.ACTION_VIEW }
+
+fun Intent.addClearTaskNewTask() = addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+
+fun Intent.addFlagClearSingleTop() = addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
 fun Intent.changePageFromIntent(activity: ComponentActivity, bundle: Bundle? = null, finish: Boolean = false) {
     if (bundle != null) putExtras(bundle)
@@ -31,11 +47,7 @@ fun Intent.changePageFromIntent(activity: ComponentActivity, bundle: Bundle? = n
     if (finish) activity.finish()
 }
 
-fun Intent.changePageFromIntent(
-    fragment: Fragment,
-    bundle: Bundle? = null,
-    finish: Boolean = false,
-) {
+fun Intent.changePageFromIntent(fragment: Fragment, bundle: Bundle? = null, finish: Boolean = false) {
     fragment.activity?.let {
         if (bundle != null) putExtras(bundle)
         it.startActivity(this)
@@ -60,24 +72,14 @@ fun Intent?.isTypeImage() =
 
 inline fun <reified T> Context.makeIntent() = Intent(this, T::class.java)
 
-inline fun <reified T> Activity.changePage(
-    bundle: Bundle? = null,
-    finish: Boolean = false,
-    intent: Intent? = null,
-    optionBundle: Bundle? = null,
-) {
+inline fun <reified T> Activity.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null) {
     val newIntent = intent ?: Intent(this, T::class.java)
     if (bundle != null) newIntent.putExtras(bundle)
     startActivity(newIntent, optionBundle)
     if (finish) finish()
 }
 
-inline fun <reified T> Fragment.changePage(
-    bundle: Bundle? = null,
-    finish: Boolean = false,
-    intent: Intent? = null,
-    optionBundle: Bundle? = null,
-) {
+inline fun <reified T> Fragment.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null) {
     val newIntent = intent ?: Intent(activity, T::class.java)
     if (bundle != null) newIntent.putExtras(bundle)
     startActivity(newIntent, optionBundle)
@@ -103,7 +105,7 @@ fun Fragment.changePageForResultInit(result: (result: ActivityResult) -> Unit) =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result(it) }
 } catch (e: Exception) {
     e.printStackTrace()
-    Toast.makeText(this.requireContext(), e.message, Toast.LENGTH_LONG).show()
+    this.requireContext().simpleToast(e.message.toString())
     null
 }
 
@@ -217,3 +219,34 @@ fun Context.handleSendMultipleImages(intent: Intent) =
         }
         files
     } ?: arrayListOf()
+
+fun AppCompatActivity.intentPickVisualMediaInit(): ActivityResultLauncher<PickVisualMediaRequest> {
+    val imageCompressor =   ImageCompressor(context = applicationContext)
+    val fileManager =   FileManager(context = applicationContext)
+
+    val scope = CoroutineScope(this.lifecycleScope.coroutineContext)
+
+    return registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { contentUri ->
+        if (contentUri == null) return@registerForActivityResult
+
+        val mimeType = contentResolver.getType(contentUri)
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+        scope.launch {
+            fileManager.saveImage(
+                contentUri = contentUri,
+                fileName = "uncompressed.$extension"
+            )
+        }
+
+        scope.launch {
+            val compressedImage = imageCompressor.compressImage(
+                contentUri = contentUri,
+                compressionThreshold = 200 * 1024L
+            )
+            fileManager.saveImage(
+                bytes = compressedImage ?: return@launch,
+                fileName = "compressed.$extension"
+            )
+        }
+    }
+}

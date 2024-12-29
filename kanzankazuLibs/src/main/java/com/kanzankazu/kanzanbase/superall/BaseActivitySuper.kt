@@ -9,7 +9,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
@@ -17,11 +16,12 @@ import com.kanzankazu.R
 import com.kanzankazu.kanzanbase.BaseAdmob
 import com.kanzankazu.kanzannetwork.NetworkLiveData
 import com.kanzankazu.kanzannetwork.NetworkStatus
-import com.kanzankazu.kanzanutil.kanzanextension.getLifeCycleOwner
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
+import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseInfoDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
+
 
 /**
  * Created by Faisal Bahri on 2020-02-11.
@@ -31,6 +31,8 @@ abstract class BaseActivitySuper : AppCompatActivity() {
     val baseAlertDialog by lazy { BaseAlertDialog() }
     val baseAdmob by lazy { BaseAdmob(this) }
     val networkLiveData by lazy { NetworkLiveData(this) }
+
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
     protected open fun setActivityResult() {}
     protected open fun setSubscribeToLiveData() {}
@@ -49,7 +51,9 @@ abstract class BaseActivitySuper : AppCompatActivity() {
     /**example MenuItem xxx = menu.findItem(R.id.xxx);*/
     open fun setOptionMenuValidation(menu: Menu) {}
 
-    open fun onBackPressedListener() {}
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (setOptionMenu() != -1) menuInflater.inflate(setOptionMenu(), menu)
@@ -69,19 +73,14 @@ abstract class BaseActivitySuper : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        OnBackPressedDispatcher().addCallback(getLifeCycleOwner(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                onBackPressedListener()
-            }
-        })
     }
 
     fun toast(
         message: CharSequence,
         duration: Int = Toast.LENGTH_LONG,
     ) {
-        if (message.isNotEmpty()) Toast.makeText(this, message, duration).show()
-        else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessage()
+        if (message.isNotEmpty()) this.simpleToast(message, duration)
+        else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessageDebug()
     }
 
     fun snackBar(
@@ -98,7 +97,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
                 snackbar.setAction(actionText, actionListener)
             }
             snackbar.show()
-        } else "showSnackbar BaseActivity message.isNullOrEmpty()".debugMessage()
+        } else "showSnackbar BaseActivity message.isNullOrEmpty()".debugMessageDebug()
     }
 
     fun snackBarNoConnection(

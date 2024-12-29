@@ -40,7 +40,7 @@
         <item name="cardUseCompatPadding">true</item>
     </style>
 
-    <style name="CollapsingToolbarStandart">
+    <style name="CollapsingToolbarStandard">
         <item name="contentScrim">@color/baseWhite</item>
         <item name="collapsedTitleGravity">top</item>
         <item name="layout_scrollFlags">scroll|exitUntilCollapsed|snap</item>

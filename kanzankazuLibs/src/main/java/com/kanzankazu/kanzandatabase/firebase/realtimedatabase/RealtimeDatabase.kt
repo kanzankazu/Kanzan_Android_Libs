@@ -58,11 +58,7 @@ interface RealtimeDatabase {
         function: (pair: Pair<Boolean, String>) -> Unit,
     )
 
-    fun querySelectTableDataByKeyValue(
-        tableChildKey: String,
-        rowChildKey: String,
-        rowChildValue: Boolean,
-    ): Query
+    fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKey: String, rowChildValue: Boolean): Query
 
     fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKey: String, rowChildValue: Double): Query
 

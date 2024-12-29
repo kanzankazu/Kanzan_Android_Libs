@@ -40,7 +40,7 @@ fun Handler.repeatFunStop(r: Runnable) {
     removeCallbacks(r)
 }
 
-fun Activity.delayFun(delayMillis: Long = 500, r: () -> Unit): Boolean {
+fun Context.delayFun(delayMillis: Long = 500, r: () -> Unit): Boolean {
     return Handler(Looper.getMainLooper()).postDelayed(r, delayMillis)
 }
 
