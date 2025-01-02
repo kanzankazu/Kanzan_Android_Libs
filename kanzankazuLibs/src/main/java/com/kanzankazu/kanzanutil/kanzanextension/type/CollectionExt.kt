@@ -8,6 +8,12 @@ fun <T> join(vararg list: ArrayList<T>): ArrayList<T> {
     return arrayListOf
 }
 
+fun <T> joinNullAble(vararg list: ArrayList<T>?): ArrayList<T> {
+    val arrayListOf = arrayListOf<T>()
+    list.forEach { tArrayList -> tArrayList?.forEach { arrayListOf.add(it) } }
+    return arrayListOf
+}
+
 fun <T> Array<out T>.toArrayList(): ArrayList<T> {
     val arrayListOf = arrayListOf<T>()
     this.forEach { arrayListOf.add(it) }
