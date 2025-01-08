@@ -1,6 +1,7 @@
 package com.kanzankazu.kanzanutil.kanzanextension.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.InputFilter
@@ -13,13 +14,16 @@ import android.text.TextPaint
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewParent
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.ListPopupWindow
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.textfield.TextInputLayout
@@ -282,4 +286,92 @@ fun textWatcherAfterChange(onAfterChange: (s: Editable?) -> Unit): TextWatcher =
 
 fun EditText.setMaxLength(maxLength: Int) {
     filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
+}
+
+
+fun EditText.setupAutocomplete(
+    context: Context,
+    suggestions: List<String>, // Data suggesstion yang akan ditampilkan dalam popup list
+    triggerOnClick: Boolean = true, // Langsung muncul saat fokus
+    thresholdOnChange: Int = 1, // Minimal karakter sebelum popup muncul
+    maxItemsToShow: Int = 5, // Jumlah maksimal item yang ditampilkan
+    onItemSelected: ((String) -> Unit)? = null, // Callback jika item dipilih
+) {
+    val listPopupWindow = ListPopupWindow(context)
+    listPopupWindow.anchorView = this // Set EditText sebagai anchor
+
+    // Fungsi untuk menampilkan popup dengan data yang difilter
+    fun showPopup(inputText: String) {
+        val filteredSuggestions = suggestions.filter {
+            it.contains(inputText, ignoreCase = true)
+        }
+
+        if (filteredSuggestions.isNotEmpty()) {
+            val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, filteredSuggestions)
+            listPopupWindow.setAdapter(adapter)
+
+
+            // Hitung tinggi maksimal berdasarkan jumlah item dan tinggi per item
+            if (suggestions.size > maxItemsToShow) {
+                val itemHeight = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    48f, // Perkiraan tinggi item (48dp)
+                    resources.displayMetrics
+                ).toInt()
+
+                val maxHeight = itemHeight * maxItemsToShow
+                listPopupWindow.height = maxHeight
+            }
+
+            listPopupWindow.show()
+        } else {
+            listPopupWindow.dismiss()
+        }
+    }
+
+    // Fungsi manual untuk memicu autocomplete
+    fun triggerAutocomplete() {
+        val inputText = if (triggerOnClick) "" else this.text.toString()
+        showPopup(inputText)
+    }
+
+    if (triggerOnClick) {
+        // Listener untuk fokus (jika diaktifkan)
+        this.makeClickable()
+        this.click { triggerAutocomplete() }
+//        this.setOnFocusChangeListener { _, hasFocus ->
+//            if (hasFocus) {
+//                triggerAutocomplete()
+//            } else {
+//                listPopupWindow.dismiss()
+//            }
+//        }
+    } else {
+        this.onFocusIn { triggerAutocomplete() }
+        // Listener untuk perubahan teks
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if ((s?.length ?: 0) >= thresholdOnChange) {
+                    showPopup(s.toString())
+                } else {
+                    listPopupWindow.dismiss()
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    // Set behavior ketika item dipilih dari popup
+    listPopupWindow.setOnItemClickListener { _, _, position, _ ->
+        val selectedItem = listPopupWindow.listView?.adapter?.getItem(position) as String
+        this.setText(selectedItem) // Isi EditText dengan item yang dipilih
+        this.setSelection(this.text.length) // Tempatkan kursor di akhir teks
+        listPopupWindow.dismiss()
+        onItemSelected?.invoke(selectedItem) // Trigger callback
+    }
+
+    // Return fungsi triggerAutocomplete agar bisa dipanggil manual
+    this.tag = ::triggerAutocomplete
 }
