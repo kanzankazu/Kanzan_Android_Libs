@@ -24,8 +24,8 @@ open class BaseFragmentPagerStateAdapter(fragmentManager: FragmentManager) :
     override fun getCount(): Int = fragments.size
 
     override fun addFragment(fragment: Fragment, title: String) {
-        fragments.add(fragment)
-        titles.add(title)
+        this.fragments.add(fragment)
+        this.titles.add(title)
         notifyDataSetChanged()
     }
 

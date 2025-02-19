@@ -18,6 +18,7 @@ import com.kanzankazu.kanzannetwork.NetworkLiveData
 import com.kanzankazu.kanzannetwork.NetworkStatus
 import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.lazyNone
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseInfoDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
@@ -27,10 +28,10 @@ import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
  * Created by Faisal Bahri on 2020-02-11.
  */
 abstract class BaseActivitySuper : AppCompatActivity() {
-    val baseProgressDialog by lazy { BaseProgressDialog() }
-    val baseAlertDialog by lazy { BaseAlertDialog() }
-    val baseAdmob by lazy { BaseAdmob(this) }
-    val networkLiveData by lazy { NetworkLiveData(this) }
+    val baseProgressDialog by lazyNone { BaseProgressDialog() }
+    val baseAlertDialog by lazyNone { BaseAlertDialog() }
+    val baseAdmob by lazyNone { BaseAdmob(this) }
+    val networkLiveData by lazyNone { NetworkLiveData(this) }
 
     private lateinit var onBackPressedCallback: OnBackPressedCallback
 

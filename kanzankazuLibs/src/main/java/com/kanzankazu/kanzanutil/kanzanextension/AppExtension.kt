@@ -13,9 +13,19 @@ inline fun <reified T> FragmentActivity.findChildListener(tag: String): T? {
     return supportFragmentManager.findFragmentByTag(tag) as? T
 }
 
+/**Mencari listener yg di gunakan Fragment child dari Activity*/
+inline fun <reified T : Fragment> FragmentActivity.findChildListener(): T? {
+    return supportFragmentManager.fragments.find { it is T } as? T
+}
+
 /**Mencari listener yg di gunakan Fragment child dari Fragment parent*/
 inline fun <reified T> Fragment.findChildListener(tag: String): T? {
     return childFragmentManager.findFragmentByTag(tag) as? T
+}
+
+/**Mencari listener yg di gunakan Fragment child dari Fragment parent*/
+inline fun <reified T : Fragment> Fragment.findChildListener(): T? {
+    return childFragmentManager.fragments.find { it is T } as? T
 }
 
 fun FragmentActivity.getLifeCycle() = lifecycle

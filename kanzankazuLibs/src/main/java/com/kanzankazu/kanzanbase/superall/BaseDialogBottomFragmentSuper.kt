@@ -14,6 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.kanzankazu.R
 import com.kanzankazu.kanzanbase.BaseAdmob
 import com.kanzankazu.kanzanutil.kanzanextension.getLifeCycleOwner
+import com.kanzankazu.kanzanutil.kanzanextension.type.lazyNone
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
 
@@ -21,9 +22,9 @@ import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
  * Created by Faisal Bahri on 2020-02-11.
  */
 abstract class BaseDialogBottomFragmentSuper : BottomSheetDialogFragment() {
-    val baseProgressDialog by lazy { BaseProgressDialog() }
-    val baseAlertDialog by lazy { BaseAlertDialog() }
-    val baseAdmob by lazy { BaseAdmob(requireActivity()) }
+    val baseProgressDialog by lazyNone { BaseProgressDialog() }
+    val baseAlertDialog by lazyNone { BaseAlertDialog() }
+    val baseAdmob by lazyNone { BaseAdmob(requireActivity()) }
 
     protected abstract fun setContent()
     protected open fun setActivityResult() {}

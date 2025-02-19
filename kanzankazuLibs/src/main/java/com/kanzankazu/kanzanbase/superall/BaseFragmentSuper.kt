@@ -12,14 +12,15 @@ import androidx.viewbinding.ViewBinding
 import com.kanzankazu.kanzanbase.BaseAdmob
 import com.kanzankazu.kanzannetwork.NetworkLiveData
 import com.kanzankazu.kanzannetwork.NetworkStatus
+import com.kanzankazu.kanzanutil.kanzanextension.type.lazyNone
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
 
 abstract class BaseFragmentSuper : Fragment() {
-    protected val baseProgressDialog by lazy { BaseProgressDialog() }
-    protected val baseAlertDialog by lazy { BaseAlertDialog() }
-    protected val baseAdmob by lazy { BaseAdmob(requireActivity()) }
-    protected val networkLiveData by lazy { NetworkLiveData(requireContext()) }
+    protected val baseProgressDialog by lazyNone { BaseProgressDialog() }
+    protected val baseAlertDialog by lazyNone { BaseAlertDialog() }
+    protected val baseAdmob by lazyNone { BaseAdmob(requireActivity()) }
+    protected val networkLiveData by lazyNone { NetworkLiveData(requireContext()) }
 
     protected var mLayout = 0
     protected var hasInitializedRootView = false

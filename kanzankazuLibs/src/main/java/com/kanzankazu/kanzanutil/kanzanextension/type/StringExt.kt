@@ -226,6 +226,7 @@ fun String.getInitialName(): String {
     }
 }
 
+
 fun String?.getPhoneNumber62(): String {
     return if (this != null) {
         val sub0 = substring(0, 1)
@@ -243,8 +244,8 @@ fun String?.getPhoneNumber62(): String {
     }
 }
 
-fun String.maskingEmailAddress() =
-    replace(Regex("(?<=.)[^@](?=[^@]*?@)|(?:(?<=@.)|(?!^)\\G(?=[^@]*$)).(?!$)"), "*")
+
+fun String.maskingEmailAddress() = replace(Regex("(?<=.)[^@](?=[^@]*?@)|(?:(?<=@.)|(?!^)\\G(?=[^@]*$)).(?!$)"), "*")
 
 fun String.maskingPhoneNumber() = replace(Regex("\\b(\\d{2})\\d+(\\d)"), "$1*******$2")
 
@@ -296,16 +297,12 @@ fun getUniquePseudoID(): String {
 }
 
 fun convertToKm(km: String): String {
-    //  ex : 12.345,6 replace all "." with "" and "," with ".", enable parsing to double
     val sKm = km.replace("\\.".toRegex(), "").replace(",".toRegex(), ".")
-    // ex : 12500.6 parse to double -> 12.500.6 replace all "." with "," and replace first found char of "." with ","
     return String.format("%s KM", NumberFormat.getNumberInstance(Locale.UK).format(sKm.toDouble()).replace(".", ",").replaceFirst(",".toRegex(), "."))
 }
 
 fun convertToKmNumberOnly(km: String): String {
-    //  ex : 12.345,6 replace all "." with "" and "," with ".", enable parsing to double
     val sKm = km.replace("\\.".toRegex(), "").replace(",".toRegex(), ".")
-    // ex : 12500.6 parse to double -> 12.500.6 replace all "." with "," and replace first found char of "." with ","
     return String.format("%s", NumberFormat.getNumberInstance(Locale.UK).format(sKm.toDouble()).replace(".", ",").replaceFirst(",".toRegex(), "."))
 }
 
@@ -387,13 +384,4 @@ fun getStringVarArg(condition: (String?) -> Boolean, vararg s: String?): String 
         }
     }
     return s1
-}
-
-fun String.isRemoteFeatureFlag(keyName: String): Boolean {
-    return try {
-        val jsonObject = JSONObject(this)
-        return jsonObject.getBoolean(keyName)
-    } catch (e: Exception) {
-        false
-    }
 }

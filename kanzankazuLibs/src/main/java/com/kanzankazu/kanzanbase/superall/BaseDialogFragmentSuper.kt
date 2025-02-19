@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.kanzankazu.R
 import com.kanzankazu.kanzanbase.BaseAdmob
+import com.kanzankazu.kanzanutil.kanzanextension.type.lazyNone
 import com.kanzankazu.kanzanwidget.dialog.BaseAlertDialog
 import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
 
@@ -21,9 +22,9 @@ import com.kanzankazu.kanzanwidget.dialog.BaseProgressDialog
  * Created by Faisal Bahri on 2020-02-11.
  */
 abstract class BaseDialogFragmentSuper : DialogFragment() {
-    val baseProgressDialog by lazy { BaseProgressDialog() }
-    val baseAlertDialog by lazy { BaseAlertDialog() }
-    val baseAdmob by lazy { BaseAdmob(requireActivity()) }
+    val baseProgressDialog by lazyNone { BaseProgressDialog() }
+    val baseAlertDialog by lazyNone { BaseAlertDialog() }
+    val baseAdmob by lazyNone { BaseAdmob(requireActivity()) }
 
     protected open fun setActivityResult() {}
     protected open fun setSubscribeToLiveData() {}

@@ -26,10 +26,26 @@ import androidx.core.view.isVisible
 import com.kanzankazu.kanzanutil.OnSingleClickListener
 import com.kanzankazu.kanzanutil.kanzanextension.type.dpTopx
 
+/**
+ * Meng-inflate layout yang diberikan dan mengembalikan view yang telah di-inflate.
+ * Layout yang diberikan akan di-inflate dengan menggunakan LayoutInflate yang di dapatkan dari activity.
+ * Metode ini berguna jika kita ingin meng-inflate layout di dalam activity dan mengembalikan view yang di-inflate.
+ *
+ * @param layout resource id dari layout yang ingin di-inflate
+ * @return view yang telah di-inflate
+ */
 fun Activity.inflate(@LayoutRes layout: Int): View {
     return layoutInflater.inflate(layout, null)
 }
 
+/**
+ * Meng-inflate layout yang diberikan dan mengembalikan view yang telah di-inflate.
+ * Layout yang diberikan akan di-inflate dengan menggunakan LayoutInflate yang di dapatkan dari context.
+ * Metode ini berguna jika kita ingin meng-inflate layout di dalam view group dan mengembalikan view yang di-inflate.
+ *
+ * @param layout resource id dari layout yang ingin di-inflate
+ * @return view yang telah di-inflate
+ */
 fun ViewGroup.inflate(@LayoutRes layout: Int): View {
     return LayoutInflater.from(context).inflate(layout, this, false)
 }
@@ -116,13 +132,16 @@ fun View.visibleView(textView: TextView, s: String?, isInvisible: Boolean = fals
     }
 }
 
-fun View.visibleView(i: Int, isShowHide: Boolean = true, isInvisible: Boolean = false): Boolean {
-    val b = i != 0
+fun View.visibleView(b: Boolean, isShowHide: Boolean = true, isInvisible: Boolean = false): Boolean {
     if (b && this is CheckBox) isChecked = b
     else if (b && this is Switch) isChecked = b
 
     if (isShowHide) visibleView(b)
     return b
+}
+
+fun View.visibleView(i: Int, isShowHide: Boolean = true, isInvisible: Boolean = false): Boolean {
+    return visibleView(i != 0, isShowHide, isInvisible)
 }
 
 fun View.visibleView(s: String?, isShowHide: Boolean = true, isInvisible: Boolean = false): Boolean {
@@ -223,6 +242,15 @@ fun View.idName(): String? {
     else id.toString()
 }
 
+/**
+ * Mengatur padding view berdasarkan ukuran dalam satuan dp.
+ * Ukuran yang diberikan akan dikonversi menjadi ukuran dalam pixel sebelum digunakan.
+ * Nilai default untuk left, top, right, dan bottom adalah 0.
+ * @param left padding kiri dalam dp
+ * @param top padding atas dalam dp
+ * @param right padding kanan dalam dp
+ * @param bottom padding bawah dalam dp
+ */
 fun View.paddingByDp(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) {
     setPadding(left.dpTopx(), top.dpTopx(), right.dpTopx(), bottom.dpTopx())
 }
@@ -246,18 +274,26 @@ fun View.backgroundDrawable(@DrawableRes drawableResource: Int) {
 }
 
 /**
- * @param menuRes Menu ID
- * @param listener return true if there func false if no func*/
+ * Membuat popup menu dan menambahkan listener pada menu item yang di klik.
+ * Fungsi ini membuat popup menu dengan resource menu yang diberikan
+ * dan menambahkan listener pada menu item yang di klik.
+ * Parameter context digunakan untuk membuat popup menu,
+ * parameter menuRes digunakan sebagai resource menu yang akan di gunakan,
+ * dan parameter listener digunakan sebagai listener yang akan di jalankan
+ * ketika menu item di klik.
+ * Fungsi ini memanggil setOnSingleClickListener untuk menambahkan listener
+ * pada view yang di gunakan sebagai anchor popup menu.
+ * Ketika view di klik maka popup menu akan di munculkan dan listener
+ * akan di jalankan ketika menu item di klik.
+ */
 fun View.popUpMenu(context: Context, @MenuRes menuRes: Int, listener: (MenuItem) -> Boolean) {
     setOnSingleClickListener {
         val popupMenu = PopupMenu(context, it)
         popupMenu.setOnMenuItemClickListener { item -> listener(item) }
-        //popupMenu.inflate(menuRes)
         popupMenu.menuInflater.inflate(menuRes, popupMenu.menu)
         popupMenu.show()
     }
 }
-
 fun View.getViewGroup(): ViewGroup? = this as? ViewGroup
 
 fun ViewGroup.getAllView(): ArrayList<View> {
@@ -278,11 +314,6 @@ inline fun <reified T> ArrayList<View>.getAllViewDetail(): ArrayList<T> {
     return arrayListOf
 }
 
-/**
- * @receiver ArrayList<Triple<View, Boolean, Boolean>>
- * 1. View? can be null
- * 2. onError = () -> Unit
- * 3. CustomValidations = ArrayList<(View) -> Boolean*/
 fun ArrayList<Triple<View, () -> Unit, ArrayList<(View) -> Boolean>>>.asd(): Boolean {
     val b = arrayListOf<Boolean>()
     forEach { triple ->

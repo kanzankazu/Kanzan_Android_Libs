@@ -49,14 +49,12 @@ class GenericAdapter<T : Equatable>(
         val item = items[position]
         when (getItemViewType(position)) {
             TYPE_DATA -> {
-                (holder as DataViewHolder<T>)
-                    .bind(position, item as T, onBind)
+                (holder as DataViewHolder<T>).bind(position, item as T, onBind)
             }
 
             TYPE_ERROR -> {
                 val itemError = item as ErrorData
-                (holder as ErrorViewHolder)
-                    .bind(itemError.errorMessage, onBindError)
+                (holder as ErrorViewHolder).bind(itemError.errorMessage, onBindError)
             }
         }
     }

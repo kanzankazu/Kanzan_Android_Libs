@@ -23,7 +23,7 @@ class CrashlyticsTimberTree @Inject constructor(
     override fun log(priority: Int, tag: String?, message: String, throwable: Throwable?) {
         if (priority < minLogPriority) return
 
-        val formattedTag = tag ?: "CrashlyticsTree"
+        val formattedTag = tag ?: "CrashlyticsTimberTree"
 
         if (isDebug) {
             Log.println(priority, formattedTag, message)

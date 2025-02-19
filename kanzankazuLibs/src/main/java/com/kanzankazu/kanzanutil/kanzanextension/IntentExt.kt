@@ -72,28 +72,32 @@ fun Intent?.isTypeImage() =
 
 inline fun <reified T> Context.makeIntent() = Intent(this, T::class.java)
 
-inline fun <reified T> Activity.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null) {
+inline fun <reified T> Activity.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null, intentHandle: Intent.() -> Unit = {}) {
     val newIntent = intent ?: Intent(this, T::class.java)
+    newIntent.apply { intentHandle.invoke(this) }
     if (bundle != null) newIntent.putExtras(bundle)
     startActivity(newIntent, optionBundle)
     if (finish) finish()
 }
 
-inline fun <reified T> Fragment.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null) {
+inline fun <reified T> Fragment.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null, intentHandle: Intent.() -> Unit = {}) {
     val newIntent = intent ?: Intent(activity, T::class.java)
+    newIntent.apply { intentHandle.invoke(this) }
     if (bundle != null) newIntent.putExtras(bundle)
     startActivity(newIntent, optionBundle)
     if (finish) activity?.finish()
 }
 
-inline fun <reified T> Activity.changePageForResult(requestCode: Int, bundle: Bundle? = null, intent: Intent? = null, optionBundle: Bundle? = null) {
+inline fun <reified T> Activity.changePageForResult(requestCode: Int, bundle: Bundle? = null, intent: Intent? = null, optionBundle: Bundle? = null, intentHandle: Intent.() -> Unit = {}) {
     val newIntent = intent ?: Intent(this, T::class.java)
+    newIntent.apply { intentHandle.invoke(this) }
     if (bundle != null) newIntent.putExtras(bundle)
     startActivityForResult(newIntent, requestCode, optionBundle)
 }
 
-inline fun <reified T> Fragment.changePageForResult(requestCode: Int, bundle: Bundle? = null, intent: Intent? = null, optionBundle: Bundle? = null) {
+inline fun <reified T> Fragment.changePageForResult(requestCode: Int, bundle: Bundle? = null, intent: Intent? = null, optionBundle: Bundle? = null, intentHandle: Intent.() -> Unit = {}) {
     val newIntent = intent ?: Intent(activity, T::class.java)
+    newIntent.apply { intentHandle.invoke(this) }
     if (bundle != null) newIntent.putExtras(bundle)
     startActivityForResult(newIntent, requestCode, optionBundle)
 }
@@ -221,8 +225,8 @@ fun Context.handleSendMultipleImages(intent: Intent) =
     } ?: arrayListOf()
 
 fun AppCompatActivity.intentPickVisualMediaInit(): ActivityResultLauncher<PickVisualMediaRequest> {
-    val imageCompressor =   ImageCompressor(context = applicationContext)
-    val fileManager =   FileManager(context = applicationContext)
+    val imageCompressor = ImageCompressor(context = applicationContext)
+    val fileManager = FileManager(context = applicationContext)
 
     val scope = CoroutineScope(this.lifecycleScope.coroutineContext)
 

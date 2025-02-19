@@ -13,6 +13,7 @@ import com.kanzankazu.kanzanutil.kanzanextension.type.decodedString
 import com.kanzankazu.kanzanutil.kanzanextension.type.encodeString
 import com.kanzankazu.kanzanutil.kanzanextension.type.toBooleanOrFalse
 import com.kanzankazu.kanzanutil.kanzanextension.type.toIntOrDefault
+import com.kanzankazu.kanzanutil.kanzanextension.type.toLongOrDefault
 
 
 /**
@@ -95,17 +96,21 @@ abstract class BasePreference(context: Context) {
 
     fun getSharedPrefInt(key: String, defaultValue: Int = 0): Int = getSharedPrefString(key).toIntOrDefault(defaultValue)//sharedPreferences.getInt(key, 0)
 
-    fun putSharedPrefLong(key: String, value: Long) = sharedPreferences.edit().putLong(key, value).commit()
+    fun putSharedPrefLong(key: String, value: Long) = putSharedPrefString(key, value.toString())
 
-    fun getSharedPrefLong(key: String): Long = sharedPreferences.getLong(key, 0)
+    fun getSharedPrefLong(key: String): Long = getSharedPrefString(key).toLongOrDefault()
 
     fun putSharedPrefBoolean(key: String, value: Boolean) = putSharedPrefString(key, value.toString())//sharedPreferences.edit().putBoolean(key, value).commit()
 
     fun getSharedPrefBoolean(key: String, defaultValue: Boolean = false): Boolean = getSharedPrefString(key).toBooleanOrFalse(defaultValue)//sharedPreferences.getBoolean(key, false)
 
-    fun putSharedPrefFloat(key: String, value: Float) = sharedPreferences.edit().putFloat(key, value).commit()
+    fun putSharedPrefFloat(key: String, value: Float) = putSharedPrefString(key, value.toString())
 
-    fun getSharedPrefFloat(key: String): Float = sharedPreferences.getFloat(key, 0f)
+    fun getSharedPrefFloat(key: String): Float = getSharedPrefString(key).toFloatOrNull() ?: 0F
+
+    fun putSharedPrefDouble(key: String, value: Double) = putSharedPrefString(key, value.toString())
+
+    fun getSharedPrefDouble(key: String): Double = getSharedPrefString(key).toDoubleOrNull() ?: 0.0
 
     fun putSharedPrefStringArray(key: String, values: ArrayList<String>) {
         for (i in values.indices) {

@@ -2,6 +2,10 @@ package com.kanzankazu.kanzanutil.kanzanextension.type
 
 import com.google.gson.Gson
 
+fun <T> lazyNone(initializer: () -> T): Lazy<T> {
+    return lazy(LazyThreadSafetyMode.NONE, initializer)
+}
+
 fun <T> object2Json(objectClass: Class<T>?): String {
     val gson = Gson()
     return gson.toJson(objectClass)

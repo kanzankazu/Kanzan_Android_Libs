@@ -1,5 +1,6 @@
 package com.kanzankazu.kanzanbase
 
+import com.kanzankazu.kanzanutil.kanzanextension.type.lazyNone
 import com.kanzankazu.kanzanutil.scheduler.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -7,7 +8,7 @@ import java.lang.ref.WeakReference
 
 open class BasePresenter<V : BaseViewPresenter> constructor(var scheduler: SchedulerProvider) : BasePresenterContract<V> {
 
-    private val mCompositeDisposable by lazy {
+    private val mCompositeDisposable by lazyNone {
         CompositeDisposable()
     }
 
