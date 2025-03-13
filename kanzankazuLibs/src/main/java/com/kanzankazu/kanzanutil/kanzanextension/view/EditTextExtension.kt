@@ -288,7 +288,21 @@ fun EditText.setMaxLength(maxLength: Int) {
     filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 }
 
-
+/**
+ * Mengatur fitur autocomplete untuk EditText dengan menampilkan popup daftar saran.
+ *
+ * @param context Context dari aplikasi untuk mengakses resource dan layanan aplikasi.
+ * @param suggestions Daftar data saran yang akan ditampilkan dalam popup list.
+ * @param triggerOnClick Jika true, popup akan muncul langsung saat EditText mendapatkan fokus.
+ * @param thresholdOnChange Jumlah minimal karakter yang harus diketik sebelum popup muncul.
+ * @param maxItemsToShow Jumlah maksimal item yang ingin ditampilkan di popup.
+ * @param onItemSelected Callback yang akan dipanggil ketika item dalam popup dipilih.
+ *
+ * Contoh hasil penggunaan:
+ * Jika pengguna mengetik 'app' dalam EditText, dan daftar saran berisi ['apple', 'application', 'banana'],
+ * maka popup akan menampilkan 'apple' dan 'application'. Jika 'apple' dipilih, callback onItemSelected
+ * akan dipanggil dengan nilai 'apple'.
+ */
 fun EditText.setupAutocomplete(
     context: Context,
     suggestions: List<String>, // Data suggesstion yang akan ditampilkan dalam popup list
