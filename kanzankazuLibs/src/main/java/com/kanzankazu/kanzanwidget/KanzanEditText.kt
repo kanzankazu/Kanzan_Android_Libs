@@ -17,9 +17,9 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.material.textfield.TextInputLayout
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.initCustomAttribute
-import com.kanzankazu.kanzanutil.kanzanextension.type.initCustomView
 import com.kanzankazu.kanzanutil.kanzanextension.view.afterTextChanged
+import com.kanzankazu.kanzanutil.kanzanextension.view.initCustomAttribute
+import com.kanzankazu.kanzanutil.kanzanextension.view.initCustomView
 import com.kanzankazu.kanzanutil.kanzanextension.view.visibleView
 
 class KanzanEditText @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr) {
