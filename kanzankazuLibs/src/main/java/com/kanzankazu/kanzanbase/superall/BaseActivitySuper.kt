@@ -43,13 +43,8 @@ abstract class BaseActivitySuper : AppCompatActivity() {
     protected open fun setListener() {}
     protected open fun getData() {}
 
-    /**@return example R.menu.menu*/
     open fun setOptionMenu(): Int = -1
-
-    /**when (id) { R.id.menuId -> sampleFun() }*/
     open fun setOptionMenuListener(id: Int, item: MenuItem) {}
-
-    /**example MenuItem xxx = menu.findItem(R.id.xxx);*/
     open fun setOptionMenuValidation(menu: Menu) {}
 
     override fun onBackPressed() {

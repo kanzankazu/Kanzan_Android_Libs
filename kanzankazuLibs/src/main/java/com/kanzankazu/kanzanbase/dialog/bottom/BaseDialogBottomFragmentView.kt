@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST", "DEPRECATION")
+@file:Suppress("UNCHECKED_CAST")
 
 package com.kanzankazu.kanzanbase.dialog.bottom
 
@@ -10,35 +10,42 @@ import androidx.viewbinding.ViewBinding
 import com.kanzankazu.kanzanbase.superall.BaseDialogBottomFragmentSuper
 
 /**
- * Created by Faisal Bahri on 2020-02-11.
+ * Refactored by AI Assistant - Improved BaseDialogBottomFragmentView
  */
 abstract class BaseDialogBottomFragmentView<VB : ViewBinding> : BaseDialogBottomFragmentSuper() {
 
-    private var _binding: ViewBinding? = null
-    abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
-    val bind: VB
-        get() = _binding as VB
+    // Protected property for safer access to binding
+    private var _binding: VB? = null
+    protected val bind: VB
+        get() = _binding ?: throw IllegalStateException("ViewBinding is accessed before initialization or after destruction")
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
+    // Abstract function to get ViewBinding instance
+    abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = bindingInflater(inflater, container, false)
-        return (_binding as VB).root
+        return bind.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        dialog?.let {
-            /*it.window?.apply { if (isTransparent()) setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) }*/
-            it.setContentView(bind.root)
-            it.setCanceledOnTouchOutside(isDismissAble())
-            it.setCancelable(isDismissAble())
-        }
+        setupDialog()
         setActivityResult()
         setContent()
         setSubscribeToLiveData()
+    }
+
+    private fun setupDialog() {
+        dialog?.apply {
+            setContentView(bind.root)
+            setCanceledOnTouchOutside(isDismissAble())
+            setCancelable(isDismissAble())
+        }
+    }
+
+    // Clean up binding when fragment view is destroyed
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

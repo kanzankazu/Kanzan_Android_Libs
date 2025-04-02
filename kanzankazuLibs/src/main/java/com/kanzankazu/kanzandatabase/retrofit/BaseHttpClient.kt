@@ -1,9 +1,4 @@
-@file:Suppress("SameParameterValue")
-
-package com.kanzankazu.kanzandatabase.retrofit
-
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -22,15 +17,6 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
-/**
-companion object {
-private val mInstance: HttpClient = HttpClient()
-
-@Synchronized
-fun getInstance(): HttpClient {
-return mInstance
-}
-}*/
 abstract class BaseHttpClient<T> {
     var client: Retrofit? = null
     private var endpoint: Class<T>? = null
@@ -40,6 +26,11 @@ abstract class BaseHttpClient<T> {
     protected abstract fun getBaseUrl(): String
     protected abstract fun isDebug(): Boolean
     protected open fun getTokenSuffix(): String = "Bearer"
+
+    companion object {
+        private const val DATE_FORMAT_SERVER = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        private const val AUTHORIZATION_HEADER = "Authorization"
+    }
 
     init {
         buildRetrofitClient()
@@ -52,69 +43,67 @@ abstract class BaseHttpClient<T> {
 
     private fun buildRetrofitClient() {
         val httpClient = OkHttpClient.Builder()
-        httpClient.connectTimeout(2, TimeUnit.MINUTES)
-        httpClient.readTimeout(2, TimeUnit.MINUTES)
+            .connectTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(2, TimeUnit.MINUTES)
 
         if (isDebug()) {
-            val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
-            httpClient.addInterceptor(interceptor)
-            httpClient.addInterceptor(ChuckInterceptor(getContext()))
+            configureDebugInterceptors(httpClient)
         }
 
-        if (getToken().isNotEmpty()) {
-            if (getTokenSuffix().isNotEmpty()) httpClient.addInterceptor(getInterceptorWithHeader("Authorization", "${getTokenSuffix()} ${getToken()}"))
-            else httpClient.addInterceptor(getInterceptorWithHeader("Authorization", getToken()))
-            Log.d("Lihat KanzanKazu", "buildRetrofitClient BaseHttpClient ${getToken()}")
+        val token = getToken()
+        if (token.isNotEmpty()) {
+            httpClient.addInterceptor(createAuthorizationInterceptor(token))
         }
 
-        val okHttpClient = httpClient.build()
         client = Retrofit.Builder()
             .baseUrl(getBaseUrl())
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(getDefaultGson()))
+            .client(httpClient.build())
+            .addConverterFactory(GsonConverterFactory.create(createDefaultGson()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
+
         endpoint = null // clear retrofit endpoint
     }
 
-    private fun getInterceptorWithHeader(headerName: String, headerValue: String): Interceptor {
-        val header = HashMap<String, String>()
-        header[headerName] = headerValue
-        return getInterceptorWithHeader(header)
+    private fun configureDebugInterceptors(httpClient: OkHttpClient.Builder) {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        httpClient.addInterceptor(loggingInterceptor)
+        httpClient.addInterceptor(ChuckInterceptor(getContext()))
     }
 
-    private fun getInterceptorWithHeader(headers: Map<String, String>): Interceptor {
+    private fun createAuthorizationInterceptor(token: String): Interceptor {
+        val fullToken = if (getTokenSuffix().isNotEmpty()) {
+            "${getTokenSuffix()} $token"
+        } else {
+            token
+        }
         return Interceptor { chain ->
             val original = chain.request()
-            val builder = original.newBuilder()
-            for ((key, value) in headers) {
-                builder.addHeader(key, value)
-            }
-            builder.method(original.method, original.body)
-            chain.proceed(builder.build())
+            val request = original.newBuilder()
+                .addHeader(AUTHORIZATION_HEADER, fullToken)
+                .method(original.method, original.body)
+                .build()
+            chain.proceed(request)
         }
     }
 
-    private fun getDefaultGson(): Gson {
-        val dateFormatServer = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-
+    private fun createDefaultGson(): Gson {
         return GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
-            .setDateFormat(dateFormatServer)
+            .setDateFormat(DATE_FORMAT_SERVER)
             .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
-                val formatServer = SimpleDateFormat(dateFormatServer, Locale.ENGLISH)
-                formatServer.timeZone = TimeZone.getTimeZone("UTC")
-                formatServer.parse(json.asString)
+                val format = SimpleDateFormat(DATE_FORMAT_SERVER, Locale.ENGLISH).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }
+                format.parse(json.asString)
             })
             .registerTypeAdapter(Date::class.java, JsonSerializer<Date> { src, _, _ ->
-                val format = SimpleDateFormat(dateFormatServer, Locale.ENGLISH)
-                format.timeZone = TimeZone.getTimeZone("UTC")
-                if (src != null) {
-                    JsonPrimitive(format.format(src))
-                } else {
-                    null
+                val format = SimpleDateFormat(DATE_FORMAT_SERVER, Locale.ENGLISH).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
                 }
+                JsonPrimitive(src?.let { format.format(it) })
             })
             .create()
     }

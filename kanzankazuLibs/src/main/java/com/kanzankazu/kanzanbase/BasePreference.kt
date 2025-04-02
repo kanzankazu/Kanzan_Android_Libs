@@ -9,177 +9,127 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
 import com.kanzankazu.BuildConfig
-import com.kanzankazu.kanzanutil.kanzanextension.type.decodedString
-import com.kanzankazu.kanzanutil.kanzanextension.type.encodeString
-import com.kanzankazu.kanzanutil.kanzanextension.type.toBooleanOrFalse
-import com.kanzankazu.kanzanutil.kanzanextension.type.toIntOrDefault
-import com.kanzankazu.kanzanutil.kanzanextension.type.toLongOrDefault
 
-
-/**
-IMPLEMENT in SubClass
-
-companion object {
-const val PREFS_NAME = "SHARED_PREF"
-private var userPreference: UserPreference? = null
-
-private fun newInstance(context: Context): UserPreference {
-if (userPreference == null) {
-userPreference = UserPreference(context.applicationContext)
-}
-return userPreference!!
-}
-
-@JvmStatic
-val instance: UserPreference
-get() = userPreference ?: newInstance(MyApplication.getInstance())
-}
-
-var login: Boolean
-get() = getSharedPrefBoolean(Const.SharedPreference.LOGIN)
-set(b) = putSharedPrefBoolean(Const.SharedPreference.LOGIN, b)
-
-IMPLEMENT in ApplicationClass
-
-companion object {
-lateinit var instance: MyApplication
-
-fun getApp(): MyApplication {
-return instance
-}
-}
-
-UserPreference = ClassName
-MyApplication = ApplicationClass
- */
 abstract class BasePreference(context: Context) {
+
     private val prefsName = "${BuildConfig.LIBRARY_PACKAGE_NAME}.secure_preferences"
 
-    private val sharedPreferences =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+    private val sharedPreferences = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        createEncryptedSharedPreferences(context)
+    } else {
+        context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+    }
 
-            //If allowBackup is set to true and the user uninstall & reinstall the app,
-            //It will throw exception because the generated masterKey is different
-            EncryptedSharedPreferences.create(
-                prefsName,
-                masterKeyAlias,
-                context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        } else {
-            context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-        }
-
-    /*val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences(
+    // Helper to create encrypted SharedPreferences
+    private fun createEncryptedSharedPreferences(context: Context) = try {
+        val masterKey = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        EncryptedSharedPreferences.create(
             prefsName,
-            Context.MODE_PRIVATE
-        )*/
+            masterKey,
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    } catch (e: Exception) {
+        // Handle exception gracefully
+        context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+    }
 
     /**
-     * Preference Helper
+     * Utility method for safely editing shared preferences
      */
-    fun removeSharedPrefByKey(key: String) = sharedPreferences.edit().remove(key).commit()
+    private inline fun editPreferences(action: (android.content.SharedPreferences.Editor) -> Unit): Boolean {
+        return sharedPreferences.edit().apply(action).commit()
+    }
 
-    fun isContainKey(key: String): Boolean = sharedPreferences.contains(key)
+    // General Put and Get Methods to Avoid Code Duplication
+    fun putString(key: String, value: String) = editPreferences { it.putString(key, value.encodeString()) }
+    fun getString(key: String, defaultValue: String = "") =
+        sharedPreferences.getString(key, defaultValue)?.decodedString() ?: defaultValue
+
+    fun putInt(key: String, value: Int) = putString(key, value.toString())
+    fun getInt(key: String, defaultValue: Int = 0): Int = getString(key).toIntOrNull() ?: defaultValue
+
+    fun putLong(key: String, value: Long) = putString(key, value.toString())
+    fun getLong(key: String, defaultValue: Long = 0L): Long = getString(key).toLongOrNull() ?: defaultValue
+
+    fun putBoolean(key: String, value: Boolean) = putString(key, value.toString())
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean = getString(key).toBooleanStrictOrNull() ?: defaultValue
+
+    fun putFloat(key: String, value: Float) = putString(key, value.toString())
+    fun getFloat(key: String, defaultValue: Float = 0F): Float = getString(key).toFloatOrNull() ?: defaultValue
+
+    fun removeKey(key: String): Boolean = editPreferences { it.remove(key) }
+    fun containsKey(key: String): Boolean = sharedPreferences.contains(key)
 
     /**
-     * Preference Editor
+     * Manage List of Strings
      */
-    fun putSharedPrefString(key: String, value: String) = sharedPreferences.edit().putString(key, value.encodeString()).commit()
+    fun putStringList(key: String, values: List<String>) {
+        val serializedList = TextUtils.join("‚‗‚", values.map { it.encodeString() })
+        putString(key, serializedList)
+    }
 
-    fun getSharedPrefString(key: String): String = (sharedPreferences.getString(key, "") ?: "").decodedString()
+    fun getStringList(key: String): List<String> {
+        val serializedList = getString(key)
+        return if (serializedList.isEmpty()) emptyList()
+        else TextUtils.split(serializedList, "‚‗‚").map { it.decodedString() }
+    }
 
-    fun putSharedPrefInt(key: String, value: Int) = putSharedPrefString(key, value.toString())//sharedPreferences.edit().putInt(key, value).commit()
+    /**
+     * Manage Objects
+     */
+    fun <T> putObject(key: String, obj: T) {
+        val json = Gson().toJson(obj)
+        putString(key, json)
+    }
 
-    fun getSharedPrefInt(key: String, defaultValue: Int = 0): Int = getSharedPrefString(key).toIntOrDefault(defaultValue)//sharedPreferences.getInt(key, 0)
-
-    fun putSharedPrefLong(key: String, value: Long) = putSharedPrefString(key, value.toString())
-
-    fun getSharedPrefLong(key: String): Long = getSharedPrefString(key).toLongOrDefault()
-
-    fun putSharedPrefBoolean(key: String, value: Boolean) = putSharedPrefString(key, value.toString())//sharedPreferences.edit().putBoolean(key, value).commit()
-
-    fun getSharedPrefBoolean(key: String, defaultValue: Boolean = false): Boolean = getSharedPrefString(key).toBooleanOrFalse(defaultValue)//sharedPreferences.getBoolean(key, false)
-
-    fun putSharedPrefFloat(key: String, value: Float) = putSharedPrefString(key, value.toString())
-
-    fun getSharedPrefFloat(key: String): Float = getSharedPrefString(key).toFloatOrNull() ?: 0F
-
-    fun putSharedPrefDouble(key: String, value: Double) = putSharedPrefString(key, value.toString())
-
-    fun getSharedPrefDouble(key: String): Double = getSharedPrefString(key).toDoubleOrNull() ?: 0.0
-
-    fun putSharedPrefStringArray(key: String, values: ArrayList<String>) {
-        for (i in values.indices) {
-            putSharedPrefString(key + "_" + i, values[i])
+    inline fun <reified T> getObject(key: String): T? {
+        val json = getString(key)
+        return try {
+            Gson().fromJson(json, T::class.java)
+        } catch (e: Exception) {
+            null // Fallback to null if deserialization fails
         }
-        putSharedPrefInt(key + "_size", values.size)
     }
 
-    fun getSharedPrefStringArray(key: String): ArrayList<String> {
-        val values = ArrayList<String>()
-        for (i in 0 until getSharedPrefInt(key + "_size")) {
-            values.add(getSharedPrefString(key + "_" + i))
-        }
-        return values
+    fun <T> putObjectList(key: String, objList: List<T>) {
+        val jsonList = objList.map { Gson().toJson(it) }
+        putStringList(key, jsonList)
     }
 
-    fun putListString(key: String?, stringList: ArrayList<String>) {
-        val myStringList = stringList.toTypedArray()
-        sharedPreferences.edit().putString(key, TextUtils.join("‚‗‚", myStringList)).commit()
-    }
-
-    fun getListString(key: String?): ArrayList<String> {
-        return ArrayList(listOf(*TextUtils.split(sharedPreferences.getString(key, ""), "‚‗‚")))
-    }
-
-    fun putSharedPrefObject(key: String, obj: Any) {
-        val gson = Gson()
-        putSharedPrefString(key, gson.toJson(obj))
-    }
-
-    inline fun <reified T> getSharedPrefObject(key: String): T? {
-        val json = getSharedPrefString(key)
-        return Gson().fromJson(json, T::class.java)
-    }
-
-    fun putSharedPrefObjectList(key: String, objArray: ArrayList<Any>?) {
-        val gson = Gson()
-        val objStrings = ArrayList<String>()
-        if (objArray != null) {
-            for (obj in objArray) {
-                objStrings.add(gson.toJson(obj))
+    fun <T> getObjectList(key: String, clazz: Class<T>): List<T> {
+        return getStringList(key).mapNotNull { json ->
+            try {
+                Gson().fromJson(json, clazz)
+            } catch (e: Exception) {
+                null
             }
-            putListString(key, objStrings)
         }
     }
 
-    fun getSharedPrefObjectList(key: String, mClass: Class<*>): ArrayList<Any> {
-        val gson = Gson()
-        val objStrings = getListString(key)
-        val objects = ArrayList<Any>()
-        for (jObjString in objStrings) {
-            val value = gson.fromJson(jObjString, mClass)
-            objects.add(value)
+    /**
+     * Error-safe decoding and encoding functions
+     */
+    private fun String.encodeString(): String =
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                java.util.Base64.getEncoder().encodeToString(this.toByteArray())
+            } else {
+                android.util.Base64.encodeToString(this.toByteArray(), android.util.Base64.NO_WRAP)
+            }
+        } catch (e: Exception) {
+            this // Fallback to original string if encoding fails
         }
-        return objects
-    }
 
-    /*private fun encrypt(value: String): String {
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), IvParameterSpec(ByteArray(16)))
-        val encryptedValue = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
-        return Base64.encodeToString(encryptedValue, Base64.DEFAULT)
-    }
-
-    private fun decrypt(encryptedValue: String): String {
-        val encryptedValueByteArray = Base64.decode(encryptedValue, Base64.DEFAULT)
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), IvParameterSpec(ByteArray(16)))
-        val decryptedByteArray = cipher.doFinal(encryptedValueByteArray)
-        return String(decryptedByteArray, Charsets.UTF_8)
-    }*/
+    private fun String.decodedString(): String =
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                String(java.util.Base64.getDecoder().decode(this))
+            } else {
+                String(android.util.Base64.decode(this, android.util.Base64.NO_WRAP))
+            }
+        } catch (e: Exception) {
+            this // Fallback to original string if decoding fails
+        }
 }

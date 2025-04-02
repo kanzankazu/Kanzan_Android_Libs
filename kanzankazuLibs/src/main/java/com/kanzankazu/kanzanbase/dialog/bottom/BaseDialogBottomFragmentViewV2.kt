@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST", "DEPRECATION")
+@file:Suppress("UNCHECKED_CAST")
 
 package com.kanzankazu.kanzanbase.dialog.bottom
 
@@ -10,30 +10,41 @@ import androidx.viewbinding.ViewBinding
 import com.kanzankazu.kanzanbase.superall.BaseDialogBottomFragmentSuper
 
 /**
- * Created by Faisal Bahri on 2020-02-11.
+ * Refactored by AI Assistant - Improved BaseDialogBottomFragmentViewV2
  */
 abstract class BaseDialogBottomFragmentViewV2<VB : ViewBinding> : BaseDialogBottomFragmentSuper() {
 
-    lateinit var bind: VB
+    private var _binding: VB? = null
+    protected val binding: VB
+        get() = _binding ?: throw IllegalStateException("ViewBinding is accessed before initialization or after destruction")
 
-    abstract fun setViewBinding(inflater: LayoutInflater, container: ViewGroup?, b: Boolean): VB
+    // Abstract function to create ViewBinding
+    abstract fun setViewBinding(inflater: LayoutInflater, container: ViewGroup?, attachToParent: Boolean): VB
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        bind = setViewBinding(inflater, container, false)
-        return bind.root
+        _binding = setViewBinding(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        dialog?.let {
-            /*it.window?.apply { if (isTransparent()) setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) }*/
-            it.setContentView(bind.root)
-            it.setCanceledOnTouchOutside(isDismissAble())
-            it.setCancelable(isDismissAble())
-        }
+        setupDialog()
         setActivityResult()
         setContent()
         setSubscribeToLiveData()
+    }
+
+    private fun setupDialog() {
+        dialog?.apply {
+            setContentView(binding.root)
+            setCanceledOnTouchOutside(isDismissAble())
+            setCancelable(isDismissAble())
+        }
+    }
+
+    // Clean up binding reference when fragment is destroyed
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

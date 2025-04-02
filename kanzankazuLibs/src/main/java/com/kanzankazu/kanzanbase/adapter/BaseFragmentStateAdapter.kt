@@ -5,8 +5,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-abstract class BaseFragmentStateAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
-    FragmentStateAdapter(fragmentManager, lifecycle) {
+abstract class BaseFragmentStateAdapter(
+    fragmentManager: FragmentManager,
+    lifecycle: Lifecycle,
+) : FragmentStateAdapter(fragmentManager, lifecycle) {
     private var fragments = ArrayList<Fragment>()
     private var fragmentTags = ArrayList<String>()
 

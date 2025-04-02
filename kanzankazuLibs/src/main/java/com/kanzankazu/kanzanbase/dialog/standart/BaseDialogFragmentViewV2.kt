@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package com.kanzankazu.kanzanbase.dialog.standart
 
 import android.graphics.Color
@@ -16,45 +14,53 @@ import com.kanzankazu.kanzanbase.superall.BaseDialogFragmentSuper
 
 abstract class BaseDialogFragmentViewV2<VB : ViewBinding> : BaseDialogFragmentSuper() {
 
-    lateinit var bind: VB
+    // Properti `bind` dibuat nullable untuk menghindari UninitializedPropertyAccessException
+    private var _bind: VB? = null
+    protected val bind: VB
+        get() = _bind ?: throw IllegalStateException("ViewBinding is not initialized")
 
     abstract fun setViewBinding(inflater: LayoutInflater, container: ViewGroup?, b: Boolean): VB
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        bind = setViewBinding(inflater, container, false)
+        _bind = setViewBinding(inflater, container, false)
         return bind.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dialog?.let {
-            //it.setContentView(bind.root)
+        val dialog = dialog ?: return // Early return jika dialog null
 
-            it.window?.apply {
-                if (setDialogPosition() != Gravity.NO_GRAVITY) {
-                    val width = ViewGroup.LayoutParams.MATCH_PARENT
-                    val height = ViewGroup.LayoutParams.WRAP_CONTENT
-                    it.window?.apply {
-                        val wlp: WindowManager.LayoutParams = attributes
-                        wlp.gravity = setDialogPosition()
-                        wlp.flags = wlp.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND.inv()
+        dialog.window?.let { window ->
+            if (setDialogPosition() != Gravity.NO_GRAVITY) {
+                val width = ViewGroup.LayoutParams.MATCH_PARENT
+                val height = ViewGroup.LayoutParams.WRAP_CONTENT
+                val layoutParams = window.attributes
+                layoutParams.gravity = setDialogPosition()
+                layoutParams.flags = layoutParams.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND.inv() // Hilangkan background blur
 
-                        setLayout(width, height)
-                        setBackgroundDrawableResource(R.drawable.bg_white_dialog)
-                        setStyle(STYLE_NO_TITLE, R.style.DialogStyle)
-
-                        attributes = wlp
-                    }
+                window.apply {
+                    setLayout(width, height)
+                    setBackgroundDrawableResource(R.drawable.bg_white_dialog) // Pastikan resource tersedia
+                    attributes = layoutParams
                 }
-                if (isTransparent()) setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
-            it.setCanceledOnTouchOutside(isDismissAbleOutsideDialog())
-            it.setCancelable(isDismissAbleBackDialog())
+            if (isTransparent()) {
+                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
         }
+
+        dialog.setCanceledOnTouchOutside(isDismissAbleOutsideDialog())
+        dialog.setCancelable(isDismissAbleBackDialog())
+
         setActivityResult()
         setSubscribeToLiveData()
         setContent()
         setListener()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _bind = null // Bersihkan binding untuk menghindari memory leak
     }
 }

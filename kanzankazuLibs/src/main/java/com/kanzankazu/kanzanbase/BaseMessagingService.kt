@@ -12,6 +12,7 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
     val allUserTopic = NotifTopics.ALL_USER_APP.topic
     val adminChannelId = "admin_channel"
     lateinit var notif: MyFirebaseNotificationModel
+        private set
 
     abstract fun onMessageReceivedListener(
         notif: MyFirebaseNotificationModel,
@@ -19,26 +20,27 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
     )
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-        "onMessageReceived BaseMessagingService $remoteMessage".debugMessageDebug()
-        "onMessageReceived BaseMessagingService ${remoteMessage.from}".debugMessageDebug()
+        "onMessageReceived: $remoteMessage".debugMessageDebug()
+
+        // Default inisialisasi
+        notif = MyFirebaseNotificationModel()
 
         if (remoteMessage.data.isNotEmpty()) {
-            val map = remoteMessage.data
-            val mapToObject = JSONObject(map as Map<*, *>)
-            "onMessageReceived BaseMessagingService $mapToObject".debugMessageDebug()
-            notif = mapToObject.toString().json2Object(MyFirebaseNotificationModel::class.java)
-            "onMessageReceived BaseMessagingService $notif".debugMessageDebug()
-            "onMessageReceived BaseMessagingService isNotEmpty".debugMessageDebug()
+            try {
+                val map = remoteMessage.data
+                val mapToObject = JSONObject(map as Map<*, *>)
+                notif = mapToObject.toString().json2Object(MyFirebaseNotificationModel::class.java)
+            } catch (e: Exception) {
+                "Error parsing notification data: ${e.message}".debugMessageDebug()
+            }
         } else {
-            "onMessageReceived BaseMessagingService isEmpty".debugMessageDebug()
+            "RemoteMessage data is empty".debugMessageDebug()
         }
 
         onMessageReceivedListener(notif, remoteMessage)
     }
 
     override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        "onNewToken BaseMessagingService $token".debugMessageDebug()
+        "onNewToken received: $token".debugMessageDebug()
     }
 }
