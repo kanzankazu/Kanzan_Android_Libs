@@ -26,8 +26,11 @@ import java.math.BigInteger
 import kotlin.coroutines.resume
 
 open class RealtimeDatabaseImpl : RealtimeDatabase {
-    override fun getRootRefKt(tableChildKey: String) =
-        FirebaseDatabase.getInstance().getReference(tableChildKey)
+    private val firebaseDatabase: FirebaseDatabase by lazy {
+        FirebaseDatabase.getInstance()
+    }
+
+    override fun getRootRefKt(tableChildKey: String) = firebaseDatabase.getReference(tableChildKey)
 
     override fun createPrimaryKeyData(tableChildKey: String): String =
         getRootRefKt(tableChildKey).push().key ?: ""
@@ -188,6 +191,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 .handleBaseResponseConvertToObject(targetClass)
             emit(response)
         }.flowOn(Dispatchers.IO).catch {
+            this.debugMessageError("RealtimeDatabaseImpl - getDataByIdBaseResponseFlow")
             emit((it as Exception).toError())
         }
     }

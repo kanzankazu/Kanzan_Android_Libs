@@ -13,22 +13,6 @@ fun View.pairViewCreate(keyTransition: String): Pair<View, String> {
     return Pair.create(this, keyTransition)
 }
 
-fun View.setViewCreate(keyTransition: String) {
-    ViewCompat.setTransitionName(this, keyTransition)
-}
-
-fun Activity.enterTransition(@TransitionRes transitionRes: Int) {
-    window.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(transitionRes)
-}
-
-fun Activity.exitTransition(@TransitionRes transitionRes: Int) {
-    window.sharedElementExitTransition = TransitionInflater.from(this).inflateTransition(transitionRes)
-}
-
-fun Activity.pairViewCreateJoinToBundle(vararg pairs: Pair<View, String>): Bundle? {
-    return ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs).toBundle()
-}
-
 fun Activity.startTransition(@TransitionRes transitionRes: Int, vararg pairs: Pair<View, String>): Bundle? {
     enterTransition(transitionRes)
     return pairViewCreateJoinToBundle(*pairs)
@@ -37,4 +21,20 @@ fun Activity.startTransition(@TransitionRes transitionRes: Int, vararg pairs: Pa
 fun Activity.endTransition(@TransitionRes transitionRes: Int, vararg pairs: Pair<View, String>) {
     exitTransition(transitionRes)
     pairs.forEach { it.first.setViewCreate(it.second) }
+}
+
+private fun Activity.pairViewCreateJoinToBundle(vararg pairs: Pair<View, String>): Bundle? {
+    return ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs).toBundle()
+}
+
+private fun Activity.enterTransition(@TransitionRes transitionRes: Int) {
+    window.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(transitionRes)
+}
+
+private fun Activity.exitTransition(@TransitionRes transitionRes: Int) {
+    window.sharedElementExitTransition = TransitionInflater.from(this).inflateTransition(transitionRes)
+}
+
+private fun View.setViewCreate(keyTransition: String) {
+    ViewCompat.setTransitionName(this, keyTransition)
 }
