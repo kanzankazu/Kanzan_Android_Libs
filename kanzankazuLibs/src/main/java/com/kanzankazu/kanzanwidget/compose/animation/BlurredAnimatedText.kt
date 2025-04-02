@@ -27,8 +27,33 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import kotlin.math.roundToInt
 
+/**
+ * The duration of animations in milliseconds. This constant is used across multiple composable animations
+ * to standardize the animation timing for consistent visual behavior.
+ *
+ * Example usages include specifying the duration for infinite animations like fade-ins, rotations, or
+ * custom animations in composables such as `BlurredAnimatedText`, `PulseAnimation`,
+ * and `TripleOrbitLoadingAnimation`.
+ */
 private const val ANIMATION_DURATION = 1000
 
+/**
+ * Displays a text string with an animated blur effect for non-space characters.
+ * The characters of the text animate independently to create a blurring and unblurring effect,
+ * cycling through the animation over time.
+ *
+ * @param text The string to be displayed with the animated blur effect. Non-space characters will
+ *             have a blur animation applied, while spaces remain unaffected.
+ * @param modifier The modifier to be applied to the text layout. Defaults to an empty Modifier.
+ *
+ * Example:
+ * ```kotlin
+ * BlurredAnimatedText(
+ *     text = "Blur Effect",
+ *     modifier = Modifier.padding(16.dp)
+ * )
+ * ```
+ */
 @Composable
 fun BlurredAnimatedText(
     text: String,
@@ -91,6 +116,24 @@ fun BlurredAnimatedText(
     }
 }
 
+/**
+ * Applies a blur effect to the entire content drawn within the modifier.
+ * The blur intensity is determined dynamically via a lambda function for the radius.
+ * An optional color is also applied over the blurred content.
+ *
+ * @param blurRadius A lambda returning the blur radius as an integer. A radius of 0 disables the blur.
+ * @param color The color to overlay on the blurred content. Defaults to black.
+ * @return A Modifier that applies the full content blur with the specified radius and color.
+ *
+ * Example:
+ * ```kotlin
+ * Text(
+ *     text = "Blurred Text",
+ *     modifier = Modifier
+ *         .fullContentBlur(blurRadius = { 15 }, color = Color.Gray)
+ * )
+ * ```
+ */
 private fun Modifier.fullContentBlur(
     blurRadius: () -> Int,
     color: Color = Color.Black
