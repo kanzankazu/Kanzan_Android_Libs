@@ -4,7 +4,7 @@ import android.text.SpannedString
 import android.view.View
 import android.widget.EditText
 import androidx.annotation.StringRes
-import com.kanzankazu.kanzanutil.MessageType
+import com.kanzankazu.kanzanutil.enums.MessageType
 
 interface BaseView {
 

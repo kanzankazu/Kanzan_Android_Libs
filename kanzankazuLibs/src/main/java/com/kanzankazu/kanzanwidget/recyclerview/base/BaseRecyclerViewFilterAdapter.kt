@@ -3,7 +3,6 @@
 package com.kanzankazu.kanzanwidget.recyclerview.base
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,37 +11,41 @@ import android.view.animation.AnimationUtils
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.annotation.LayoutRes
-/*import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding*/
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.kanzankazu.R
 
 abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
-    var mainDatas = arrayListOf<T>()
-    var tempFilterDatas = arrayListOf<T>()
 
-    private var filterModeData: Int = 1
+    // Variables
+    var mainDatas = arrayListOf<T>()
+    var swipeListener: SwipeListener<T>? = null
+    var moveListener: MoveListener<T>? = null
+    private var tempFilterDatas = arrayListOf<T>()
+    private var filterModeData: Int = SINGLE_MODE
     private var checkPositionData: Int = 0
     private var lastPosition = -1
+    private var recentlyDeletedItem: T? = null
+    private var recentlyDeletedPosition: Int = -1
 
     companion object {
         const val MULTIPLE_MODE = 0
         const val SINGLE_MODE = 1
     }
 
+    // Abstract Methods
     protected abstract fun onCreateView(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
-
     protected abstract fun onBindView(data: T, position: Int, holder: RecyclerView.ViewHolder)
 
+    // Open Methods
     open fun onMultipleViewType(position: Int, data: T): Int = -1
-
     open fun onFilterData(row: ArrayList<T>, charString: String): ArrayList<T> = arrayListOf()
-
     open fun onFilterListener(mainData: ArrayList<T>) {}
 
+    // Overrides
     override fun getItemViewType(position: Int): Int {
-        return if (onMultipleViewType(position, mainDatas[position]) == -1) super.getItemViewType(position)
-        else onMultipleViewType(position, mainDatas[position])
+        val type = onMultipleViewType(position, mainDatas[position])
+        return if (type == -1) super.getItemViewType(position) else type
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -50,10 +53,11 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        return onBindView(mainDatas[position], position, holder)
+        onBindView(mainDatas[position], position, holder)
+        setAnimation(holder.itemView, position)
     }
 
-    override fun getItemCount(): Int = mainDatas.count()
+    override fun getItemCount(): Int = mainDatas.size
 
     override fun getFilter(): Filter {
         return object : Filter() {
@@ -62,14 +66,11 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
                 mainDatas = if (charString.isEmpty()) {
                     tempFilterDatas
                 } else {
-                    val filteredList = arrayListOf<T>()
-                    filteredList.addAll(onFilterData(tempFilterDatas, charString))
-                    filteredList
+                    onFilterData(tempFilterDatas, charString).apply {
+                        tempFilterDatas = this
+                    }
                 }
-
-                val filterResults = FilterResults()
-                filterResults.values = mainDatas
-                return filterResults
+                return FilterResults().apply { values = mainDatas }
             }
 
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
@@ -80,17 +81,12 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         }
     }
 
-    protected fun convertLayout2View(parent: ViewGroup, layout: Int): View = parent.inflate(layout)
-
-    /*protected fun convertBinding(parent: ViewGroup, layout: Int): ViewDataBinding {
-        return DataBindingUtil.inflate(LayoutInflater.from(parent.context), layout, parent, false)
-    }*/
-
+    // Public Methods
     fun setFilterMode(filterMode: Int) {
         this.filterModeData = filterMode
     }
 
-    fun getFilterMode() = filterModeData
+    fun getFilterMode(): Int = filterModeData
 
     fun setCheckPosition(pos: Int) {
         checkPositionData = pos
@@ -103,109 +99,167 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     fun getItemDataS(): ArrayList<T> = mainDatas
 
     fun setData(dataS: ArrayList<T>) {
-        this.mainDatas = dataS
-        this.tempFilterDatas = dataS
+        mainDatas = dataS
+        tempFilterDatas = dataS
         notifyDataSetChanged()
     }
 
-    fun addDataS(dataS: ArrayList<T>) {
-        val lastSize = this.mainDatas.size
-        val arrayListOf = arrayListOf<T>()
-        arrayListOf.addAll(dataS)
-
-        this.mainDatas.addAll(dataS)
-        this.tempFilterDatas = arrayListOf
-        notifyItemRangeInserted(lastSize, dataS.size)
+    fun addAllData(dataList: List<T>) {
+        val startPosition = mainDatas.size
+        mainDatas.addAll(dataList)
+        tempFilterDatas.addAll(dataList)
+        notifyItemRangeInserted(startPosition, dataList.size)
     }
 
-    fun addData(data: T) {
-        val arrayListOf = arrayListOf<T>()
-        arrayListOf.addAll(mainDatas)
-        arrayListOf.add(data)
-
-        val lastSize = mainDatas.size
-        this.mainDatas.add(data)
-        this.tempFilterDatas = arrayListOf
-        notifyItemRangeInserted(lastSize, 1)
-    }
-
-    fun addDataFirst(data: T) {
-        val position = 0
-        this.mainDatas.add(position, data)
-        this.tempFilterDatas.add(position, data)
+    fun addDataAt(data: T, position: Int) {
+        mainDatas.add(position, data)
+        tempFilterDatas.add(position, data)
         notifyItemInserted(position)
     }
 
-    fun addDataLast(data: T) {
-        mainDatas.add(data)
-        tempFilterDatas.add(data)
-        notifyItemInserted(mainDatas.lastIndex)
+    fun updateDataAt(position: Int, newData: T) {
+        if (position in mainDatas.indices) {
+            mainDatas[position] = newData
+            tempFilterDatas[position] = newData
+            notifyItemChanged(position)
+        }
     }
 
-    fun addDataAt(data: T, pos: Int) {
-        this.mainDatas.add(pos, data)
-        this.tempFilterDatas.add(pos, data)
-        notifyItemInserted(pos)
-    }
-
-    fun removeDataFirst() {
-        val position = 0
-        removeAt(position)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun removeDataS() {
-        this.mainDatas = arrayListOf()
-        this.tempFilterDatas = arrayListOf()
-        notifyDataSetChanged()
-    }
-
-    fun removeDataLast() {
-        mainDatas.removeAt(mainDatas.lastIndex)
-        notifyItemRemoved(mainDatas.lastIndex)
-    }
-
-    fun removeAt(position: Int) {
-        mainDatas[position]
-        tempFilterDatas[position]
+    fun removeDataAt(position: Int) {
         mainDatas.removeAt(position)
         tempFilterDatas.removeAt(position)
         notifyItemRemoved(position)
     }
 
-    /**
-     * Here is the key method to apply the animation
-     */
-    fun setAnimation(itemView: View, position: Int, context: Context) {
-        // If the bound view wasn't previously displayed on screen, it's animated
+    @SuppressLint("NotifyDataSetChanged")
+    fun clearData() {
+        mainDatas.clear()
+        tempFilterDatas.clear()
+        notifyDataSetChanged()
+    }
+
+    fun refreshItemAt(position: Int) {
+        if (position in mainDatas.indices) {
+            notifyItemChanged(position)
+        }
+    }
+
+    fun findPosition(predicate: (T) -> Boolean): Int? {
+        return mainDatas.indexOfFirst(predicate).takeIf { it >= 0 }
+    }
+
+    fun getSelectedItem(): T? {
+        return if (filterModeData == SINGLE_MODE && checkPositionData in mainDatas.indices) {
+            mainDatas[checkPositionData]
+        } else null
+    }
+
+    fun undoDelete() {
+        if (recentlyDeletedItem != null && recentlyDeletedPosition != -1) {
+            mainDatas.add(recentlyDeletedPosition, recentlyDeletedItem!!)
+            tempFilterDatas.add(recentlyDeletedPosition, recentlyDeletedItem!!)
+            notifyItemInserted(recentlyDeletedPosition)
+            recentlyDeletedItem = null
+            recentlyDeletedPosition = -1
+        }
+    }
+
+    fun removeDataWithUndo(position: Int) {
+        if (position in mainDatas.indices) {
+            recentlyDeletedItem = mainDatas[position]
+            recentlyDeletedPosition = position
+            mainDatas.removeAt(position)
+            tempFilterDatas.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun setCustomAnimation(animationResId: Int, view: View) {
+        val animation = AnimationUtils.loadAnimation(view.context, animationResId)
+        view.startAnimation(animation)
+    }
+
+    fun addItemTouchHelperMoveSwipe(
+        recyclerView: RecyclerView?,
+        adapter: BaseRecyclerViewFilterAdapter<T>,
+        swipeListener: SwipeListener<T>? = null,
+        moveListener: MoveListener<T>? = null,
+    ) {
+        this.swipeListener = swipeListener
+        this.moveListener = moveListener
+
+        // Swipe dan drag handler
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, // Untuk drag
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // Untuk swipe
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                // Swap data dalam adapter
+                val startPosition = viewHolder.adapterPosition
+                val endPosition = target.adapterPosition
+                adapter.swapData(startPosition, endPosition)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // Hapus item dalam adapter (dengan undo jika dibutuhkan)
+                val position = viewHolder.adapterPosition
+                adapter.removeDataWithUndo(position)
+            }
+        }
+
+        // Tambahkan ItemTouchHelper ke RecyclerView
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    fun swipeToDelete(position: Int) {
+        if (position in mainDatas.indices) {
+            val removedItem = mainDatas[position]
+            mainDatas.removeAt(position)
+            tempFilterDatas.removeAt(position)
+            notifyItemRemoved(position)
+            swipeListener?.onSwipe(position, removedItem)
+        }
+    }
+
+    fun swapData(startPosition: Int, endPosition: Int) {
+        if (startPosition in mainDatas.indices && endPosition in mainDatas.indices) {
+            // Swap posisi data utama
+            mainDatas[startPosition] = mainDatas[endPosition].also {
+                mainDatas[endPosition] = mainDatas[startPosition]
+            }
+
+            // Sinkronkan perubahan ke data filter
+            tempFilterDatas[startPosition] = tempFilterDatas[endPosition].also {
+                tempFilterDatas[endPosition] = tempFilterDatas[startPosition]
+            }
+
+            // Notifikasi perubahan posisi
+            notifyItemMoved(startPosition, endPosition)
+
+            // Trigger listener
+            moveListener?.onMove(startPosition, endPosition, mainDatas[endPosition])
+        }
+    }
+
+    // Protected Methods
+    protected fun convertLayout2View(parent: ViewGroup, layout: Int): View {
+        return parent.inflate(layout)
+    }
+
+    protected fun setAnimation(view: View, position: Int) {
         if (position > lastPosition) {
-            val animation: Animation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
-            itemView.startAnimation(animation)
+            val animation: Animation = AnimationUtils.loadAnimation(view.context, R.anim.item_animation_fall_down)
+            view.startAnimation(animation)
             lastPosition = position
         }
     }
 
-    open fun addItem(model: T, position: Int) {
-        mainDatas.add(position, model)
-        notifyItemInserted(position)
-    }
-
-    open fun moveItem(fromPosition: Int, toPosition: Int) {
-        val model: T = mainDatas.removeAt(fromPosition)
-        mainDatas.add(toPosition, model)
-        notifyItemMoved(fromPosition, toPosition)
-    }
-
-    fun ViewGroup.inflate(@LayoutRes layout: Int): View {
-        return LayoutInflater.from(context).inflate(layout, this, false)
-    }
-
-    /**
-     * @param selected tempDatas[checkPosition].selected
-     * @param adapterPosition adapterPosition\currentPosition
-     * @param listenerSelectItem
-     * @return [ListenerSelectItem.onSelected] always false, [ListenerSelectItem.onSelect] always true
-     * */
     protected fun selectItemSingleMultiple(selected: Boolean, adapterPosition: Int, listenerSelectItem: ListenerSelectItem) {
         if (selected) {
             listenerSelectItem.onSelected(false)
@@ -216,66 +270,39 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         setChangeModeItem(adapterPosition)
     }
 
-    /**
-    (sebelumnya)SINGLE_MODE -> {
-    tempDatas[checkPosition].selected = false
-    }
-     */
+    // Private Methods
     private fun checkSingleMode(listener: (Boolean) -> Unit = {}) {
-        when (filterModeData) {
-            SINGLE_MODE -> listener(false)
-        }
+        if (filterModeData == SINGLE_MODE) listener(false)
     }
 
     private fun setChangeModeItem(adapterPosition: Int) {
-        when (filterModeData) {
-            SINGLE_MODE -> {
-                setCheckPosition(adapterPosition)
-                notifyDataSetChanged()
-            }
+        if (filterModeData == SINGLE_MODE) {
+            setCheckPosition(adapterPosition)
+            notifyDataSetChanged()
         }
     }
 
+    private fun ViewGroup.inflate(@LayoutRes layout: Int): View {
+        return LayoutInflater.from(context).inflate(layout, this, false)
+    }
+
+    // Interfaces
     interface ListenerSelectItem {
-        /** @return always false, set in function like this => tempDatas[adapterPosition].selected = b */
-        fun onSelected(b: Boolean)
+        fun onSelected(selected: Boolean)
+        fun onCheckSingleMode(isSingleMode: Boolean)
+        fun onSelect(selected: Boolean)
+    }
 
-        /** @return set in function like this => tempDatas[checkPosition].selected = onSelectItemTrueSingle */
-        fun onCheckSingleMode(onSelectItemTrueSingle: Boolean)
+    interface SwipeListener<T> {
+        fun onSwipe(position: Int, item: T)
+    }
 
-        /** @return  always true, set in function like this => tempDatas[adapterPosition].selected = b */
-        fun onSelect(b: Boolean)
+    interface MoveListener<T> {
+        fun onMove(startPosition: Int, endPosition: Int, data: T)
     }
 
     class Holder<T>(itemView: View) : BaseRecyclerViewHolder<T>(itemView) {
-        override fun setContent(data: T) {
-        }
-
-        override fun setListener(data: T) {
-        }
+        override fun setContent(data: T) {}
+        override fun setListener(data: T) {}
     }
-
-    /*abstract class RecyclerViewHolderAbs<T>(binding: ViewDataBinding) : RecyclerView.ViewHolder((binding.root)) {
-        abstract fun setContent(data: T)
-        open fun setListener(data: T) {}
-    }
-
-    class RecyclerViewHolder0(var binding: ViewDataBinding) : RecyclerView.ViewHolder((binding.root)) {
-        init {
-            binding.root.tag = this
-        }
-    }
-
-    class RecyclerViewHolder1(var binding: ViewDataBinding) : RecyclerView.ViewHolder((binding.root)) {
-        init {
-            binding.root.tag = this
-        }
-    }
-
-    class RecyclerViewHolder2(var binding: ViewDataBinding) : RecyclerView.ViewHolder((binding.root)) {
-        init {
-            binding.root.tag = this
-        }
-    }*/
 }
-

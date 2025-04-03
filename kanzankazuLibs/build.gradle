@@ -97,6 +97,7 @@ dependencies {
     api "androidx.recyclerview:recyclerview:1.2.1"
     api "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     api "androidx.security:security-crypto:1.0.0"
+    implementation libs.featureDeliveryKtx
     /*Lifecycle_Mvvm*/
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.4.1'
     api "androidx.lifecycle:lifecycle-common-java8:2.4.1"

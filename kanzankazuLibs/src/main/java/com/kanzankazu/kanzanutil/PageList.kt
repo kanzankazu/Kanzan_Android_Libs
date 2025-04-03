@@ -2,6 +2,13 @@ package com.kanzankazu.kanzanutil
 
 import kotlin.math.ceil
 
+/**
+ * A generic class that divides a list of data into pages. Provides functionality to navigate between pages
+ * and retrieve data from the current page or other specific pages.
+ *
+ * @param datas The complete list of data to be paginated.
+ * @param dataPerPage The number of items per page.
+ */
 class PageList<T>(private val datas: ArrayList<T>, private val dataPerPage: Int) {
     private var pageListData = arrayListOf<ArrayList<T>>()
     private var totalPage = ceil((datas.size / dataPerPage.toDouble())).toInt()

@@ -14,6 +14,40 @@ import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
 import java.security.MessageDigest;
 
+/**
+ * A transformation to apply rounded corners to a bitmap in various configurations such as
+ * all corners, individual corners, sides, or diagonal combinations.
+ *
+ * <p> This class extends {@link BitmapTransformation} and provides customization for
+ * radius, margin, and corner types. It supports different configurations for rounding
+ * specific corners or sides of a bitmap.
+ * </p>
+ *
+ * <p> It is mainly used with libraries like Glide to transform images dynamically before displaying them.
+ * The transformation applies using a {@link BitmapShader} to render the rounded corners.
+ * </p>
+ *
+ * Constructor Details:
+ * - {@code RoundedCornersTransformation(int radius, int margin)}: Initializes the transformation
+ *   with the specified corner radius and margin, applying the transformation to all corners.
+ * - {@code RoundedCornersTransformation(int radius, int margin, CornerType cornerType)}: Provides more
+ *   customization by specifying which corners or sides to apply the rounded effect.
+ *
+ * Corner Types:
+ * - Defines the target area of the transformation. Supported types include: ALL, TOP, BOTTOM, LEFT,
+ *   RIGHT, individual corners (e.g., TOP_LEFT), and diagonal combinations (e.g., DIAGONAL_FROM_TOP_LEFT).
+ *
+ * Methods:
+ * - {@code toString()}: Returns a string representation of the transformation, including radius,
+ *   margin, diameter, and corner type.
+ * - {@code equals(Object o)}: Compares this transformation with another object, checking
+ *   if their parameters are identical.
+ * - {@code hashCode()}: Computes the hash code for this transformation instance.
+ * - {@code updateDiskCacheKey(@NonNull MessageDigest messageDigest)}: Updates the disk cache key for
+ *   caching the result of the transformation.
+ * - {@code transform(@NonNull BitmapPool pool, @NonNull Bitmap toTransform, int outWidth, int outHeight)}:
+ *   Transforms the given bitmap by applying rounded corners based on the specified configuration.
+ */
 public class RoundedCornersTransformation extends BitmapTransformation {
 
     private static final int VERSION = 1;

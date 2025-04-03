@@ -6,44 +6,74 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 fun FragmentActivity.getLaunch(
-    context: CoroutineContext = EmptyCoroutineContext,
+    context: CoroutineContext = Dispatchers.Main,
     start: CoroutineStart = CoroutineStart.DEFAULT,
+    onError: ((Throwable) -> Unit)? = null,
     block: suspend CoroutineScope.() -> Unit,
-) =
-    lifecycleScope.launch(context, start, block)
+): Job = lifecycleScope.launch(context + CoroutineExceptionHandler { _, throwable ->
+    onError?.invoke(throwable)
+}, start, block)
 
 fun Fragment.getLaunch(
-    context: CoroutineContext = EmptyCoroutineContext,
+    context: CoroutineContext = Dispatchers.Main,
     start: CoroutineStart = CoroutineStart.DEFAULT,
+    onError: ((Throwable) -> Unit)? = null,
     block: suspend CoroutineScope.() -> Unit,
-) =
-    viewLifecycleOwner.lifecycleScope.launch(context, start, block)
+): Job = viewLifecycleOwner.lifecycleScope.launch(context + CoroutineExceptionHandler { _, throwable ->
+    onError?.invoke(throwable)
+}, start, block)
 
 fun ViewModel.getLaunch(
-    context: CoroutineContext = EmptyCoroutineContext,
+    context: CoroutineContext = Dispatchers.Main,
     start: CoroutineStart = CoroutineStart.DEFAULT,
+    onError: ((Throwable) -> Unit)? = null,
     block: suspend CoroutineScope.() -> Unit,
-) =
-    viewModelScope.launch(context, start, block)
+): Job = viewModelScope.launch(context + CoroutineExceptionHandler { _, throwable ->
+    onError?.invoke(throwable)
+}, start, block)
 
-suspend fun <T> FragmentActivity.mainCoContext(block: suspend CoroutineScope.() -> T) =
-    withContext(Dispatchers.Main, block)
+suspend fun <T> FragmentActivity.mainCoContext(
+    onError: ((Throwable) -> Unit)? = null,
+    block: suspend CoroutineScope.() -> T,
+): T? = try {
+    withContext(Dispatchers.Main) { block() }
+} catch (e: Throwable) {
+    onError?.invoke(e)
+    null
+}
 
-suspend fun <T> Fragment.mainCoContext(block: suspend CoroutineScope.() -> T) =
-    withContext(Dispatchers.Main, block)
+suspend fun <T> Fragment.mainCoContext(
+    onError: ((Throwable) -> Unit)? = null,
+    block: suspend CoroutineScope.() -> T,
+): T? = try {
+    withContext(Dispatchers.Main) { block() }
+} catch (e: Throwable) {
+    onError?.invoke(e)
+    null
+}
 
-suspend fun <T> ioCoContext(block: suspend CoroutineScope.() -> T) =
-    withContext(Dispatchers.IO, block)
+suspend fun <T> ioCoContext(
+    onError: ((Throwable) -> Unit)? = null,
+    block: suspend CoroutineScope.() -> T,
+): T? = try {
+    withContext(Dispatchers.IO) { block() }
+} catch (e: Throwable) {
+    onError?.invoke(e)
+    null
+}
 
-suspend fun <T> CoroutineDispatcher.coContext(block: suspend CoroutineScope.() -> T): T {
+suspend fun <T> CoroutineDispatcher.coContext(
+    block: suspend CoroutineScope.() -> T,
+): T {
     return withContext(this, block)
 }

@@ -1,4 +1,4 @@
-package com.kanzankazu.kanzanutil
+package com.kanzankazu.kanzanutil.enums
 
 import java.util.Locale
 
@@ -198,16 +198,16 @@ enum class CountryLocale(val locale: Locale, val displayName: String) {
         }
 
         /**
-         * Fetches the corresponding com.kanzankazu.kanzanutil.CountryLocale object based on the given country name.
-         * If no matching com.kanzankazu.kanzanutil.CountryLocale is found, it defaults to the INDONESIA locale.
+         * Fetches the corresponding com.kanzankazu.kanzanutil.enums.CountryLocale object based on the given country name.
+         * If no matching com.kanzankazu.kanzanutil.enums.CountryLocale is found, it defaults to the INDONESIA locale.
          *
          * @param countryName The name of the country to find the locale for. This comparison is case-insensitive.
-         * @return The matching com.kanzankazu.kanzanutil.CountryLocale object for the given country name, or the INDONESIA locale if no match is found.
+         * @return The matching com.kanzankazu.kanzanutil.enums.CountryLocale object for the given country name, or the INDONESIA locale if no match is found.
          *
          * Example:
          * ```kotlin
-         * val locale = com.kanzankazu.kanzanutil.CountryLocale.getCountryLocaleByName("Indonesia") // Returns INDONESIA
-         * val defaultLocale = com.kanzankazu.kanzanutil.CountryLocale.getCountryLocaleByName("UnknownCountry") // Returns INDONESIA
+         * val locale = com.kanzankazu.kanzanutil.enums.CountryLocale.getCountryLocaleByName("Indonesia") // Returns INDONESIA
+         * val defaultLocale = com.kanzankazu.kanzanutil.enums.CountryLocale.getCountryLocaleByName("UnknownCountry") // Returns INDONESIA
          * ```
          */
         fun getCountryLocaleByName(countryName: String): CountryLocale {

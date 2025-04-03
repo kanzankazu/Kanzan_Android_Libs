@@ -11,293 +11,249 @@ import android.os.Build
 import android.os.CountDownTimer
 import android.view.ViewGroup
 import android.widget.TextView
-import com.kanzankazu.kanzanutil.kanzanextension.type.toIntOrDefault
+import com.kanzankazu.kanzanutil.enums.CountryLocale
+import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.TimeUnit
-import java.text.DateFormatSymbols
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-fun getMonthList(locale: Locale = Locale("id", "ID")): List<String> {
-    val months = DateFormatSymbols(locale).months
-    return months.filter { it.isNotEmpty() } // Filter untuk menghapus string kosong
+enum class DateTimeType {
+    MONTH,
+    DAY
 }
 
 /**
- * Generates a list of consecutive years starting from the current year up to the specified range.
+ * Retrieves a list of names corresponding to either months or weekdays based on the specified type and locale.
  *
- * @param n The number of years to include in the list, starting from the current year.
- *          Defaults to 5 if not provided.
- * @return A list of integers representing the years starting from the current year up to (current year + n).
+ * @param type The type of names to retrieve, either `DateTimeType.MONTH` for months or `DateTimeType.DAY` for weekdays.
+ * @param countryLocale The locale used for retrieving names. Defaults to `CountryLocale.INDONESIA`.
+ * @return A list of strings containing the names of months or weekdays for the specified locale. If a name is empty in the locale, it will be excluded
+ *  from the list.
  *
  * Example:
  * ```kotlin
- * val years = getListOfYears(3) // e.g., [2023, 2024, 2025, 2026]
- * val defaultYears = getListOfYears() // e.g., [2023, 2024, 2025, 2026, 2027, 2028]
+ * val monthNames = getDateTimeNameList(DateTimeType.MONTH) // e.g., ["Januari", "Februari", ...] for Indonesia
+ * val dayNames = getDateTimeNameList(DateTimeType.DAY, CountryLocale.US) // e.g., ["Sunday", "Monday", ...] for US
  * ```
  */
-fun getListOfYears(n: Int = 5): List<Int> {
-    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    return (currentYear..currentYear + n).toList()
+fun getDateTimeNameList(
+    type: DateTimeType,
+    countryLocale: CountryLocale = CountryLocale.INDONESIA,
+): List<String> {
+    val locale = countryLocale.locale
+    return when (type) {
+        DateTimeType.MONTH -> DateFormatSymbols(locale).months.filter { it.isNotEmpty() }
+        DateTimeType.DAY -> DateFormatSymbols(locale).weekdays.filter { it.isNotEmpty() }
+    }
 }
 
 /**
- * Sets up a countdown timer between two Calendar instances.
+ * Generates a list of consecutive integers starting from a specified value.
  *
- * This function calculates the duration between two calendar instances and then
- * uses the `setCountDownTimer` extension function on the millisecond difference
- * to create and start a CountDownTimer.
+ * @param start The starting number of the list. Defaults to the current year.
+ * @param count The number of consecutive integers to generate. Defaults to 5.
+ * @return A list of integers, starting from the specified `start` value and containing `count` numbers.
  *
- * @param calendarStart The starting time of the countdown, represented by a Calendar object.
- * @param calendarEnd The ending time of the countdown, represented by a Calendar object.
- * @param textView (Optional) A TextView to display the remaining time. If null, no display updates will occur.
- * @param title (Optional) A title to prepend to the displayed time.  Defaults to an empty string.
- * @param isIndo (Optional) A boolean indicating whether to use Indonesian language for the time units (e.g., "detik" for seconds).  Defaults to false (English).
- * @param onFinish (Optional) A lambda function to be executed when the countdown finishes. Defaults to an empty lambda (no action).
- * @return A CountDownTimer object representing the configured countdown timer.  The timer has already been started and will trigger the `onFinish` lambda when it expires.
- */
-fun setCountDownTimer(calendarStart: Calendar, calendarEnd: Calendar, textView: TextView? = null, title: String = "", isIndo: Boolean = false, onFinish: () -> Unit = {}): CountDownTimer {
-    val startMillis: Long = calendarStart.timeInMillis //get the start time in milliseconds
-    val endMillis: Long = calendarEnd.timeInMillis //get the end time in milliseconds
-    val totalMillis = endMillis - startMillis //total time in milliseconds
-    return totalMillis.setCountDownTimer(textView, title, isIndo, onFinish)
-}
-
-/**
- * Creates and starts a countdown timer.
- *
- * @param textView (Optional) The TextView to display the countdown.  If null, no text updates will be performed.
- * @param title  The title to prepend to the countdown display in the TextView. Defaults to an empty string.
- * @param isIndo  A boolean indicating whether to use Indonesian language formatting for the countdown display. Defaults to false.
- * @param onFinish A lambda function to be executed when the countdown timer finishes. Defaults to an empty lambda.
- * @return A CountDownTimer object that has been created and started. You should manage its lifecycle (e.g., `cancel()` when no longer needed).
- *
- * The countdown timer ticks every 1000 milliseconds (1 second).  During each tick, it updates the text of the provided `textView` (if not null) with the remaining time formatted using the `stringCountDownTimer2` extension function (not provided in this context, assumed to handle string formatting). When the timer finishes, it executes the provided `onFinish` lambda.
- *
- * **Example:**
+ * Example:
  * ```kotlin
- *  val myTextView: TextView = findViewById(R.id.my_text_view)
- *  val duration = 60000L // 1 minute in milliseconds
- *
- *  val timer = duration.setCountDownTimer(myTextView, "Time remaining: ", onFinish = {
- *      // Actions to perform when the countdown finishes, e.g., show a message, enable a button.
- *      Toast.makeText(this, "Countdown finished!", Toast.LENGTH_SHORT).show()
- *  })
- *
- *  // To stop the timer prematurely (e.g., in onPause or onDestroy):
- *  // timer.cancel()
+ * val numbers = generateNumberList(start = 2020, count = 3)
+ * // Result: [2020, 2021, 2022]
  * ```
  */
-fun Long.setCountDownTimer(textView: TextView? = null, title: String = "", isIndo: Boolean = false, onFinish: () -> Unit = {}): CountDownTimer {
-    return object : CountDownTimer(this, 1000) {
-        /**
-         * Mengatur teks hitung mundur pada komponen `TextView` berdasarkan durasi waktu yang tersisa.
-         *
-         * @param millisUntilFinished jumlah waktu yang tersisa dalam hitungan milidetik.
-         */
-        @SuppressLint("SetTextI18n")
+fun generateNumberList(
+    start: Int = Calendar.getInstance().get(Calendar.YEAR),
+    count: Int = 5,
+): List<Int> {
+    return List(count) { index -> start + index }
+}
+
+
+/**
+ * Calculates the difference in milliseconds between the given Date and the current Date (now).
+ *
+ * @return The difference in milliseconds as a Long value. A positive value indicates that the given Date
+ * is in the past relative to the current time, while a negative value indicates it is in the future.
+ *
+ * Example:
+ * ```kotlin
+ * val pastDate = Date(System.currentTimeMillis() - 10000) // 10 seconds ago
+ * val diffMillis = pastDate.getDiffMillisToNow() // e.g., 10000 (milliseconds)
+ * ```
+ */
+fun Date.getDiffMillisToNow(): Long = this.time - Date().time
+
+/**
+ * Creates and starts a unified countdown timer based on the given input parameters, updating the specified TextView
+ * with the current countdown time in a human-readable format. The timer can be configured to display the countdown
+ * either in English or Indonesian, and executes a callback function upon completion.
+ *
+ * If both `calendarStart` and `calendarEnd` are provided, the duration is calculated as the difference between their
+ * respective time values. Alternatively, a specific duration can be provided via `durationMillis`. At least one of
+ * these two methods for defining the duration must be provided.
+ *
+ * @param calendarStart The starting point of the countdown as a Calendar object (nullable).
+ * @param calendarEnd The ending point of the countdown as a Calendar object (nullable).
+ * @param durationMillis The total duration of the countdown in milliseconds (nullable). Used if `calendarStart` and
+ *                       `calendarEnd` are not provided.
+ * @param textView The TextView to update with the countdown timer's progress (nullable). If null, no updates are made.
+ * @param title A title to prefix the countdown display (default is an empty string).
+ * @param isIndo A flag indicating whether the countdown should be displayed in Indonesian (true) or English (false).
+ *               Defaults to false (English).
+ * @param onFinish A callback function to be called when the countdown finishes. Executes irrespective of the UI.
+ * @return A `CountDownTimer` object if successfully created and started, or `null` if an error occurs during setup.
+ *
+ * Example:
+ * ```kotlin
+ * val calendarStart = Calendar.getInstance()
+ * val calendarEnd = Calendar.getInstance().apply { add(Calendar.HOUR, 1) }
+ *
+ * setUnifiedCountDownTimer(
+ *     calendarStart = calendarStart,
+ *     calendarEnd = calendarEnd,
+ *     textView = myTextView,
+ *     title = "Time Remaining: ",
+ *     isIndo = false
+ * ) {
+ *     println("Countdown Finished!")
+ * }
+ * ```
+ */
+fun setUnifiedCountDownTimer(
+    calendarStart: Calendar? = null,
+    calendarEnd: Calendar? = null,
+    durationMillis: Long? = null,
+    textView: TextView? = null,
+    title: String = "",
+    isIndo: Boolean = false,
+    onFinish: () -> Unit = {},
+): CountDownTimer? {
+    // Hitung durasi berdasarkan parameter yang diberikan
+    val duration = when {
+        calendarStart != null && calendarEnd != null -> calendarEnd.timeInMillis - calendarStart.timeInMillis
+        durationMillis != null -> durationMillis
+        else -> throw IllegalArgumentException("Setidaknya `calendarStart` dan `calendarEnd`, atau `durationMillis` harus diisi")
+    }
+
+    // Buat dan jalankan CountDownTimer
+    return object : CountDownTimer(duration, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            /*var seconds = (millisUntilFinished / 1000).toInt()
-            val hours = seconds / (60 * 60)
-            val tempMint = seconds - hours * 60 * 60
-            val minutes = tempMint / 60
-            seconds = tempMint - minutes * 60
-            if (textView != null) textView.text = "" + "${checkHourMinuteOverTenDateTimepicker(hours)}:" + "${checkHourMinuteOverTenDateTimepicker(minutes)}:" + "${checkHourMinuteOverTenDateTimepicker(seconds)}"*/
-            textView?.text = millisUntilFinished.stringCountDownTimer2(title, isIndo)
+            textView?.text = millisUntilFinished.toCountdownString(title, isIndo)
         }
 
-        /**
-         * Dipanggil saat hitungan waktu selesai dalam metode CountDownTimer.
-         * Fungsi ini menjalankan aksi yang telah didefinisikan melalui parameter `onFinish`
-         * pada metode `setCountDownTimer`.
-         */
         override fun onFinish() {
             onFinish()
         }
-    }
+    }.start()
 }
 
 /**
- * Calculates the difference in milliseconds between the current time and the time represented by this Date object.
- *  A positive return value indicates that the Date object represents a time in the past relative to now.
- *  A negative return value indicates that the Date object represents a time in the future relative to now.
- *  A zero return value indicates that the Date object represents the current time.
+ * Converts a duration represented in milliseconds into a human-readable countdown string, formatted in either
+ * English or Indonesian. The output includes days, hours, minutes, and seconds, optionally prefixed with a custom title.
  *
- * @return The difference in milliseconds between the current time and the time represented by this Date object.
- */
-fun Date.getDiffMillisToNow(): Long {
-    return this.time - Date().time
-}
-
-/**
- * Converts a duration in milliseconds into a formatted countdown timer string.
+ * @param title An optional string to prefix the countdown (default is an empty string).
+ * @param isIndo A flag indicating whether the output should be in Indonesian (true) or English (false).
+ *               Defaults to false (English).
+ * @return A formatted countdown string representing the duration in the format
+ *         "[title][XX days, XX hours, XX minutes, XX seconds]" or
+ *         "[title][XX hari, XX jam, XX menit, XX detik]" depending on the `isIndo` parameter.
  *
- * @param isIndo  A Boolean flag indicating whether to format the string in Indonesian (true) or the default locale (false).
- * @return A string representing the countdown timer in the format "DD day, HH hour, MM min, SS sec" (or the Indonesian equivalent).
- *         If the input duration is negative, the returned values for days, hours, minutes, and seconds will all be zero.
- *         The largest unit of time will always be days.
- *
- * Example usage:
- *
- * val durationMillis = 86400000L // 1 day
- * val timerString = durationMillis.stringCountDownTimer1() // Returns "01 day, 00 hour, 00 min, 00 sec"
- *
- * val shortDurationMillis = 3661000L // 1 hour, 1 minute, 1 second
- * val shortTimerString = shortDurationMillis.stringCountDownTimer1() // Returns "00 day, 01 hour, 01 min, 01 sec"
- *
- * val indoTimerString = durationMillis.stringCountDownTimer1(true) // Returns "01 hari, 00 jam, 00 menit, 00 detik"
- */
-private fun Long.stringCountDownTimer1(isIndo: Boolean = false): String {
-    var millisUntilFinished: Long = this
-    val days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished)
-    millisUntilFinished -= TimeUnit.DAYS.toMillis(days)
-
-    val hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished)
-    millisUntilFinished -= TimeUnit.HOURS.toMillis(hours)
-
-    val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
-    millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes)
-
-    val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished)
-
-    // Format the string
-    if (!isIndo) {
-        return String.format(Locale.getDefault(), "%02d day, %02d hour, %02d min, %02d sec", days, hours, minutes, seconds)
-    } else {
-        return String.format(Locale.getDefault(), "%02d hari, %02d jam, %02d menit, %02d detik", days, hours, minutes, seconds)
-    }
-}
-
-/**
- * Converts a duration in milliseconds into a human-readable countdown string.
- *
- * The function calculates the days, hours, minutes, and seconds from the given duration and formats them into a string representation.
- * It supports an optional title prefix and can output the countdown in either English or Indonesian.
- *
- * @param title An optional title to prepend to the countdown string (e.g., "Remaining Time:"). Defaults to an empty string.
- * @param isIndo A boolean flag indicating whether the output should be in Indonesian ("hari", "jam", "menit", "detik") or English ("day", "hour", "min", "sec"). Defaults to `false` (English).
- * @return A string representing the countdown in the specified format (e.g., "2 day, 10 hour, 30 min, 15 sec" or "Sisa Waktu: 2 hari, 10 jam, 30 menit, 15 detik").
- *
- * Example usage:
+ * Example:
  * ```kotlin
- * val remainingTimeMs = 172800000L // 2 days
- * val countdownString = remainingTimeMs.stringCountDownTimer2() // Output: "2 day, 0 hour, 0 min, 0 sec"
- * val countdownStringIndo = remainingTimeMs.stringCountDownTimer2(isIndo = true) // Output: "2 hari, 0 jam, 0 menit, 0 detik"
- * val countdownStringWithTitle = remainingTimeMs.stringCountDownTimer2("Time Left:") // Output: "Time Left: 2 day, 0 hour, 0 min, 0 sec"
+ * val duration: Long = 123456789L
+ * val resultEnglish = duration.toCountdownString("Remaining: ", false)
+ * // "Remaining: 01 days, 10 hours, 17 minutes, 36 seconds"
+ *
+ * val resultIndonesian = duration.toCountdownString("Sisa: ", true)
+ * // "Sisa: 01 hari, 10 jam, 17 menit, 36 detik"
  * ```
  */
-private fun Long.stringCountDownTimer2(title: String = "", isIndo: Boolean = false): String {
-    val days = this / (24 * 60 * 60 * 1000)
-    val hours = this / (1000 * 60 * 60) % 24
-    val minutes = this / (1000 * 60) % 60
-    val seconds = (this / 1000) % 60
+@SuppressLint("DefaultLocale")
+private fun Long.toCountdownString(title: String = "", isIndo: Boolean = false): String {
+    val days = TimeUnit.MILLISECONDS.toDays(this)
+    val hours = TimeUnit.MILLISECONDS.toHours(this) % 24
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(this) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(this) % 60
 
-    // Display Countdown
-    return if (!isIndo) {
-        if (title.isNotEmpty()) "$title $days day, $hours hour, $minutes min, $seconds sec"
-        else "$days day, $hours hour, $minutes min, $seconds sec"
-    } else {
-        if (title.isNotEmpty()) "$title $days hari, $hours jam, $minutes menit, $seconds detik"
-        else "$days hari, $hours jam, $minutes menit, $seconds detik"
-    }
+    val timeString =
+        if (isIndo) String.format("%02d hari, %02d jam, %02d menit, %02d detik", days, hours, minutes, seconds)
+        else String.format("%02d days, %02d hours, %02d minutes, %02d seconds", days, hours, minutes, seconds)
+    return "$title$timeString"
 }
 
 /**
- * Shows a calendar dialog for date selection.
+ * Shows a dialog for either date or time selection.
  *
- * @param titleTimePicker The title of the dialog.  Defaults to an empty string.
- * @param viewTarget The TextView that will display the selected date. If provided, the date will be formatted and set to this TextView.
- * @param isLimitByCurrent  If `true`, the minimum selectable date will be set to [limitDayAfter] days after the current date. Defaults to `false`.
- * @param limitDayAfter The number of days after the current date to set as the minimum selectable date.  Only applicable if `isLimitByCurrent` is `true`. Defaults to 1.
- * @param year The initially selected year. Defaults to the current year.
- * @param month The initially selected month (0-indexed). Defaults to the current month.
- * @param day The initially selected day of the month. Defaults to the current day.
- * @param listener A lambda function that will be invoked with the selected Calendar object when a date is chosen.  Use this to access the selected date.  Defaults to an empty lambda.
+ * @param isDatePicker `true` to show a DatePickerDialog, `false` to show a TimePickerDialog.
+ * @param titlePicker The title of the dialog. Defaults to an empty string.
+ * @param viewTarget The TextView that will display the selected date/time. If provided, the result will be formatted and set to this TextView. Defaults to `null`.
+ * @param year The initially selected year (for DatePickerDialog). Defaults to the current year.
+ * @param month The initially selected month (0-indexed, for DatePickerDialog). Defaults to the current month.
+ * @param day The initially selected day (for DatePickerDialog). Defaults to the current day.
+ * @param hour The initially selected hour (for TimePickerDialog). Defaults to the current hour.
+ * @param minute The initially selected minute (for TimePickerDialog). Defaults to the current minute.
+ * @param isLimitByCurrent If `true`, limits the selectable date to [limitDayAfter] days after the current date. Only applies to DatePickerDialog. Defaults to `false`.
+ * @param limitDayAfter The number of days after the current date to set as the minimum selectable date. Only applicable if `isLimitByCurrent` is `true`. Defaults to `1`.
+ * @param is24HourView Whether to use 24-hour format for TimePickerDialog. Defaults to `true`.
+ * @param listener A lambda function called with the selected Calendar object when a selection is made.
  */
-fun Activity.showCalendarDialog(
-    titleTimePicker: String = "",
+fun Activity.showDateTimeDialog(
+    isDatePicker: Boolean,
+    titlePicker: String = "",
     viewTarget: TextView? = null,
+    year: Int = Calendar.getInstance().get(Calendar.YEAR),
+    month: Int = Calendar.getInstance().get(Calendar.MONTH),
+    day: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
+    hour: Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
+    minute: Int = Calendar.getInstance().get(Calendar.MINUTE),
     isLimitByCurrent: Boolean = false,
     limitDayAfter: Int = 1,
-    year: Int = Date().toStringFormat(DateTimeCalendarObject.YEAR_FULL).toDigits().toIntOrDefault(),
-    month: Int = Date().toStringFormat(DateTimeCalendarObject.MONTH_FULL).toDigits().toIntOrDefault(),
-    day: Int = Date().toStringFormat(DateTimeCalendarObject.DATE_FULL).toDigits().toIntOrDefault(),
-    listener: (cal: Calendar) -> Unit = {},
-) {
-    lateinit var datePickerDialog: DatePickerDialog
-    val calendar: Calendar = Calendar.getInstance()
-    val myDateListener = DatePickerDialog.OnDateSetListener { picker, year, month, date ->
-        if (viewTarget != null) {
-            val tag = picker.tag as Int
-            if (tag == viewTarget.id) {
-                calendar.set(year, month, date)
-                listener(calendar)
-                setInDateFormalFormat(calendar, viewTarget)
-            } else {
-                calendar.set(year, month, date)
-                listener(calendar)
-            }
-        } else {
-            calendar.set(year, month, date)
-            listener(calendar)
-        }
-    }
-    datePickerDialog = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) DatePickerDialog(this, myDateListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-    else DatePickerDialog(this, AlertDialog.THEME_TRADITIONAL, myDateListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)))
-
-    datePickerDialog.setTitle(titleTimePicker)
-    datePickerDialog.datePicker.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
-    datePickerDialog.updateDate(year, month, day)
-    if (isLimitByCurrent) datePickerDialog.datePicker.minDate = Date().addDays(limitDayAfter).time
-    if (viewTarget != null) datePickerDialog.datePicker.tag = viewTarget.id
-    datePickerDialog.show()
-}
-
-/**
- * Shows a TimePickerDialog.
- *
- * @param titleTimePicker The title of the TimePickerDialog. Defaults to an empty string.
- * @param hour The initial hour to display. Defaults to the current hour.
- * @param minute The initial minute to display. Defaults to the current minute.
- * @param is24HourView Whether to use 24-hour format. Defaults to true.
- * @param listener A lambda function to be called when the time is set.  It receives a Calendar object with the selected time.  Defaults to an empty lambda.
- */
-fun Activity.showTimePickerDialog(
-    titleTimePicker: String = "",
-    hour: Int = Date().hours,
-    minute: Int = Date().minutes,
     is24HourView: Boolean = true,
     listener: (cal: Calendar) -> Unit = {},
 ) {
-    lateinit var timePickerDialog: TimePickerDialog
-    val calendar: Calendar = Calendar.getInstance()
-    val myDateListener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-        calendar.set(Calendar.MINUTE, minute)
-        listener(calendar)
+    val calendar = Calendar.getInstance()
+
+    if (isDatePicker) {
+        // Show DatePickerDialog
+        val datePickerListener = DatePickerDialog.OnDateSetListener { picker, selectedYear, selectedMonth, selectedDay ->
+            calendar.set(selectedYear, selectedMonth, selectedDay)
+            listener(calendar)
+            viewTarget?.let {
+                setInDateFormalFormat(calendar, it)
+            }
+        }
+
+        val datePickerDialog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            DatePickerDialog(this, datePickerListener, year, month, day)
+        } else {
+            DatePickerDialog(this, AlertDialog.THEME_TRADITIONAL, datePickerListener, year, month, day)
+        }
+
+        datePickerDialog.setTitle(titlePicker)
+        datePickerDialog.datePicker.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
+        if (isLimitByCurrent) {
+            datePickerDialog.datePicker.minDate = Date().addDays(limitDayAfter).time
+        }
+        datePickerDialog.show()
+    } else {
+        // Show TimePickerDialog
+        val timePickerListener = TimePickerDialog.OnTimeSetListener { _, selectedHour, selectedMinute ->
+            calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
+            calendar.set(Calendar.MINUTE, selectedMinute)
+            listener(calendar)
+        }
+
+        val timePickerDialog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            TimePickerDialog(this, timePickerListener, hour, minute, is24HourView)
+        } else {
+            TimePickerDialog(this, AlertDialog.THEME_TRADITIONAL, timePickerListener, hour, minute, is24HourView)
+        }
+
+        timePickerDialog.setTitle(titlePicker)
+        timePickerDialog.show()
     }
-    timePickerDialog = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) TimePickerDialog(this, myDateListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), is24HourView)
-    else TimePickerDialog(this, AlertDialog.THEME_TRADITIONAL, myDateListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), is24HourView))
-    /**
-     * Returns a list of strings representing years from the current year up to the specified number of years ahead.
-     *
-     * @param futureYears The number of years ahead to include in the list. Defaults to 5.
-     * @return A list of year strings from the current year up to the specified number of years.
-     *
-     * Example usage:
-     * ```kotlin
-     * val years = getYearList() // Returns the list for 5 years ahead (default).
-     * val customYears = getYearList(10) // Returns the list for 10 years ahead.
-     * ```
-     */
-    fun getYearList(futureYears: Int = 5): List<String> {
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        return (currentYear..currentYear + futureYears).map { it.toString() }
-    }
-    timePickerDialog.setTitle(titleTimePicker)
-    timePickerDialog.updateTime(hour, minute)
-    timePickerDialog.show()
 }
 
 /**
@@ -775,141 +731,38 @@ fun Calendar.setTimes(hour: Int, minute: Int = 0, second: Int = 0): Calendar {
 }
 
 /**
- * Converts the month component of the Date object into its complete Indonesian month name equivalent.
- * This method handles the conversion of English month names (e.g., "January") into Indonesian month names (e.g., "Januari").
+ * Formats the current Date object into a locale-specific string based on the provided parameters.
+ * The format can vary depending on the flags provided for month, day, and year representation.
  *
- * @return A string representation of the month name in Indonesian, based on the Date object.
- * For example, "January" will be converted to "Januari", "February" to "Februari", and so on.
- *
- * Example:
- * ```kotlin
- * val myDate = SimpleDateFormat("yyyy-MM-dd").parse("2024-03-15") // March 15, 2024
- * val indonesianMonth = myDate.getMonthINAFormatComplete() // Output: "Maret"
- * ```
- */
-@SuppressLint("SimpleDateFormat")
-fun Date.getMonthINAFormatComplete(): String {
-    val simpleDateFormat = SimpleDateFormat("MMMM")
-    val completeMonth = simpleDateFormat.format(this)
-    var completeMonthINA = ""
-
-    when (completeMonth) {
-        "January" -> completeMonthINA = "Januari"
-        "February" -> completeMonthINA = "Februari"
-        "March" -> completeMonthINA = "Maret"
-        "April" -> completeMonthINA = "April"
-        "May" -> completeMonthINA = "Mei"
-        "June" -> completeMonthINA = "Juni"
-        "July" -> completeMonthINA = "Juli"
-        "August" -> completeMonthINA = "Agustus"
-        "September" -> completeMonthINA = "September"
-        "October" -> completeMonthINA = "Oktober"
-        "November" -> completeMonthINA = "November"
-        "December" -> completeMonthINA = "Desember"
-    }
-    return completeMonthINA
-}
-
-/**
- * Converts the month of the calling Date object into its Indonesian (Bahasa Indonesia) abbreviated name.
- * The method takes the English abbreviated month name (e.g., "Jan", "Feb") and maps it to its equivalent in Indonesian.
- *
- * @return A string representing the abbreviated month name in Indonesian, corresponding to the month of the Date object.
+ * @param isMonth A flag indicating whether to format the date as a month. Defaults to false.
+ * @param isComplete A flag determining whether the full name or an abbreviated name is used. Defaults to false.
+ * @param forYear A flag specifying whether to format the date to display only the year. Defaults to false.
+ * @param countryLocale The Locale to use for formatting. Defaults to the device's default locale.
+ * @return A formatted locale-specific string representation of the Date.
  *
  * Example:
  * ```kotlin
- * val myDate = SimpleDateFormat("yyyy-MM-dd").parse("2024-03-15") // March 15, 2024
- * val monthINA = myDate.getMonthINAFormatHalf() // Result: "Maret"
+ * val currentDate = Date() // e.g., February 15, 2024
+ * val formattedDate = currentDate.toLocaleSpecificFormat(isMonth = true, isComplete = true) // "February"
  * ```
  */
 @SuppressLint("SimpleDateFormat")
-fun Date.getMonthINAFormatHalf(): String {
-    val simpleDateFormat = SimpleDateFormat("MMM")
-    val halfMonth = simpleDateFormat.format(this)
-    var halfMonthINA = ""
-
-    when (halfMonth) {
-        "Jan" -> halfMonthINA = "Januari"
-        "Feb" -> halfMonthINA = "Februari"
-        "Mar" -> halfMonthINA = "Maret"
-        "Apr" -> halfMonthINA = "April"
-        "May" -> halfMonthINA = "Mei"
-        "Jun" -> halfMonthINA = "Juni"
-        "Jul" -> halfMonthINA = "Juli"
-        "Aug" -> halfMonthINA = "Agustus"
-        "Sep" -> halfMonthINA = "September"
-        "Oct" -> halfMonthINA = "Oktober"
-        "Nov" -> halfMonthINA = "November"
-        "Dec" -> halfMonthINA = "Desember"
+fun Date.formatToLocaleSpecificString(
+    isMonth: Boolean = false,
+    isComplete: Boolean = false,
+    forYear: Boolean = false,
+    countryLocale: CountryLocale = CountryLocale.INDONESIA,
+): String {
+    val format = when {
+        forYear -> "yyyy" // Year
+        isMonth && isComplete -> "MMMM" // Full month
+        isMonth && !isComplete -> "MMM" // Abbreviated month
+        !isMonth && isComplete -> "EEEE" // Full day name
+        else -> "EEE" // Abbreviated day name
     }
-    return halfMonthINA
-}
 
-/**
- * Converts the current `Date` object to a string that represents the day in its complete Indonesian format.
- * For instance, "Monday" is converted to "Senini", "Tuesday" to "Selasa", and so on.
- *
- * @return A string representing the day in complete Indonesian format.
- *
- * Example:
- * ```kotlin
- * val myDate = Date() // Assuming the date is Monday.
- * val dayInIndonesian = myDate.getDayINAFormatComplete() // Returns "Senini".
- * ```
- */
-@SuppressLint("SimpleDateFormat")
-fun Date.getDayINAFormatComplete(): String {
-    val simpleDateFormat = SimpleDateFormat("EEE")
-    val completeDay = simpleDateFormat.format(this)
-    var completeDayINA = ""
-
-    when (completeDay) {
-        "Monday" -> completeDayINA = "Senini"
-        "Tuesday" -> completeDayINA = "Selasa"
-        "Wednesday" -> completeDayINA = "Rabu"
-        "Thursday" -> completeDayINA = "Kamis"
-        "Friday" -> completeDayINA = "Jumat"
-        "Saturday" -> completeDayINA = "Sabtu"
-        "Sunday" -> completeDayINA = "Minggu"
-    }
-    return completeDayINA
-}
-
-/**
- * Converts the current `Date` object into a three-letter day representation in Bahasa Indonesia (Indonesian).
- * The day is returned in an abbreviated format matching Bahasa Indonesia standards:
- * - "Mon" becomes "Sen"
- * - "Tue" becomes "Sel"
- * - "Wed" becomes "Rab"
- * - "Thu" becomes "Kam"
- * - "Fri" becomes "Jum"
- * - "Sat" becomes "Sab"
- * - "Sun" becomes "Ming"
- *
- * @return A string representing the day of the week in Bahasa Indonesia using its abbreviated form.
- *
- * Example:
- * ```kotlin
- * val myDate = Date() // Assume it's a Monday
- * val dayINA = myDate.getDayINAFormatHalf() // "Sen"
- * ```
- */
-@SuppressLint("SimpleDateFormat")
-fun Date.getDayINAFormatHalf(): String {
-    val simpleDateFormat = SimpleDateFormat("EEE")
-    val halfDay = simpleDateFormat.format(this)
-    var halfDayINA = ""
-
-    when (halfDay) {
-        "Mon" -> halfDayINA = "Sen"
-        "Tue" -> halfDayINA = "Sel"
-        "Wed" -> halfDayINA = "Rab"
-        "Thu" -> halfDayINA = "Kam"
-        "Fri" -> halfDayINA = "Jum"
-        "Sat" -> halfDayINA = "Sab"
-        "Sun" -> halfDayINA = "Ming"
-    }
-    return halfDayINA
+    val simpleDateFormat = SimpleDateFormat(format, countryLocale.locale) // Use Locale
+    return simpleDateFormat.format(this)
 }
 
 /**
@@ -963,322 +816,138 @@ fun isBetween2Date(startDate: Date, endDate: Date): Boolean {
     return Date().after(startDate) && Date().before(endDate)
 }
 
-/**
- * Checks if the given Date object `date` is on the same calendar day as the calling Date object.
- * Throws an IllegalArgumentException if either `this` or `date` is null.
- *
- * @param date The Date object to compare with the calling Date object.
- * @return `true` if both Date objects fall on the same calendar day (considering era, year, and day of the year),
- *         otherwise `false`.
- *
- * Example:
- * ```kotlin
- * val date1 = SimpleDateFormat("yyyy-MM-dd").parse("2023-10-01")
- * val date2 = SimpleDateFormat("yyyy-MM-dd").parse("2023-10-01")
- * val isSameDay = date1.isSameDay(date2) // true
- *
- * val date3 = SimpleDateFormat("yyyy-MM-dd").parse("2023-10-02")
- * val isSameDayDifferent = date1.isSameDay(date3) // false
- * ```
- */
-fun Date?.isSameDay(date: Date?): Boolean {
-    if (this == null || date == null) {
-        throw IllegalArgumentException("The dates must not be null")
+fun isSameDay(date1: Any?, date2: Any?): Boolean {
+    if (date1 == null || date2 == null) {
+        throw IllegalArgumentException("The dates or calendars must not be null")
     }
-    val cal1 = Calendar.getInstance()
-    cal1.time = this
-    val cal2 = Calendar.getInstance()
-    cal2.time = date
-    return cal1.isSameDay(cal2)
-}
 
-/**
- * Checks if the two Calendar objects represent the same calendar day, irrespective of the time.
- *
- * Compares the ERA, YEAR, and DAY_OF_YEAR fields of both Calendar objects
- * to determine if they represent the same calendar date.
- * If either of the Calendar objects is null, an IllegalArgumentException is thrown.
- *
- * @param cal The Calendar object to compare with. Cannot be null.
- * @return `true` if both Calendar objects represent the same day, `false` otherwise.
- *
- * Example:
- * ```kotlin
- * val calendar1 = Calendar.getInstance().apply { set(2023, 9, 18) }
- * val calendar2 = Calendar.getInstance().apply { set(2023, 9, 18) }
- * val calendar3 = Calendar.getInstance().apply { set(2023, 9, 19) }
- *
- * println(calendar1.isSameDay(calendar2)) // true
- * println(calendar1.isSameDay(calendar3)) // false
- * ```
- *
- * @throws IllegalArgumentException if either Calendar object is null.
- */
-fun Calendar?.isSameDay(cal: Calendar?): Boolean {
-    if (this == null || cal == null) {
-        throw IllegalArgumentException("The dates must not be null")
+    val cal1 = when (date1) {
+        is Date -> Calendar.getInstance().apply { time = date1 }
+        is Calendar -> date1
+        else -> throw IllegalArgumentException("The first parameter must be of type Date or Calendar")
     }
-    return get(Calendar.ERA) == cal.get(Calendar.ERA) &&
-            get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
-            get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
-}
 
-/**
- * Checks whether the current Date object represents today's date.
- *
- * @return `true` if the Date object corresponds to today's date, `false` otherwise.
- *
- * Example:
- * ```kotlin
- * val today = Date() // e.g., June 8, 2024
- * val isToday = today.isToday() // true
- *
- * val anotherDate = SimpleDateFormat("yyyy-MM-dd").parse("2024-06-07")
- * val isAnotherDateToday = anotherDate.isToday() // false
- * ```
- */
-fun Date.isToday(): Boolean {
-    return isSameDay(Calendar.getInstance().time)
-}
-
-/**
- * Determines if the current `Calendar` instance corresponds to today's date.
- * It checks the year, day of the year, and era of the `Calendar` instance
- * against the current date.
- *
- * @return `true` if the `Calendar` instance represents today's date, otherwise `false`.
- *
- * Example:
- * ```kotlin
- * val calendar = Calendar.getInstance()
- * val isToday = calendar.isToday() // true if the calendar date is today
- * ```
- */
-fun Calendar.isToday(): Boolean {
-    return isSameDay(Calendar.getInstance())
-}
-
-/**
- * Determines if the current Date object is before the specified Date object, ignoring the time portion.
- * It compares the year, era, and day of the year values of both dates to establish order.
- *
- * @param date The Date object to compare against. If either `this` or `date` is null, an
- * IllegalArgumentException will be thrown.
- * @return `true` if the current Date is before the given Date (by day), otherwise `false`.
- *
- * Example:
- * ```kotlin
- * val date1 = SimpleDateFormat("yyyy-MM-dd").parse("2023-09-15")
- * val date2 = SimpleDateFormat("yyyy-MM-dd").parse("2023-09-16")
- * val result = date1.isBeforeDay(date2) // true
- * ```
- */
-fun Date?.isBeforeDay(date: Date?): Boolean {
-    if (this == null || date == null) {
-        throw IllegalArgumentException("The dates must not be null")
+    val cal2 = when (date2) {
+        is Date -> Calendar.getInstance().apply { time = date2 }
+        is Calendar -> date2
+        else -> throw IllegalArgumentException("The second parameter must be of type Date or Calendar")
     }
-    val cal1 = Calendar.getInstance()
-    cal1.time = this
-    val cal2 = Calendar.getInstance()
-    cal2.time = date
-    return cal1.isBeforeDay(cal2)
+
+    return cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
+            cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }
 
-/**
- * Determines whether the current Calendar instance represents a date that comes before the given Calendar instance.
- * This comparison considers the era, year, and day of the year for accuracy.
- *
- * @param cal The Calendar object to compare against. Must not be null.
- * @return `true` if the current Calendar instance is before the input Calendar, otherwise `false`.
- * @throws IllegalArgumentException if either the current Calendar instance (`this`) or the input Calendar (`cal`) is null.
- *
- * Example:
- * ```kotlin
- * val calendar1 = Calendar.getInstance().apply { set(2023, Calendar.OCTOBER, 10) }
- * val calendar2 = Calendar.getInstance().apply { set(2023, Calendar.OCTOBER, 15) }
- *
- * val isBefore = calendar1.isBeforeDay(calendar2) // true
- * val isAfter = calendar2.isBeforeDay(calendar1)  // false
- * ```
- */
-fun Calendar?.isBeforeDay(cal: Calendar?): Boolean {
-    if (this == null || cal == null) {
-        throw IllegalArgumentException("The dates must not be null")
+fun isToday(date: Any?): Boolean {
+    if (date == null) {
+        throw IllegalArgumentException("The date or calendar must not be null")
     }
-    if (get(Calendar.ERA) < cal.get(Calendar.ERA)) return true
-    if (get(Calendar.ERA) > cal.get(Calendar.ERA)) return false
-    if (get(Calendar.YEAR) < cal.get(Calendar.YEAR)) return true
-    return if (get(Calendar.YEAR) > cal.get(Calendar.YEAR)) false else get(Calendar.DAY_OF_YEAR) < cal.get(Calendar.DAY_OF_YEAR)
-}
 
-/**
- * Checks if the current Date object occurs after the specified targetDate,
- * based solely on the date (ignores time components).
- *
- * Throws an IllegalArgumentException if either the current Date or targetDate is null.
- *
- * @param targetDate The target Date to compare against. Must not be null.
- * @return `true` if the current Date is after the targetDate in terms of the date, otherwise `false`.
- *
- * Example:
- * ```kotlin
- * val date1 = SimpleDateFormat("yyyy-MM-dd").parse("2023-10-15")
- * val date2 = SimpleDateFormat("yyyy-MM-dd").parse("2023-10-14")
- * val result = date1.isAfterDay(date2) // true
- * ```
- */
-fun Date?.isAfterDay(targetDate: Date?): Boolean {
-    if (this == null || targetDate == null) {
-        throw IllegalArgumentException("The dates must not be null")
+    val calendar = when (date) {
+        is Date -> Calendar.getInstance().apply { time = date }
+        is Calendar -> date
+        else -> throw IllegalArgumentException("The parameter must be of type Date or Calendar")
     }
-    val cal1 = Calendar.getInstance()
-    cal1.time = this
-    val cal2 = Calendar.getInstance()
-    cal2.time = targetDate
-    return cal1.isAfterDay(cal2)
-}
 
-/**
- * Determines whether the current Calendar object represents a date after the specified target Calendar object,
- * considering only the day, year, and era components of the dates.
- * Both calendars must be non-null.
- *
- * @param targetCal The target Calendar object to compare with. Must not be null.
- * @return `true` if the current Calendar's date is strictly after the target Calendar's date;
- *         `false` otherwise.
- *
- * Example:
- * ```kotlin
- * val currentCal = Calendar.getInstance().apply { set(2024, Calendar.JUNE, 10) }
- * val targetCal = Calendar.getInstance().apply { set(2024, Calendar.JUNE, 9) }
- * val result = currentCal.isAfterDay(targetCal) // true
- * ```
- */
-fun Calendar?.isAfterDay(targetCal: Calendar?): Boolean {
-    if (this == null || targetCal == null) {
-        throw IllegalArgumentException("The dates must not be null")
-    }
-    if (get(Calendar.ERA) < targetCal.get(Calendar.ERA)) return false
-    if (get(Calendar.ERA) > targetCal.get(Calendar.ERA)) return true
-    if (get(Calendar.YEAR) < targetCal.get(Calendar.YEAR)) return false
-    return if (get(Calendar.YEAR) > targetCal.get(Calendar.YEAR)) true else get(Calendar.DAY_OF_YEAR) > targetCal.get(Calendar.DAY_OF_YEAR)
-}
-
-/**
- * Checks if the current Date object falls within the specified number of days in the future,
- * relative to the current date. Throws an exception if the Date object is null.
- *
- * @param days The number of days into the future to check against.
- * @return True if the current Date is within the specified number of days into the future; otherwise, false.
- *
- * Example:
- * ```kotlin
- * val myDate = Date() // e.g., June 8, 2024
- * val isWithin = myDate.isWithinDaysFuture(7) // Checks if it's within the next 7 days
- * ```
- */
-fun Date?.isWithinDaysFuture(days: Int): Boolean {
-    if (this == null) {
-        throw IllegalArgumentException("The date must not be null")
-    }
-    val cal = Calendar.getInstance()
-    cal.time = this
-    return cal.isWithinDaysFuture(days)
-}
-
-/**
- * Determines if the given Calendar instance represents a date within the specified number of days into the future,
- * starting from the current date. The method excludes the current day itself.
- * If the input Calendar is null, an IllegalArgumentException is thrown.
- *
- * @param days The number of days from today (exclusive) to check against.
- * @return `true` if the given Calendar date is within the specified number of days in the future, excluding today;
- *         `false` otherwise.
- *
- * Example:
- * ```kotlin
- * val calendar = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 5) }
- * println(calendar.isWithinDaysFuture(7)) // Output: true
- * println(calendar.isWithinDaysFuture(3)) // Output: false
- * ```
- */
-fun Calendar?.isWithinDaysFuture(days: Int): Boolean {
-    if (this == null) {
-        throw IllegalArgumentException("The date must not be null")
-    }
     val today = Calendar.getInstance()
-    val future = Calendar.getInstance()
-    future.add(Calendar.DAY_OF_YEAR, days)
-    return isAfterDay(today) && !isAfterDay(future)
+
+    return calendar.get(Calendar.ERA) == today.get(Calendar.ERA) &&
+            calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+            calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
 }
 
-/**
- * Checks if the current `Date` instance is within the specified number of days in the past.
- * Throws an `IllegalArgumentException` if the `Date` instance is null.
- *
- * @param days The number of days to check in the past. Must be a non-negative integer.
- * @return `true` if the date is within the past range specified by `days`, `false` otherwise.
- *
- * Example:
- * ```kotlin
- * val date = Date() // Assume it's October 10, 2023
- * val result = date.isWithinDaysPast(5) // Checks if the date is within the past 5 days
- * ```
- */
-fun Date?.isWithinDaysPast(days: Int): Boolean {
-    if (this == null) {
-        throw IllegalArgumentException("The date must not be null")
+fun isBeforeDay(date1: Any?, date2: Any?): Boolean {
+    if (date1 == null || date2 == null) {
+        throw IllegalArgumentException("The dates or calendars must not be null")
     }
-    val cal = Calendar.getInstance()
-    cal.time = this
-    return cal.isWithinDaysPast(days)
+
+    val cal1 = when (date1) {
+        is Date -> Calendar.getInstance().apply { time = date1 }
+        is Calendar -> date1
+        else -> throw IllegalArgumentException("The first parameter must be of type Date or Calendar")
+    }
+
+    val cal2 = when (date2) {
+        is Date -> Calendar.getInstance().apply { time = date2 }
+        is Calendar -> date2
+        else -> throw IllegalArgumentException("The second parameter must be of type Date or Calendar")
+    }
+
+    return if (cal1.get(Calendar.ERA) < cal2.get(Calendar.ERA)) true
+    else if (cal1.get(Calendar.ERA) > cal2.get(Calendar.ERA)) false
+    else if (cal1.get(Calendar.YEAR) < cal2.get(Calendar.YEAR)) true
+    else if (cal1.get(Calendar.YEAR) > cal2.get(Calendar.YEAR)) false
+    else cal1.get(Calendar.DAY_OF_YEAR) < cal2.get(Calendar.DAY_OF_YEAR)
 }
 
-/**
- * Determines whether the current Calendar instance falls within the specified number of past days,
- * relative to the current date.
- *
- * @param days The number of past days to check against. A positive integer representing the range in days.
- *             For example, passing `7` will check if the date is within the past 7 days.
- * @return `true` if the current Calendar instance is within the specified days in the past,
- *         otherwise `false`.
- * @throws IllegalArgumentException If the current Calendar instance is null.
- *
- * Example:
- * ```kotlin
- * val calendar = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) } // 3 days ago
- * val isWithin = calendar.isWithinDaysPast(5) // Returns true, as 3 days ago is within the past 5 days
- * val isNotWithin = calendar.isWithinDaysPast(2) // Returns false, as 3 days ago is outside the past 2 days
- * ```
- */
-fun Calendar?.isWithinDaysPast(days: Int): Boolean {
-    if (this == null) {
-        throw IllegalArgumentException("The date must not be null")
+fun isAfterDay(date1: Any?, date2: Any?): Boolean {
+    if (date1 == null || date2 == null) {
+        throw IllegalArgumentException("The dates or calendars must not be null")
     }
+
+    val cal1 = when (date1) {
+        is Date -> Calendar.getInstance().apply { time = date1 }
+        is Calendar -> date1
+        else -> throw IllegalArgumentException("The first parameter must be of type Date or Calendar")
+    }
+
+    val cal2 = when (date2) {
+        is Date -> Calendar.getInstance().apply { time = date2 }
+        is Calendar -> date2
+        else -> throw IllegalArgumentException("The second parameter must be of type Date or Calendar")
+    }
+
+    return if (cal1.get(Calendar.ERA) > cal2.get(Calendar.ERA)) true
+    else if (cal1.get(Calendar.ERA) < cal2.get(Calendar.ERA)) false
+    else if (cal1.get(Calendar.YEAR) > cal2.get(Calendar.YEAR)) true
+    else if (cal1.get(Calendar.YEAR) < cal2.get(Calendar.YEAR)) false
+    else cal1.get(Calendar.DAY_OF_YEAR) > cal2.get(Calendar.DAY_OF_YEAR)
+}
+
+fun isWithinDaysFromNow(date: Any?, days: Int, future: Boolean = true): Boolean {
+    if (date == null) {
+        throw IllegalArgumentException("The date or calendar must not be null")
+    }
+
+    val calendar = when (date) {
+        is Date -> Calendar.getInstance().apply { time = date }
+        is Calendar -> date
+        else -> throw IllegalArgumentException("The parameter must be of type Date or Calendar")
+    }
+
     val today = Calendar.getInstance()
-    val future = Calendar.getInstance()
-    future.add(Calendar.DAY_OF_YEAR, days)
-    return isBeforeDay(today) && !isBeforeDay(future)
+    val target = Calendar.getInstance().apply {
+        add(Calendar.DAY_OF_YEAR, if (future) days else -days)
+    }
+
+    return if (future) {
+        calendar.after(today) && !calendar.after(target)
+    } else {
+        calendar.before(today) && !calendar.before(target)
+    }
 }
-/*Is End*/
 
 /**
- * Ensures that a single-digit integer is formatted as a two-digit string by prefixing it with "0" if necessary.
- * If the value is 10 or greater, it returns the number as a string without modification.
+ * Mengonversi angka menjadi string dengan format dua digit.
+ * Jika angka kurang dari 10, akan ditambahkan "0" di depannya.
+ * Cocok digunakan untuk format waktu (jam/menit) atau komponen lain seperti bulan/hari.
  *
- * @receiver An integer representing an hour or minute (e.g., 3, 9, 25).
- * @return A two-digit string representation of the integer (e.g., "03", "09", "25").
+ * @receiver Angka bulat yang ingin diformat (misalnya: jam, menit, bulan, atau hari).
+ * @return String dengan format dua digit (contoh: "03", "12").
  *
- * Example:
+ * Contoh:
  * ```kotlin
  * val hour = 9
- * val formattedHour = hour.checkHourMinuteOverTenDateTimepicker() // "09"
+ * val formattedHour = hour.toTwoDigitString() // "09"
  *
- * val minute = 15
- * val formattedMinute = minute.checkHourMinuteOverTenDateTimepicker() // "15"
+ * val month = 5
+ * val formattedMonth = month.toTwoDigitString() // "05"
+ *
+ * val day = 15
+ * val formattedDay = day.toTwoDigitString() // "15"
  * ```
  */
-fun Int.checkHourMinuteOverTenDateTimepicker(): String = if (this < 10) "0${this}" else "$this"
+fun Int.toTwoDigitString(): String = if (this < 10) "0$this" else "$this"
 
 /**
  * Determines whether the given hour in 24-hour format corresponds to "a.m." or "p.m.".
@@ -1293,29 +962,7 @@ fun Int.checkHourMinuteOverTenDateTimepicker(): String = if (this < 10) "0${this
  * val period = hour.checkAmPmDateTimepicker() // Returns "p.m."
  * ```
  */
-fun Int.checkAmPmDateTimepicker(): String = if (this > 12) "p.m" else "a.m"
-
-/**
- * Converts an integer representing a month or day into a two-digit string format
- * by adding a leading zero if the value is less than 10.
- * This is useful for ensuring date components are in the "MM" or "DD" format.
- *
- * @return A two-digit string representation of the number. If the integer is less than 10, a leading zero is prepended; otherwise, the integer is returned
- *  as a string.
- *
- * Example:
- * ```kotlin
- * val month = 5.toMonthAndDayFormat() // Output: "05"
- * val day = 12.toMonthAndDayFormat()  // Output: "12"
- * ```
- */
-fun Int.toMonthAndDayFormat(): String {
-    return if ((this) < 10) {
-        "0${this}"
-    } else {
-        "$this"
-    }
-}
+fun Int.toAmPmString(): String = if (this > 12) "p.m" else "a.m"
 
 /**
  * Converts a Date object to a formatted string based on the provided pattern.
@@ -1332,7 +979,7 @@ fun Int.toMonthAndDayFormat(): String {
  * println(formattedDate) // Output: "2024-06-08"
  * ```
  */
-fun Date.toStringDateFormat(pattern: String): String {
+fun Date.toFormattedString(pattern: String): String {
     val newFormat = SimpleDateFormat(pattern)
     return newFormat.format(this)
 }

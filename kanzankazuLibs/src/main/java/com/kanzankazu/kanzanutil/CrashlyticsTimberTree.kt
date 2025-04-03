@@ -1,44 +1,17 @@
 package com.kanzankazu.kanzanutil
 
 import android.annotation.SuppressLint
-import android.app.Application
-import android.content.Context
-import android.util.DebugUtils
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 import javax.inject.Inject
 
-
 /**
- * Implementasi [Timber.Tree] yang mencatat pesan dan pengecualian (exception) ke Firebase Crashlytics.
+ * A logging class for directing log messages to Logcat and Firebase Crashlytics,
+ * based on a specified minimum log priority.
  *
- * Kelas ini mengintegrasikan logging Timber dengan Crashlytics, memungkinkan Anda untuk melacak
- * kejadian (event) dan kesalahan (error) secara langsung di konsol Crashlytics.
- *
- * Fitur Utama:
- * - **Penyaringan (Filtering):** Log disaring berdasarkan `minLogPriority` yang ditentukan. Hanya
- *   pesan dengan prioritas yang sama atau lebih tinggi dari ambang batas yang akan dikirim ke
- *   Crashlytics.
- * - **Output Debug:** Pada *build* debug (dikontrol oleh `isDebug`), log juga dicetak ke logcat
- *   Android untuk keperluan *debugging* lokal.
- * - **Penandaan (Tagging):** Jika tag tidak diberikan saat pemanggilan log, tag default
- *   "CrashlyticsTimberTree" akan digunakan.
- * - **Pencatatan Pengecualian (Exception Logging):** Setiap `Throwable` yang diberikan ke metode
- *   `log` secara otomatis dicatat sebagai pengecualian di Crashlytics, memberikan laporan
- *   kesalahan yang terperinci.
- * - **Pesan Log yang Terformat:** Setiap pesan log digabungkan dengan tag-nya dalam format
- *   "`tag`: `message`" sebelum dikirim ke Crashlytics.
- * - **Thread Safety:** Implementasi ini aman digunakan dari berbagai thread.
- * - **Mencegah crash:** melakukan pengecekan jika priority tidak sesuai dengan minLogPriority
- *
- * @property isDebug Bendera boolean yang menunjukkan apakah aplikasi berada dalam *build* debug.
- *                   Jika `true`, log juga akan dicetak ke logcat Android.
- * @property minLogPriority Prioritas log minimum yang diperlukan agar pesan dapat dikirim ke
- *                          Crashlytics. Standarnya adalah [Log.INFO]. Prioritas log didefinisikan
- *                          dalam kelas [Log] (misalnya, [Log.VERBOSE], [Log.DEBUG], [Log.INFO],
- *                          [Log.WARN], [Log.ERROR], [Log.ASSERT]).
- *
+ * @param isDebug Determines if the logs should be displayed in Logcat. Typically set to `true` in debug builds.
+ * @param minLogPriority The minimum log priority that will be handled by this logging tree. Defaults to Log.INFO.
  */
 class CrashlyticsTimberTree @Inject constructor(
     private val isDebug: Boolean,
@@ -46,29 +19,35 @@ class CrashlyticsTimberTree @Inject constructor(
 ) : Timber.Tree() {
 
     companion object {
+        // Default log tag used when no tag is provided
         private const val DEFAULT_TAG = "CrashlyticsTimberTree"
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        // Memastikan priority yang di log sesuai dengan minLogPriority yang sudah di tentukan
+        // Only log messages that meet the minimum priority requirement
         if (priority < minLogPriority) return
 
         val finalTag = tag ?: DEFAULT_TAG
 
-        // Jika dalam mode debug, cetak log ke Logcat
-        if (isDebug) logToLogcat(priority, finalTag, message, t) // best practice 1
+        if (isDebug) {
+            // In debug mode, log to Logcat
+            logToLogcat(priority, finalTag, message, t)
+        }
 
-        // Kirim log dan throwable ke Firebase Crashlytics
-        logToCrashlytics(finalTag, message, t) // best practice 2
+        // Log messages and exceptions to Firebase Crashlytics
+        logToCrashlytics(finalTag, message, t)
     }
 
     @SuppressLint("LogNotTimber")
     private fun logToLogcat(priority: Int, tag: String, message: String, throwable: Throwable?) {
+        // Log message to Logcat
         Log.println(priority, tag, message)
+        // Log throwable if present
         throwable?.let { Log.e(tag, "Error: ", it) }
     }
 
     private fun logToCrashlytics(tag: String, message: String, throwable: Throwable?) {
+        // Send log messages and exceptions to Firebase Crashlytics
         FirebaseCrashlytics.getInstance().run {
             log("$tag: $message")
             throwable?.let { recordException(it) }

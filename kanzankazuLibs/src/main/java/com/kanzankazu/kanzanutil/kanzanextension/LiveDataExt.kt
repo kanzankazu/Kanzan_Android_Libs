@@ -18,8 +18,8 @@ import com.kanzankazu.kanzanutil.kanzanextension.type.isNullOrZero
 fun <T> MutableLiveData<T>.toLiveData(): LiveData<T> = this
 
 fun <T> LiveData<T>.reObserve(owner: LifecycleOwner, observer: Observer<in T>) {
-    removeObservers(owner)
-    observe(owner, observer)
+    removeObservers(owner) // Remove observers attached to LifecycleOwner
+    observe(owner, observer) // Add the new observer
 }
 
 inline fun <reified T : ViewModel> FragmentActivity.vmInit(): T =

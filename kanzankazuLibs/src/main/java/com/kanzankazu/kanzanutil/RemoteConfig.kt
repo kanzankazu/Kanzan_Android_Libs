@@ -2,164 +2,65 @@
 
 package com.kanzankazu.kanzanutil
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import com.afollestad.materialdialogs.DialogCallback
-import com.afollestad.materialdialogs.MaterialDialog
-import com.google.firebase.ktx.Firebase
+import com.google.android.gms.tasks.Task
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
-import com.kanzankazu.kanzanutil.kanzanextension.type.toIntOrDefault
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
-implementation 'com.google.firebase:firebase-config-ktx:21.0.0'
-implementation 'com.google.firebase:firebase-analytics-ktx:19.0.0'
+ * Manages remote configuration using Firebase Remote Config. This class handles fetching, activating,
+ * and applying configuration values from Firebase, with error handling and logging for any issues encountered.
  */
-class RemoteConfig(private var activity: Activity, onFirebaseRemoteConfig: (FirebaseRemoteConfig) -> Unit = {}) {
+class RemoteConfig {
+    private val firebaseRemoteConfig: FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
-    private var isMaintenance: Boolean = false
-    private var minVer: Int = 0
-    private var currVer: Int = 0
-    private lateinit var remoteConfig: FirebaseRemoteConfig
-
-    init {
-        setupFirebaseRemoteConfig(onFirebaseRemoteConfig)
-    }
-
-    @SuppressLint("ResourceType")
-    fun setupFirebaseRemoteConfig(
+    suspend fun getFirebaseRemoteConfig(
         onFirebaseRemoteConfig: (FirebaseRemoteConfig) -> Unit = {},
+        onFailed: (errorMessage: String) -> Unit = {},
     ) {
-        try {
-            remoteConfig = Firebase.remoteConfig
-            val configSettings = remoteConfigSettings { minimumFetchIntervalInSeconds = 3600 }
-            remoteConfig.setConfigSettingsAsync(configSettings)
-            remoteConfig.setDefaultsAsync(R.xml.remote_config_default)
-            onFirebaseRemoteConfig(remoteConfig)
-        } catch (e: Exception) {
-            e.message.toString().debugMessageDebug()
-            e.printStackTrace()
-        }
-    }
+        withContext(Dispatchers.IO){
+            try {
+                val configSettings = FirebaseRemoteConfigSettings.Builder()
+                    .setMinimumFetchIntervalInSeconds(10)
+                    .build()
 
-    /**
-     * @param T is first activity/splashscreen
-     * @param deviceVerCode from BuildConfig.VERSION_CODE
-     */
-    private inline fun <reified T> validationMaintenanceUpdateRemoteConfig(deviceVerCode: Int, listenerUpdate: ListenerUpdate) {
-        remoteConfig.fetchAndActivate().addOnCompleteListener(activity) { task ->
-            if (task.isSuccessful) {
-                try {
-                    isMaintenance = remoteConfig.getBoolean(IS_MAINTENANCE)
-                    minVer = remoteConfig.getString(CURRENT_VERSION).toIntOrDefault()
-                    currVer = remoteConfig.getString(MIN_VERSION).toIntOrDefault()
-                } catch (e: NumberFormatException) {
-                    listenerUpdate.onNoUpdate(e.message.toString())
-                }
-            } else {
-                listenerUpdate.onNoUpdate(task.exception?.message.toString())
+                firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
+                firebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default)
+
+                firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener { task -> handleTaskResult(task, onFirebaseRemoteConfig, onFailed) }
+            } catch (e: Exception) {
+                handleException(e, "initializeRemoteConfig", onFailed)
             }
         }
-
-        "RC VALIDATION : $deviceVerCode $minVer $currVer".debugMessageDebug()
-        if (isMaintenance) {
-            listenerUpdate.onMaintenance()
-        } else if (deviceVerCode < minVer) {
-            "RC FORCE : $deviceVerCode < $minVer".debugMessageDebug()
-            listenerUpdate.onUpdateForce()
-        } else if (deviceVerCode < currVer) {
-            if (activity is T) {
-                "RC SUGGEST : $deviceVerCode < $currVer".debugMessageDebug()
-                listenerUpdate.onUpdateSuggest()
-            } else listenerUpdate.onNoUpdate("")
-        } else listenerUpdate.onNoUpdate("")
     }
 
-    private fun initMaintenanceDialog(
-        maintenanceTitle: String,
-        maintenanceDesc: String,
-        maintenanceCloseTitle: String? = null,
-    ) {
-        setupDialogRemoteConfig(
-            maintenanceTitle,
-            maintenanceDesc,
-            maintenanceCloseTitle ?: activity.getString(R.string.label_close_apps),
-            positiveAction = { activity.finishAffinity() }
-        )
-    }
-
-    private fun initForceUpdateDialog(
-        forceTitle: String,
-        forceDesc: String,
-        forceUpdateAction: DialogCallback,
-        forceUpdateCloseAction: DialogCallback,
-        forceUpdateTitle: String? = null,
-        forceUpdateCloseTitle: String? = null,
-    ) {
-        setupDialogRemoteConfig(
-            forceTitle,
-            forceDesc,
-            forceUpdateTitle ?: activity.getString(R.string.label_update),
-            forceUpdateAction,
-            forceUpdateCloseTitle ?: activity.getString(R.string.label_close_apps),
-            forceUpdateCloseAction,
-        )
-    }
-
-    private fun initSuggestUpdateDialog(
-        suggestTitle: String,
-        suggestDesc: String,
-        suggestUpdateAction: DialogCallback,
-        suggestUpdateCloseAction: DialogCallback,
-        suggestUpdateTitle: String? = null,
-        suggestUpdateCloseTitle: String? = null,
-    ) {
-        setupDialogRemoteConfig(
-            suggestTitle,
-            suggestDesc,
-            suggestUpdateTitle ?: activity.getString(R.string.label_update),
-            suggestUpdateAction,
-            suggestUpdateCloseTitle ?: activity.getString(R.string.label_close_apps),
-            suggestUpdateCloseAction,
-        )
-    }
-
-    @SuppressLint("CheckResult")
-    private fun setupDialogRemoteConfig(
-        title: String? = null,
-        desc: String? = null,
-        positiveTitle: String? = null,
-        positiveAction: DialogCallback? = null,
-        negativeTitle: String? = null,
-        negativeAction: DialogCallback? = null,
-        neutralTitle: String? = null,
-        neutralAction: DialogCallback? = null,
-    ) {
-        MaterialDialog(activity).show {
-            noAutoDismiss()
-            cancelOnTouchOutside(false)
-            title(text = title ?: activity.getString(R.string.label_maintenance_title))
-            message(text = desc ?: activity.getString(R.string.label_maintenance_desc))
-            if (!positiveTitle.isNullOrEmpty()) positiveButton(text = positiveTitle, click = positiveAction)
-            if (!negativeTitle.isNullOrEmpty()) negativeButton(text = negativeTitle, click = negativeAction)
-            if (!neutralTitle.isNullOrEmpty()) neutralButton(text = neutralTitle, click = neutralAction)
+    private fun handleTaskResult(task: Task<Boolean>, onFirebaseRemoteConfig: (FirebaseRemoteConfig) -> Unit, onFailed: (errorMessage: String) -> Unit) {
+        if (task.isSuccessful) {
+            try {
+                onFirebaseRemoteConfig.invoke(firebaseRemoteConfig)
+            } catch (e: NumberFormatException) {
+                val message = "Failed to parse configuration: ${e.message}"
+                logError(message, e)
+                onFailed.invoke(message)
+            }
+        } else {
+            val message = task.exception?.message ?: "Unknown error occurred during fetch"
+            logError("Fetch not successful: $message", task.exception)
+            onFailed.invoke(message)
         }
-
     }
 
-    interface ListenerUpdate {
-        fun onMaintenance()
-        fun onUpdateForce()
-        fun onUpdateSuggest()
-        fun onNoUpdate(errorMessage: String)
+    private fun handleException(e: Exception, methodName: String, onFailed: (errorMessage: String) -> Unit) {
+        val message = "$methodName - Error occurred: ${e.message}"
+        logError(message, e)
+        onFailed.invoke(e.message.orEmpty())
     }
 
-    companion object {
-        const val IS_MAINTENANCE = "is_maintenance"
-        const val CURRENT_VERSION = "current_version"
-        const val MIN_VERSION = "min_version"
+    private fun logError(message: String, throwable: Throwable?) {
+        val errorDetails = "RemoteConfig - $message >> ${throwable?.stackTraceToString()}"
+        errorDetails.debugMessageError()
     }
 }
