@@ -21,15 +21,11 @@ import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import java.lang.ref.WeakReference
 
 /**
- * A class that manages in-app updates for an Android application.
- * It uses `AppUpdateManager` to handle both immediate and flexible update types and provides
- * utility methods to validate, execute, and complete updates.
+ * Handles in-app updates by interacting with the Play Core library. Provides functionality to check
+ * update availability, initiate updates, and manage update states using both flexible and immediate update types.
  *
- * @constructor Creates an instance of `InAppUpdate` with the specified `Activity` and optional `AppUpdateManager`.
- *
- * @param activity The `Activity` used to display UI components and manage the update lifecycle.
- * @param appUpdateManager The `AppUpdateManager` instance for managing the in-app update process. By default, a new instance is created using `AppUpdate
- * ManagerFactory`.
+ * @param activity The activity initiating the in-app update process.
+ * @param appUpdateManager The manager used for handling in-app update operations. Defaults to a new instance created using the activity context.
  */
 class InAppUpdate(
     private val activity: Activity,
@@ -45,17 +41,20 @@ class InAppUpdate(
     }
 
     /**
-     * Configures and initiates an in-app update process using the specified update type.
-     * Registers a listener to handle installation state updates and checks for update availability.
-     * If an update is available and allowed for the specified type, it begins the update process.
-     * On failure to check update info, logs the error.
+     * Configures the in-app update process with the specified update type. This method initializes the
+     * app update manager, sets up the listener for installation state changes, and checks for
+     * availability of updates. If an update is available and allowed, it starts the update process.
      *
-     * @param appUpdateType The type of in-app update to perform, defaulting to `AppUpdateType.FLEXIBLE`.
-     *                      Use `AppUpdateType.IMMEDIATE` for immediate updates or `AppUpdateType.FLEXIBLE` for flexible updates.
-     * @return The `AppUpdateManager` object used for managing the in-app update process.
+     * @param appUpdateType The type of in-app update to be used. Defaults to `AppUpdateType.FLEXIBLE`.
+     *                      Possible values include flexible and immediate updates.
+     * @return An instance of `AppUpdateManager` which manages the in-app update process.
      *
      * Example:
      * ```kotlin
+     * // Set up in-app update with default flexible update type
+     * val appUpdateManager = setupInAppUpdate()
+     *
+     * // Set up in-app update with immediate update type
      * val appUpdateManager = setupInAppUpdate(AppUpdateType.IMMEDIATE)
      * ```
      */

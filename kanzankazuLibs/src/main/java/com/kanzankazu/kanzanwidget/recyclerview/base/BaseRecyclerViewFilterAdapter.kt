@@ -12,7 +12,6 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.annotation.LayoutRes
 import androidx.core.widget.NestedScrollView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.kanzankazu.R
@@ -93,7 +92,7 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         this.filterModeData = filterMode
     }
 
-    fun getFilterMode(): Int = filterModeData
+    fun getFilterMode() = filterModeData
 
     fun setCheckPosition(pos: Int) {
         checkPositionData = pos
@@ -106,116 +105,73 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     fun getItemDataS(): ArrayList<T> = mainDatas
 
     fun setData(dataS: ArrayList<T>) {
-        val diffCallback = object : DiffUtil.Callback() {
-            override fun getOldListSize() = mainDatas.size // Saat kosong, ini adalah 0
-            override fun getNewListSize() = dataS.size
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                // Karena dataset lama kosong, ini tidak akan pernah terpanggil
-                return mainDatas.getOrNull(oldItemPosition) == dataS.getOrNull(newItemPosition)
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                // Karena dataset lama kosong, ini tidak akan pernah terpanggil
-                return mainDatas.getOrNull(oldItemPosition) == dataS.getOrNull(newItemPosition)
-            }
-        }
-
-        // Kalkulasi perbedaan dengan DiffUtil
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-
-        // Update dataset lama
-        mainDatas.clear()
-        mainDatas.addAll(dataS)
-        tempFilterDatas.clear()
-        tempFilterDatas.addAll(dataS)
-
-        // Terapkan perubahan
-        diffResult.dispatchUpdatesTo(this)
+        this.mainDatas = dataS
+        this.tempFilterDatas = dataS
+        notifyDataSetChanged()
     }
 
-    fun addAllData(dataList: List<T>) {
-        val newData = ArrayList(mainDatas).apply { addAll(dataList) }
-        val diffCallback = object : DiffUtil.Callback() {
-            override fun getOldListSize() = mainDatas.size
-            override fun getNewListSize() = newData.size
+    fun addDataS(dataS: ArrayList<T>) {
+        val lastSize = this.mainDatas.size
+        val arrayListOf = arrayListOf<T>()
+        arrayListOf.addAll(dataS)
 
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mainDatas[oldItemPosition] == newData[newItemPosition] // Sesuaikan logikanya
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mainDatas[oldItemPosition] == newData[newItemPosition] // Sesuaikan logikanya
-            }
-        }
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        mainDatas.clear()
-        mainDatas.addAll(newData)
-        tempFilterDatas.clear()
-        tempFilterDatas.addAll(newData)
-        diffResult.dispatchUpdatesTo(this)
+        this.mainDatas.addAll(dataS)
+        this.tempFilterDatas = arrayListOf
+        notifyItemRangeInserted(lastSize, dataS.size)
     }
 
-    fun addDataAt(data: T, position: Int) {
-        mainDatas.add(position, data)
-        tempFilterDatas.add(position, data)
+    fun addData(data: T) {
+        val arrayListOf = arrayListOf<T>()
+        arrayListOf.addAll(mainDatas)
+        arrayListOf.add(data)
+
+        val lastSize = mainDatas.size
+        this.mainDatas.add(data)
+        this.tempFilterDatas = arrayListOf
+        notifyItemRangeInserted(lastSize, 1)
+    }
+
+    fun addDataFirst(data: T) {
+        val position = 0
+        this.mainDatas.add(position, data)
+        this.tempFilterDatas.add(position, data)
         notifyItemInserted(position)
     }
 
-    fun updateDataAt(position: Int, newData: T) {
-        if (position in mainDatas.indices) {
-            val newDataList = ArrayList(mainDatas).apply { this[position] = newData }
-            val diffCallback = object : DiffUtil.Callback() {
-                override fun getOldListSize() = mainDatas.size
-                override fun getNewListSize() = newDataList.size
-
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return mainDatas[oldItemPosition] == newDataList[newItemPosition] // Sesuaikan logikanya
-                }
-
-                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return mainDatas[oldItemPosition] == newDataList[newItemPosition] // Sesuaikan logikanya
-                }
-            }
-            val diffResult = DiffUtil.calculateDiff(diffCallback)
-            mainDatas.clear()
-            mainDatas.addAll(newDataList)
-            tempFilterDatas.clear()
-            tempFilterDatas.addAll(newDataList)
-            diffResult.dispatchUpdatesTo(this)
-        }
+    fun addDataLast(data: T) {
+        mainDatas.add(data)
+        tempFilterDatas.add(data)
+        notifyItemInserted(mainDatas.lastIndex)
     }
 
-    fun removeDataAt(position: Int) {
-        if (position in mainDatas.indices) {
-            val newDataList = ArrayList(mainDatas)
-            newDataList.removeAt(position)
-            val diffCallback = object : DiffUtil.Callback() {
-                override fun getOldListSize() = mainDatas.size
-                override fun getNewListSize() = newDataList.size
+    fun addDataAt(data: T, pos: Int) {
+        this.mainDatas.add(pos, data)
+        this.tempFilterDatas.add(pos, data)
+        notifyItemInserted(pos)
+    }
 
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return mainDatas[oldItemPosition] == newDataList[newItemPosition] // Sesuaikan logikanya
-                }
-
-                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return mainDatas[oldItemPosition] == newDataList[newItemPosition] // Sesuaikan logikanya
-                }
-            }
-            val diffResult = DiffUtil.calculateDiff(diffCallback)
-            mainDatas.clear()
-            mainDatas.addAll(newDataList)
-            tempFilterDatas.clear()
-            tempFilterDatas.addAll(newDataList)
-            diffResult.dispatchUpdatesTo(this)
-        }
+    fun removeDataFirst() {
+        val position = 0
+        removeAt(position)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun clearData() {
-        mainDatas.clear()
-        tempFilterDatas.clear()
+    fun removeDataS() {
+        this.mainDatas = arrayListOf()
+        this.tempFilterDatas = arrayListOf()
         notifyDataSetChanged()
+    }
+
+    fun removeDataLast() {
+        mainDatas.removeAt(mainDatas.lastIndex)
+        notifyItemRemoved(mainDatas.lastIndex)
+    }
+
+    fun removeAt(position: Int) {
+        if (position in mainDatas.indices) mainDatas.removeAt(position)
+        if (position in tempFilterDatas.indices) tempFilterDatas.removeAt(position)
+        notifyDataSetChanged()
+
     }
 
     fun refreshItemAt(position: Int) {
@@ -331,7 +287,7 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         recyclerView: RecyclerView,
         nestedScrollView: NestedScrollView? = null,
         thresholdItemCount: Int = 3, // Default: Load more saat tersisa 3 item terlihat
-        onLoadMore: () -> Unit // Callback untuk memuat data baru
+        onLoadMore: () -> Unit, // Callback untuk memuat data baru
     ) {
         // Cek apakah NestedScrollView diberikan
         val nestedScrollViewParent = nestedScrollView ?: findParentNestedScrollView(recyclerView)
@@ -348,7 +304,7 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
                 }
             })
         } else {
-            recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
