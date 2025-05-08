@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.kanzankazu.R
 import com.kanzankazu.kanzanwidget.recyclerview.utils.decorator.GridItemDecoration
 import com.kanzankazu.kanzanwidget.recyclerview.utils.decorator.LinearItemDecoration
-import com.kanzankazu.kanzanwidget.recyclerview.utils.decorator.SwipeRightLeftDecoration
 import com.kanzankazu.kanzanwidget.recyclerview.utils.listener.SnapOnScrollListener
 
 /**
@@ -107,10 +106,6 @@ fun RecyclerView.loadMore(isLoadMore: Boolean, currentPage: Int, lastPage: Int, 
             }
         }
     })
-}
-
-fun RecyclerView.swipeRightLeft(drawObject: SwipeRightLeftDecoration.DrawObject, listener: SwipeRightLeftDecoration.Listener) {
-    SwipeRightLeftDecoration(this, drawObject, listener)
 }
 
 interface LoadMoreListener {

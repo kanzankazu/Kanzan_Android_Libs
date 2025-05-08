@@ -156,7 +156,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 it.toObject(targetClass)?.let { t ->
                     BaseResponse.Success(t)
                 } ?: kotlin.run {
-                    BaseResponse.Error("Error Convert")
+                    BaseResponse.Error("Data Not Found")
                 }
             })
         }
@@ -366,6 +366,27 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
+    /**
+     * Memeriksa apakah data dengan kunci spesifik ada di dalam database.
+     *
+     * @param tableChildKey Kunci dari tabel anak yang ingin diperiksa.
+     * @param tableChildPrimaryKeyId ID kunci utama dari data yang ingin diperiksa.
+     * @param function Fungsi callback yang akan dipanggil dengan hasil pemeriksaan.
+     * Hasilnya adalah pasangan boolean dan string. Boolean menunjukkan apakah data
+     * ada, dan string mengandung pesan tambahan jika diperlukan.
+     *
+     * Contoh penggunaan:
+     *
+     * ```kotlin
+     * isExistData("users", "user123") { result ->
+     *     if (result.first) {
+     *         println("Data ditemukan: ${result.second}")
+     *     } else {
+     *         println("Data tidak ditemukan: ${result.second}")
+     *     }
+     * }
+     * ```
+     */
     override fun isExistData(
         tableChildKey: String,
         tableChildPrimaryKeyId: String,
@@ -375,7 +396,6 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         getRootRefKt(tableChildKey).child(tableChildPrimaryKeyId)
             .addListenerForSingleValueEvent(handleTaskListenerIsExist(function))
     }
-
     private fun Task<Void>.handleTask(function: (pair: Pair<Boolean, String>) -> Unit) {
         this.addOnSuccessListener { function.invoke(Pair(true, "")) }
             .addOnCompleteListener { function.invoke(Pair(true, "")) }

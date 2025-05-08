@@ -152,9 +152,7 @@ fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debug
                 }
             }
         }
-    } else {
-        Timber.tag("Lihat").e("$location >> log is null")
-    }
+    } else Timber.tag("Lihat").e("$location >> log is null")
 }
 
 /**

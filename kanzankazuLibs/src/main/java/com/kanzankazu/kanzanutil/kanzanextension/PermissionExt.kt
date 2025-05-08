@@ -1,16 +1,30 @@
 package com.kanzankazu.kanzanutil.kanzanextension
 
 import android.app.AlertDialog
-import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+
+/**
+ * Represents the state of a permission.
+ *
+ *  * `GRANTED`: The permission has been granted by the user.
+ *  * `DENIED`: The permission has been denied by the user and the user can be asked again.
+ *  * `SHOW_RATIONALE`: The permission has been denied by the user and the user should be shown a rationale for why the permission is needed before asking again. This state typically occurs after a permission has been denied once.
+ *  * `PERMANENTLY_DENIED`: The permission has been permanently denied by the user, and the user will not be asked again within the app. The user may need to manually grant the permission in system settings.
+ */
+enum class PermissionState {
+    GRANTED, DENIED, SHOW_RATIONALE, PERMANENTLY_DENIED
+}
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
 fun isTiramisuAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
@@ -18,92 +32,102 @@ fun isTiramisuAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
 fun isSAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
-@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
-fun isMarshmelloAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+fun FragmentActivity.getPermissionState(permission: PermissionEnum): PermissionState {
+    return when {
+        ContextCompat.checkSelfPermission(this, permission.permission) == PackageManager.PERMISSION_GRANTED -> PermissionState.GRANTED
+        !shouldShowRequestPermissionRationale(permission.permission) &&
+                ContextCompat.checkSelfPermission(this, permission.permission) == PackageManager.PERMISSION_DENIED -> PermissionState.PERMANENTLY_DENIED
 
-fun Context.isPermissions(permission: PermissionEnum) = permission.let {
-    ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_GRANTED
+        shouldShowRequestPermissionRationale(permission.permission) -> PermissionState.SHOW_RATIONALE
+        else -> PermissionState.DENIED
+    }
 }
 
-fun Context.isPermissions(permissions: Array<PermissionEnum>) = permissions.all {
-    ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_GRANTED
+fun FragmentActivity.getPermissionState(permissions: Array<PermissionEnum>): PermissionState {
+    return when {
+        permissions.all { ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_GRANTED } -> PermissionState.GRANTED
+        permissions.any {
+            !shouldShowRequestPermissionRationale(it.permission) &&
+                    ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_DENIED
+        } -> PermissionState.PERMANENTLY_DENIED
+
+        permissions.any { shouldShowRequestPermissionRationale(it.permission) } -> PermissionState.SHOW_RATIONALE
+        else -> PermissionState.DENIED
+    }
 }
 
-fun Context.isPermissions(permissions: PermissionEnumArray) = permissions.permissions.all {
-    ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_GRANTED
+fun FragmentActivity.getPermissionState(permissions: PermissionEnumArray): PermissionState {
+    return getPermissionState(permissions.permissions) // Reuse the existing function
 }
 
-fun Context.isPermissions(permissions: Array<PermissionEnumArray>) =
-    permissions.toArrayString().all {
-        ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+fun FragmentActivity.getPermissionState(permissions: Array<PermissionEnumArray>): PermissionState {
+    return getPermissionState(permissions.convertToArray()) // Reuse the existing function (after fix)
+}
+
+@JvmOverloads
+fun FragmentActivity.requestPermissions(permissions: PermissionEnumArray, activityResultLauncher: ActivityResultLauncher<Array<String>>? = null, requestCode: Int = 0, isWithDialog: Boolean = true) {
+    requestPermissions(permissions.permissions, activityResultLauncher, requestCode, isWithDialog)
+}
+
+@JvmOverloads
+fun FragmentActivity.requestPermissions(permissions: Array<PermissionEnum>, activityResultLauncher: ActivityResultLauncher<Array<String>>? = null, requestCode: Int = 0, isWithDialog: Boolean = true) {
+    requestPermissions(permissions.toArrayString(), activityResultLauncher, requestCode, isWithDialog)
+}
+
+@JvmOverloads
+fun FragmentActivity.requestPermissions(permissions: Array<String>, activityResultLauncher: ActivityResultLauncher<Array<String>>? = null, requestCode: Int = 0, isWithDialog: Boolean = true) {
+    fun launchPermissionsRequest(activityResultLauncher: ActivityResultLauncher<Array<String>>?, permissions: Array<String>, requestCode: Int) {
+        if (activityResultLauncher != null) activityResultLauncher.launch(permissions)
+        else ActivityCompat.requestPermissions(this, permissions, requestCode)
     }
 
-fun FragmentActivity.checkPermissions(
-    permissions: PermissionEnumArray,
-    activityResultLauncher: ActivityResultLauncher<Array<String>>,
-    isWithDialog: Boolean = true,
-) {
-    checkPermissions(permissions.permissions, activityResultLauncher, isWithDialog)
-}
+    val isRationale = permissions.any { ActivityCompat.shouldShowRequestPermissionRationale(this, it) }
 
-fun FragmentActivity.checkPermissions(
-    permissions: Array<PermissionEnum>,
-    activityResultLauncher: ActivityResultLauncher<Array<String>>,
-    isWithDialog: Boolean = true,
-) {
-    checkPermissions(permissions.toArrayString(), activityResultLauncher, isWithDialog)
-}
-
-fun FragmentActivity.checkPermissions(
-    permissions: Array<String>,
-    activityResultLauncher: ActivityResultLauncher<Array<String>>,
-    isWithDialog: Boolean = true,
-) {
-    "checkPermissions".debugMessageDebug()
-
-    val isRationale =
-        permissions.all { ActivityCompat.shouldShowRequestPermissionRationale(this, it) }
-
-    if (isRationale) {
-        if (isWithDialog) {
-            val message = when {
-                permissions.contentEquals(PermissionEnumArray.POST_NOTIFICATIONS.permissions.toArrayString()) -> "Kami membutuhkan izin notifikasi untuk mengunduh memberi tahu anda jika ada notifikasi terbaru"
-                permissions.contentEquals(PermissionEnumArray.CAMERA.permissions.toArrayString()) -> "Kami membutuhkan izin kamera untuk membuka foto"
-                permissions.contentEquals(PermissionEnumArray.FILE_ACCESS.permissions.toArrayString()) -> "Kami membutuhkan izin penyimpanan untuk meletakan unduhan data"
-                permissions.contentEquals(PermissionEnumArray.CAMERA_FILE_ACCESS.permissions.toArrayString()) -> "Kami membutuhkan izin kamera dan penyimpanan untuk membuka foto dan menyimpan foto"
-                permissions.contentEquals(PermissionEnumArray.LOCATION.permissions.toArrayString()) -> "Kami membutuhkan izin lokasi untuk mencari lokasi anda untuk penyediaan data di sekitar anda"
-                else -> ""
-            }
-
-            val builder = AlertDialog.Builder(this)
-            builder.setMessage(message)
-            builder.setPositiveButton("OK") { _, _ -> activityResultLauncher.launch(permissions) }
-            builder.setNegativeButton("BATAL") { _, _ -> }
-            builder.show()
-        } else activityResultLauncher.launch(permissions)
-    } else activityResultLauncher.launch(permissions)
-}
-
-fun FragmentActivity.resultMultiplePermissions(defaultHandle: (Map<String, Boolean>) -> Unit = {}) =
-    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        val isGranted = permissions.entries.all { it.value }
-
-        if (isGranted) {
-            defaultHandle(permissions)
-        } else {
-            simpleToast("Harap izinkan akses penyimpanan untuk mengunduh file")
+    if (isRationale && isWithDialog) {
+        val message = when {
+            permissions.contentEquals(PermissionEnumArray.POST_NOTIFICATIONS.permissions.toArrayString()) -> "Kami membutuhkan izin notifikasi untuk mengunduh memberi tahu anda jika ada notifikasi terbaru"
+            permissions.contentEquals(PermissionEnumArray.CAMERA.permissions.toArrayString()) -> "Kami membutuhkan izin kamera untuk membuka foto"
+            permissions.contentEquals(PermissionEnumArray.FILE_ACCESS.permissions.toArrayString()) -> "Kami membutuhkan izin penyimpanan untuk meletakan unduhan data"
+            permissions.contentEquals(PermissionEnumArray.CAMERA_FILE_ACCESS.permissions.toArrayString()) -> "Kami membutuhkan izin kamera dan penyimpanan untuk membuka foto dan menyimpan foto"
+            permissions.contentEquals(PermissionEnumArray.LOCATION.permissions.toArrayString()) -> "Kami membutuhkan izin lokasi untuk mencari lokasi anda untuk penyediaan data di sekitar anda"
+            else -> ""
         }
-    }
+
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(message)
+        builder.setPositiveButton("OK") { _, _ -> launchPermissionsRequest(activityResultLauncher, permissions, requestCode) }
+        builder.setNegativeButton("BATAL") { _, _ -> }
+        builder.show()
+    } else launchPermissionsRequest(activityResultLauncher, permissions, requestCode)
+}
+
+fun FragmentActivity.permissionResultHandler(callback: (Map<String, Boolean>) -> Unit) =
+    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), callback)
+
+fun Array<PermissionEnumArray>.convertToArray(): Array<PermissionEnum> {
+    val hasil = mutableListOf<PermissionEnum>()
+    for (array in this) hasil.addAll(array.permissions)
+    return hasil.toTypedArray()
+}
 
 fun Array<PermissionEnumArray>.toArrayString(): Array<String> {
     val hasil = mutableListOf<PermissionEnum>()
-    for (array in this) {
-        hasil.addAll(array.permissions)
-    }
+    for (array in this) hasil.addAll(array.permissions)
     return hasil.toTypedArray().toArrayString()
 }
 
-fun Array<PermissionEnum>.toArrayString() = this.map { it.permission }.toTypedArray()
+fun PermissionEnumArray.toArrayString(): Array<String> = this.permissions.toArrayString()
+
+fun Array<PermissionEnum>.toArrayString(): Array<String> = this.map { it.permission }.toTypedArray()
+
+fun FragmentActivity.openPermissionSettings(requestCode: Int? = null) {
+    val builder = CustomTabsIntent.Builder()
+    val customTabsIntent = builder.build()
+    customTabsIntent.intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+    customTabsIntent.intent.data = Uri.fromParts("package", packageName, null)
+    customTabsIntent.intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    requestCode?.let { startActivityForResult(customTabsIntent.intent, it) } ?: run { startActivity(customTabsIntent.intent) }
+}
 
 enum class PermissionEnum(val permission: String) {
     CAMERA("android.permission.CAMERA"),

@@ -84,29 +84,11 @@ fun Int?.orNullBoolean(defaultNull: Boolean = false): Boolean = when (this) {
     else -> false
 }
 
-fun String?.orNull(defaultNull: String = "", functionIfNotNull: (s: String) -> String? = { null }): String = if (this != null) {
-    if (functionIfNotNull(this) != null) functionIfNotNull(this) ?: ((if (this.isNumeric(false)) "0" else defaultNull))
-    else this
-} else defaultNull
+fun String?.orNull(defaultNull: String = ""): String = this ?: defaultNull
 
 fun Int?.orNull(defaultNull: Int = 0): Int = this ?: defaultNull
 
-fun Int?.orNull(defaultNull: String = "0", functionIfNotNull: (i: Int) -> String? = { null }): String = if (this != null) {
-    if (functionIfNotNull(this) != null) functionIfNotNull(this) ?: defaultNull
-    else this.toString()
-} else defaultNull
-
-fun Float?.orNull(defaultNull: String, functionIfNotNull: (s: String) -> String? = { null }): String = if (this != null) {
-    if (functionIfNotNull(this.toString()) != null) functionIfNotNull(this.toString()) ?: defaultNull
-    else this.toString()
-} else defaultNull
-
 fun Float?.orNull(defaultNull: Float = 0f): Float = this ?: defaultNull
-
-fun Double?.orNull(defaultNull: String, functionIfNotNull: (s: String) -> String? = { null }): String = if (this != null) {
-    if (functionIfNotNull(this.toString()) != null) functionIfNotNull(this.toString()) ?: defaultNull
-    else this.toString()
-} else defaultNull
 
 fun Double?.orNull(defaultNull: Double = 0.0): Double = this ?: defaultNull
 
@@ -126,6 +108,17 @@ fun Double?.isNullOrZero(): Boolean = (this == null || this == 0.0)
 fun <T> T?.isNull(): Boolean = this == null
 
 fun <T> T?.isNotNull(): Boolean = this != null
+
+//TODO("IF_NULL")
+fun String?.ifEmptyOrNull(defaultValue: () -> String): String = if (this.isNullOrEmpty()) defaultValue.invoke() else this
+
+fun Int?.ifNull(defaultValue: () -> Int): Int = this ?: defaultValue.invoke()
+
+fun Float?.ifNull(defaultValue: () -> Float): Float = this ?: defaultValue.invoke()
+
+fun Double?.ifNull(defaultValue: () -> Double): Double = this ?: defaultValue.invoke()
+
+fun Boolean?.ifNull(defaultValue: () -> Boolean): Boolean = this ?: defaultValue.invoke()
 
 fun String.toDigits(withMinus: Boolean = false): String {
     val isRealMinus = if (withMinus) {
@@ -190,7 +183,7 @@ fun <T> T.isFieldCondition(falseCondition: T.() -> Boolean, errorMessage: String
     return if (falseCondition.invoke(this)) {
         when (this) {
             is KanzanEditTextComponent -> textInputLayout = this.et()?.getTil()
-            is KanzanEditText -> textInputLayout = this.et()?.getTil()
+            is KanzanEditText -> textInputLayout = this.et().getTil()
             is KanzanEditTextRupiahComponent -> textInputLayout = this.et()?.getTil()
             is EditText -> textInputLayout = this.getTil()
         }
