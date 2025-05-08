@@ -5,6 +5,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.kanzankazu.kanzanmodel.MyFirebaseNotificationModel
 import com.kanzankazu.kanzanutil.enums.NotifTopics
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import com.kanzankazu.kanzanutil.kanzanextension.type.json2Object
 import org.json.JSONObject
 
@@ -31,6 +32,7 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
                 val mapToObject = JSONObject(map as Map<*, *>)
                 notif = mapToObject.toString().json2Object(MyFirebaseNotificationModel::class.java)
             } catch (e: Exception) {
+                e.debugMessageError("BaseMessagingService - onMessageReceived")
                 "Error parsing notification data: ${e.message}".debugMessageDebug()
             }
         } else {

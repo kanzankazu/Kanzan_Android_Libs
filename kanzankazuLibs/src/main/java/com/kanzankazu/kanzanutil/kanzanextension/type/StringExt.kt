@@ -7,6 +7,7 @@ import android.os.Build
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.kanzankazu.kanzanutil.BaseConst
+import com.kanzankazu.kanzanutil.kanzanextension.getFullErrorLog
 import com.kanzankazu.kanzanutil.kanzanextension.isDebugPublic
 import com.kanzankazu.kanzanutil.kanzanextension.toDateFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toDigits
@@ -14,13 +15,15 @@ import com.kanzankazu.kanzanutil.kanzanextension.toRupiahFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toStringFormat
 import com.kanzankazu.kanzanwidget.textdrawable.ColorGenerator
 import com.kanzankazu.kanzanwidget.textdrawable.TextDrawable
-import org.json.JSONObject
 import timber.log.Timber
 import java.math.BigInteger
 import java.text.NumberFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Base64
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 /**
  * Represents different levels of debugging messages, providing a way to classify
@@ -60,6 +63,7 @@ enum class DebugType {
      * ```
      */
     VERBOSE,
+
     /**
      * Represents the DEBUG logging level used for debugging purposes in an application.
      * It can be used to track detailed information helpful during development.
@@ -71,6 +75,7 @@ enum class DebugType {
      * ```
      */
     DEBUG,
+
     /**
      * Represents a type of debug log level or severity used within the logging system.
      * Designed for categorizing and filtering log messages based on their importance or purpose.
@@ -87,6 +92,7 @@ enum class DebugType {
      * ```
      */
     ERROR,
+
     /**
      * Represents different levels of logging or debugging information for use in the application.
      *
@@ -106,6 +112,7 @@ enum class DebugType {
      * ```
      */
     INFO,
+
     /**
      * Represents the `WARNING` level in the `DebugType` enum class.
      * This warning level is used to categorize log messages or debug events that
@@ -139,10 +146,16 @@ enum class DebugType {
  */
 @SuppressLint("LogNotTimber")
 fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
-    if (log != null) {
+    val newLog = when (log) {
+        is Exception -> log.getFullErrorLog()
+        is Throwable -> log.getFullErrorLog()
+        else -> log
+    }
+
+    if (newLog != null) {
         if (isDebugPublic()) {
             val maxLogSize = 4000
-            repeat(log.toString().chunked(maxLogSize).size) { i ->
+            repeat(newLog.toString().chunked(maxLogSize).size) { i ->
                 when (debugType) {
                     DebugType.VERBOSE -> Timber.tag("Lihat").v(if (i == 0) "$i == $location >> $log" else "$log")
                     DebugType.DEBUG -> Timber.tag("Lihat").d(if (i == 0) "$i == $location >> $log" else "$log")
@@ -155,64 +168,14 @@ fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debug
     } else Timber.tag("Lihat").e("$location >> log is null")
 }
 
-/**
- * Logs a debug message with the specified location context. This method delegates the log message
- * to the `debugMessage` function, setting the debug type to `DebugType.DEBUG`.
- *
- * @param location The context or tag for the log message. Defaults to "StringExt - debugMessage - debug".
- *                 Used to identify the source or purpose of the log message.
- *
- * Example:
- * ```kotlin
- * val message = "Debugging start"
- * message.debugMessageDebug() // Logs the message with location "StringExt - debugMessage - debug"
- *
- * // Custom location
- * val customLocation = "MyCustomLocation"
- * message.debugMessageDebug(customLocation) // Logs the message with location "MyCustomLocation"
- * ```
- */
 fun Any?.debugMessageDebug(location: String = "StringExt - debugMessage - debug") {
     debugMessage(this, location, DebugType.DEBUG)
 }
 
-/**
- * Logs a warning message for the provided object along with a specified location.
- * This is a helper function that simplifies the process of generating warning log messages
- * by invoking the `debugMessage` function with a predefined `DebugType.WARNING` setting.
- *
- * @param location The location or context from where the warning message is being logged.
- *                 Defaults to "StringExt - debugMessage - warning".
- *
- * Example:
- * ```kotlin
- * val someObject: Any? = "This is a warning message"
- * someObject.debugMessageWarning()
- * // Logs: StringExt - debugMessage - warning >> This is a warning message
- * ```
- */
 fun Any?.debugMessageWarning(location: String = "StringExt - debugMessage - warning") {
     debugMessage(this, location, DebugType.WARNING)
 }
 
-/**
- * Logs an error-level debug message for the invoking object, providing optional context for the log location.
- * This method delegates the logging to the `debugMessage` method with `DebugType.ERROR` as the default log level.
- *
- * @param location A string representing the contextual location or tag for the debug message.
- *                 Defaults to "StringExt - debugMessage - error".
- *                 This is used to specify where the debug message was triggered for better traceability.
- *
- * Example:
- * ```kotlin
- * val errorDetails = "Failed to load data"
- * errorDetails.debugMessageError()
- * // Log Output: ERROR: Lihat: {location} >> Failed to load data
- *
- * errorDetails.debugMessageError("DataLoader - fetchData")
- * // Log Output: ERROR: Lihat: DataLoader - fetchData >> Failed to load data
- * ```
- */
 fun Any?.debugMessageError(location: String = "StringExt - debugMessage - error") {
     debugMessage(this, location, DebugType.ERROR)
 }
@@ -258,7 +221,7 @@ fun String.formatToRupiah(useCurrencySymbol: Boolean = false): String {
                 .replace(".", "")
         )
     } catch (e: Exception) {
-        println(e.localizedMessage)
+        e.debugMessageError("String.formatToRupiah")
         BigInteger.ZERO
     }
 
@@ -294,7 +257,7 @@ fun String.setRupiah(): String {
             sCredit = "Rp " + NumberFormat.getNumberInstance(Locale.US).format(credit.toLong()).replace(',', '.')
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        e.debugMessageError("String.setRupiah")
     }
     return sCredit
 }
@@ -346,7 +309,7 @@ fun String.setRibuan(): String {
             sCredit = NumberFormat.getNumberInstance(Locale.US).format(credit.toLong()).replace(',', '.')
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        e.debugMessageError("String.setRibuan")
     }
     return sCredit
 }

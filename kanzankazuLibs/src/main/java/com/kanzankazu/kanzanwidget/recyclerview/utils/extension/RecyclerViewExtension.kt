@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.kanzankazu.R
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanwidget.recyclerview.utils.decorator.GridItemDecoration
 import com.kanzankazu.kanzanwidget.recyclerview.utils.decorator.LinearItemDecoration
 import com.kanzankazu.kanzanwidget.recyclerview.utils.listener.SnapOnScrollListener
@@ -94,8 +95,8 @@ fun RecyclerView.loadMore(isLoadMore: Boolean, currentPage: Int, lastPage: Int, 
                 val totalItemCount: Int = mLayoutManager.itemCount
 
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                    Log.d("Lihat KanzanKazu", "onScrolled ReviewHistoryFragment ${pastVisibleItems + visibleItemCount >= totalItemCount}")
-                    Log.d("Lihat KanzanKazu", "onScrollStateChanged ${pastVisibleItems + visibleItemCount >= totalItemCount}")
+                    "onScrolled ReviewHistoryFragment ${pastVisibleItems + visibleItemCount >= totalItemCount}".debugMessageDebug(" - onScrollStateChanged1")
+                    "onScrollStateChanged ${pastVisibleItems + visibleItemCount >= totalItemCount}".debugMessageDebug(" - onScrollStateChanged2")
 
                     var mCurrentPage = currentPage
                     val mIsLoadMore = true

@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import com.kanzankazu.R
 import com.kanzankazu.databinding.LayoutProgressDialogBinding
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 
 class BaseProgressDialog {
     private var color: Int = -1
@@ -38,7 +39,7 @@ class BaseProgressDialog {
                     dialog.show()
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                e.debugMessageError("BaseProgressDialog - showDialog")
             }
         }
     }
@@ -50,7 +51,7 @@ class BaseProgressDialog {
                 mDialog = null
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            e.debugMessageError("BaseProgressDialog - dismissDialog")
             mDialog = null
         }
     }

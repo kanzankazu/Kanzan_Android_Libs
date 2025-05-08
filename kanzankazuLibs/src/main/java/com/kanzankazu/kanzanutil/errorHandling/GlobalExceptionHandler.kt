@@ -2,9 +2,8 @@ package com.kanzankazu.kanzanutil.errorHandling
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.google.gson.Gson
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import kotlin.system.exitProcess
 
 /**
@@ -29,7 +28,7 @@ class GlobalExceptionHandler private constructor(
             launchActivity(applicationContext, activityToBeLaunched, p1)
             exitProcess(0)
         } catch (e: Exception) {
-            "Exception - $e".debugMessageDebug()
+            e.debugMessageError()
             defaultHandler.uncaughtException(p0, p1)
         }
     }
@@ -52,7 +51,6 @@ class GlobalExceptionHandler private constructor(
 
     companion object {
         private const val INTENT_DATA_NAME = "CrashData"
-        private const val TAG = "CustomExceptionHandler"
 
         /**
          * [applicationContext]: Required for launching the activity.
@@ -89,7 +87,7 @@ class GlobalExceptionHandler private constructor(
             return try {
                 Gson().fromJson(intent.getStringExtra(INTENT_DATA_NAME), Throwable::class.java)
             } catch (e: Exception) {
-                Log.e(TAG, "getThrowableFromIntent: ", e)
+                e.debugMessageError("GlobalExceptionHandler - getThrowableFromIntent")
                 null
             }
         }

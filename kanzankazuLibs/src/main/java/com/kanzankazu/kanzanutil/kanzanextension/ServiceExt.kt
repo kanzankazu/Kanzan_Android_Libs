@@ -8,7 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 inline fun <reified T> Activity.startMyServices() {
     val intent = Intent(this, T::class.java)
@@ -24,11 +24,11 @@ inline fun <reified T> Activity.isMyServicesRunning(): Boolean {
     val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     for (service in manager.getRunningServices(Int.MAX_VALUE)) {
         if ((T::class.java).name == service.service.className) {
-            Log.d("Lihat KanzanKazu", "isMyServicesRunning service is running ${T::class.java}")
+            "isMyServicesRunning service is running ${T::class.java}".debugMessageDebug(" - isMyServicesRunning1")
             return true
         }
     }
-    Log.d("Lihat KanzanKazu", "isMyServicesRunning service is not running ${T::class.java}")
+    "isMyServicesRunning service is not running ${T::class.java}".debugMessageDebug(" - isMyServicesRunning2")
     return false
 }
 

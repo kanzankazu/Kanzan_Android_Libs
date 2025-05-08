@@ -14,11 +14,11 @@ import javax.inject.Inject
  */
 class CrashlyticsTimberTree @Inject constructor(
     private val isDebug: Boolean,
-    private val minLogPriority: Int = Log.INFO,
+    private val minLogPriority: Int = Log.WARN,
 ) : Timber.Tree() {
 
-    override fun log(priority: Int, tag: String?, message: String, throwable: Throwable?) {
-        val newThrowable = throwable ?: Throwable(message)
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        val newThrowable = t ?: Throwable(message)
         if (priority < minLogPriority) newThrowable.sendCrashlytics(userid = "", isLog = false, isForce = true)
     }
 }

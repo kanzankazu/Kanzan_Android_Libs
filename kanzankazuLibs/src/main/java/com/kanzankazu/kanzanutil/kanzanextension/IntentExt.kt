@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.kanzankazu.kanzanutil.image.FileManager
 import com.kanzankazu.kanzanutil.image.ImageCompressor
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -115,7 +116,7 @@ fun ComponentActivity.changePageForResultInit(result: (result: ActivityResult) -
 fun Fragment.changePageForResultInit(result: (result: ActivityResult) -> Unit) = try {
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result(it) }
 } catch (e: Exception) {
-    e.printStackTrace()
+    e.debugMessageError("Fragment.changePageForResultInit")
     this.requireContext().simpleToast(e.message.toString())
     null
 }

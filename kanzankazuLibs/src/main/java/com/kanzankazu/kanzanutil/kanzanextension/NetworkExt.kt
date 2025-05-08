@@ -13,6 +13,8 @@ import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.util.Log
 import com.kanzankazu.kanzanmodel.GeneralOption
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -90,7 +92,7 @@ fun isInternetWorking1(): Boolean {
         val returnVal = p1.waitFor()
         return returnVal == 0
     } catch (e: Exception) {
-        e.printStackTrace()
+        e.debugMessageError("isInternetWorking1")
     }
     return false
 }
@@ -102,9 +104,9 @@ fun isInternetWorking2(): Boolean {
         val exitValue = ipProcess.waitFor()
         return exitValue == 0
     } catch (e: IOException) {
-        e.printStackTrace()
+        e.debugMessageError("isInternetWorking2")
     } catch (e: InterruptedException) {
-        e.printStackTrace()
+        e.debugMessageError("isInternetWorking22")
     }
     return false
 }
@@ -117,6 +119,7 @@ fun isInternetWorkingByPort(): Boolean = try {
     sock.close()
     true
 } catch (e: IOException) {
+    e.debugMessageError("isInternetWorkingByPort")
     false
 }
 
@@ -149,7 +152,7 @@ fun Context.setWifiEnabled(isEnable: Boolean) {
         if (wifi.isWifiEnabled) simpleToast("Wifi turn on")
         else simpleToast("Wifi turn off")
     } catch (e: Exception) {
-        e.printStackTrace()
+        e.debugMessageError("setWifiEnabled")
     }
 }
 
@@ -165,17 +168,17 @@ fun Context.setMobileDataEnabled(b: Boolean) {
         setMobileDataEnabledMethod.isAccessible = b
         setMobileDataEnabledMethod.invoke(iConnectivityManager, b)
     } catch (e: Exception) {
-        e.printStackTrace()
+        e.debugMessageError("setMobileDataEnabled")
     } catch (e: ClassNotFoundException) {
-        e.printStackTrace()
+        e.debugMessageError("setMobileDataEnabled1")
     } catch (e: InvocationTargetException) {
-        e.printStackTrace()
+        e.debugMessageError("setMobileDataEnabled2")
     } catch (e: NoSuchMethodException) {
-        e.printStackTrace()
+        e.debugMessageError("setMobileDataEnabled3")
     } catch (e: IllegalAccessException) {
-        e.printStackTrace()
+        e.debugMessageError("setMobileDataEnabled4")
     } catch (e: NoSuchFieldException) {
-        e.printStackTrace()
+        e.debugMessageError("setMobileDataEnabled5")
     }
 }
 
@@ -190,11 +193,11 @@ fun Context.scanAllDeviceInWifi(timeout: Int = 1000) {
             val host = "$subnet.$i"
             if (InetAddress.getByName(host).isReachable(timeout)) {
                 val strMacAddress: String = getMacAddressFromIP(host)
-                Log.d("Lihat KanzanKazu", "scanAllDeviceInWifi Reachable Host: $host and Mac : $strMacAddress is reachable!")
+                "scanAllDeviceInWifi Reachable Host: $host and Mac : $strMacAddress is reachable!".debugMessageDebug(" - scanAllDeviceInWifi1")
                 val localDeviceInfo = GeneralOption(title = host, desc = strMacAddress)
                 deviceInfoList.add(localDeviceInfo)
             } else {
-                Log.d("Lihat KanzanKazu", "scanAllDeviceInWifi ❌ Not Reachable Host: $host")
+                "scanAllDeviceInWifi ❌ Not Reachable Host: $host".debugMessageDebug(" - scanAllDeviceInWifi2")
             }
         }
     } catch (e: java.lang.Exception) {
@@ -258,7 +261,7 @@ fun Context.isToggleMobileDataConnection(): Boolean {
         method.isAccessible = true // method is callable
         mobileDataEnabled = method.invoke(cm) as Boolean
     } catch (e: Exception) {
-        e.printStackTrace()
+        e.debugMessageError("isToggleMobileDataConnection")
     }
     return mobileDataEnabled
 }
@@ -274,8 +277,8 @@ fun getMacAddress(): String {
             if (stringBuilder.isNotEmpty()) stringBuilder.deleteCharAt(stringBuilder.length - 1)
             return stringBuilder.toString().trim()
         }
-    } catch (exception: Exception) {
-
+    } catch (e: Exception) {
+        e.debugMessageError("getMacAddress")
     }
     return "02:00:00:00:00:00"
 }

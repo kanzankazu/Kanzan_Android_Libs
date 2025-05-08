@@ -6,11 +6,11 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.animation.AnimationUtils
 import androidx.annotation.AnimRes
 import androidx.recyclerview.widget.RecyclerView
 import com.kanzankazu.R
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import com.kanzankazu.kanzanwidget.recyclerview.utils.extension.RecyclerViewLayoutType
 import com.kanzankazu.kanzanwidget.recyclerview.utils.extension.getSnapPosition
 import com.kanzankazu.kanzanwidget.recyclerview.utils.extension.setRecyclerView
@@ -123,7 +123,7 @@ class KanzanRecyclerviewComponent @JvmOverloads constructor(context: Context, at
 
                 carouselHandler.postDelayed(carouselRun, delayMillis)
             } catch (e: Exception) {
-                Log.d("Lihat KanzanKazu", "setBannerAdapter HomeFragment $e")
+                e.debugMessageError("KanzanRecyclerviewComponent - setRecyclerBanner")
             }
         }
         carouselHandler.postDelayed({ carouselRun.run() }, delayMillis)

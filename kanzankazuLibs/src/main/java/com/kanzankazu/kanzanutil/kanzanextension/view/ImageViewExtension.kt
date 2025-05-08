@@ -7,7 +7,6 @@ import android.content.Context
 import android.net.Uri
 import android.transition.AutoTransition
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -18,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestOptions
 import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.RoundedCornersTransformation
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import net.cachapa.expandablelayout.ExpandableLayout
 
 /**
@@ -109,7 +109,7 @@ fun ImageView.loadImage(url: String, isSaveCache: Boolean = true, placeholder: I
             .apply(if (isSaveCache) requestOptionStandart(placeholder) else requestOptionStandartNoSaveCache(placeholder))
             .into(this)
     } catch (e: Exception) {
-        Log.d("Lihat KanzanKazu", "loadImage ${e.message}")
+        e.debugMessageError(" - loadImage")
     }
 }
 
@@ -133,7 +133,7 @@ fun ImageView.loadImage(@DrawableRes url: Int, isSaveCache: Boolean = true, plac
             .apply(if (isSaveCache) requestOptionStandart(placeholder) else requestOptionStandartNoSaveCache(placeholder))
             .into(this)
     } catch (e: Exception) {
-        Log.d("Lihat KanzanKazu", "loadImage ${e.message}")
+        e.debugMessageError(" - loadImage1")
     }
 }
 

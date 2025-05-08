@@ -32,6 +32,7 @@ class RemoteConfig {
 
                 firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener { task -> handleTaskResult(task, onFirebaseRemoteConfig, onFailed) }
             } catch (e: Exception) {
+                e.debugMessageError("RemoteConfig - getFirebaseRemoteConfig")
                 handleException(e, "initializeRemoteConfig", onFailed)
             }
         }

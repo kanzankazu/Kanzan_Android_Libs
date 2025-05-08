@@ -15,7 +15,7 @@ fun <T> DataSnapshot.toObject(targetClass: Class<T>) =
     try {
         getValue(targetClass)
     } catch (e: Exception) {
-        e.message.toString().debugMessageError()
+        e.debugMessageError()
         null
     }
 
@@ -28,7 +28,7 @@ fun <T> DataSnapshot.toObjectList(targetClass: Class<T>) =
         }
         datas
     } catch (e: Exception) {
-        e.message.toString().debugMessageError()
+        e.debugMessageError()
         arrayListOf()
     }
 
@@ -59,10 +59,8 @@ fun Activity.remoteConfigFetch(
             }
         }
     } catch (e: Exception) {
-        e.printStackTrace()
-        val toString = e.message.toString()
-        toString.debugMessageError()
-        onFailed.invoke(toString)
+        e.debugMessageError("Activity.remoteConfigFetch")
+        onFailed.invoke(e.stackTraceToString())
     }
 }
 

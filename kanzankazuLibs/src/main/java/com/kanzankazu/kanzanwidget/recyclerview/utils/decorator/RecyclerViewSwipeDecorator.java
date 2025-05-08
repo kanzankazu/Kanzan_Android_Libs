@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import timber.log.Timber;
+
 public class RecyclerViewSwipeDecorator {
     private Canvas canvas;
     private RecyclerView recyclerView;
@@ -356,7 +358,7 @@ public class RecyclerViewSwipeDecorator {
                 }
             }
         } catch (Exception e) {
-            Log.e(this.getClass().getName(), e.getMessage());
+            Timber.e(e);
         }
     }
 

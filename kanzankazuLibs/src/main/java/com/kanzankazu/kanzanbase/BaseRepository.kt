@@ -3,6 +3,7 @@ package com.kanzankazu.kanzanbase
 import com.kanzankazu.kanzannetwork.response.BaseApiResponse
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.BaseResponse
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.toError
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -29,6 +30,7 @@ abstract class BaseRepository {
             try {
                 return@withContext endpoint().handleResponse(listener)
             } catch (e: Exception) {
+                e.debugMessageError("BaseRepository - handleResponse")
                 val toError = e.toError()
                 toError
             }
@@ -49,6 +51,7 @@ abstract class BaseRepository {
                 else -> emit(BaseResponse.Success(listener.invoke(endpoint().message ?: "", data)))
             }
         } catch (e: Exception) {
+            e.debugMessageError("BaseRepository - handleResponseFlow")
             emit(e.toError())
         }
     }.flowOn(ioDispatcher)

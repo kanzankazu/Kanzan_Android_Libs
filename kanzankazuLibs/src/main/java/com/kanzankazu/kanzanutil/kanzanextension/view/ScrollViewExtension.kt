@@ -8,6 +8,7 @@ import android.widget.ScrollView
 import androidx.core.widget.NestedScrollView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kanzankazu.kanzanutil.kanzanextension.sendCrashlytics
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import com.kanzankazu.kanzanutil.kanzanextension.type.dpTopx
 
 /**
@@ -254,6 +255,6 @@ private fun getDeepChildOffset(mainParent: ViewGroup, parent: ViewParent, child:
         if (parentGroup == mainParent) return
         getDeepChildOffset(mainParent, parentGroup.parent, parentGroup, accumulatedOffset)
     } catch (e: Exception) {
-        e.fillInStackTrace().sendCrashlytics()
+        e.debugMessageError("getDeepChildOffset")
     }
 }

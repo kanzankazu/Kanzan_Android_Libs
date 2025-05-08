@@ -1,6 +1,7 @@
 package com.kanzankazu.kanzannetwork.response.kanzanbaseresponse
 
 import com.google.gson.Gson
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -56,6 +57,7 @@ fun Exception.toError(): BaseResponse.Error {
             else -> BaseResponse.Error(message = message.orEmpty())
         }
     } catch (e: Exception) {
+        e.debugMessageError("Exception.toError")
         BaseResponse.Error(message = e.message.orEmpty())
     }
 }

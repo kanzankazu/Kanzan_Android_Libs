@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import id.zelory.compressor.Compressor
 import java.io.File
 import java.io.IOException
@@ -73,7 +73,7 @@ class PictureUtil {
                 photoFile = createImageFile(true)
             } catch (e: IOException) {
                 Snackbar.make(mActivity.findViewById(android.R.id.content), mActivity.getString(R.string.error_message_image_get_failed), Snackbar.LENGTH_SHORT).show()
-                Log.e("Lihat7", "openCamera PictureUtil21 : $e")
+                e.debugMessageError("PictureUtil - openCamera1")
             }
             if (photoFile != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -82,7 +82,7 @@ class PictureUtil {
                         if (mFragment == null) mActivity.startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAMERA)
                         else mFragment!!.startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAMERA)
                     } catch (e: IOException) {
-                        Log.e("Lihat8", "openCamera PictureUtil22 : $e")
+                        e.debugMessageError("PictureUtil - openCamera2")
                     }
                 } else {
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile))
@@ -114,13 +114,13 @@ class PictureUtil {
                         .compressToFile(file)
                     mCurrentPhotoPath = getRealPathFromURIPath(Uri.parse(compressedImage.absolutePath))
                 } catch (e: Exception) {
-                    Log.e("Lihat2", "onActivityResult PictureUtil20 : $e")
+                    e.debugMessageError("PictureUtil - onActivityResult1")
                 }
                 imageView?.let { Glide.with(mActivity).load(mCurrentPhotoPath).into(it) }
                 return mCurrentPhotoPath
             } catch (e: Exception) {
                 Snackbar.make(mActivity.findViewById(android.R.id.content), mActivity.getString(R.string.error_message_picture_failed), Snackbar.LENGTH_LONG).show()
-                Log.e("Lihat1", "onActivityResult PictureUtil21 : $e")
+                e.debugMessageError("PictureUtil - onActivityResult2")
             }
         } else if (requestCode == REQUEST_CODE_IMAGE_GALLERY && resultCode == Activity.RESULT_OK && data != null) { //FROM GALLERY
             try {
@@ -136,10 +136,10 @@ class PictureUtil {
                     imageView?.let { Glide.with(mActivity).load(mCurrentPhotoPath).into(it) }
                     return mCurrentPhotoPath
                 } catch (e: Exception) {
-                    Log.e("Lihat2", "onActivityResult PictureUtil22 : $e")
+                    e.debugMessageError("PictureUtil - onActivityResult3")
                 }
             } catch (e: Exception) {
-                Log.e("Lihat3", "onActivityResult PictureUtil23 : $e")
+                e.debugMessageError("PictureUtil - onActivityResult4")
             }
         }
         return ""

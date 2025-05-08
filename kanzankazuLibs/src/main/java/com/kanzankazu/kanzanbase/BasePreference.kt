@@ -9,6 +9,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
 import com.kanzankazu.BuildConfig
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 
 abstract class BasePreference(context: Context) {
 
@@ -31,7 +32,7 @@ abstract class BasePreference(context: Context) {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
     } catch (e: Exception) {
-        // Handle exception gracefully
+        e.debugMessageError("BasePreference - createEncryptedSharedPreferences")
         context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
     }
 

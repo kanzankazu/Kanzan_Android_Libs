@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -14,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import timber.log.Timber
 import java.util.Collections
 
 class PermissionUtil {
@@ -82,8 +82,8 @@ class PermissionUtil {
      */
     fun onRequestPermissionsResult(isFinish: Boolean, listener: PermissionUtilListener, requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
         return if (requestCode == rpAccess) {
-            Log.d("Lihat", "checkResultPermission AndroidPermissionUtil : " + grantResults.size)
-            Log.d("Lihat", "checkResultPermission AndroidPermissionUtil : " + permissions.size)
+            Timber.tag("Lihat").d("checkResultPermission AndroidPermissionUtil : %s", grantResults.size)
+            Timber.tag("Lihat").d("checkResultPermission AndroidPermissionUtil : %s", permissions.size)
             val listStat = ArrayList<String?>()
             if (grantResults.isNotEmpty() && permissions.size == grantResults.size) {
                 for (i in permissions.indices) {

@@ -9,6 +9,7 @@ import android.view.Window
 import com.kanzankazu.R
 import com.kanzankazu.databinding.LayoutAlertDialogBinding
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import com.kanzankazu.kanzanutil.kanzanextension.view.setOnSingleClickListener
 import com.kanzankazu.kanzanutil.kanzanextension.view.visibleView
 
@@ -46,7 +47,7 @@ class BaseAlertDialog {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            e.debugMessageError("BaseAlertDialog - showDialog")
         }
     }
 

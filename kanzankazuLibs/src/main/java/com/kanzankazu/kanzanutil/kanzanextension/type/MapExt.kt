@@ -75,6 +75,7 @@ fun Map<String, Any>.toBundle(): Bundle {
     return try {
         bundleOf(*toList().toTypedArray())
     } catch (e: Exception) {
+        e.debugMessageError("toBundle")
         bundleOf()
     }
 }

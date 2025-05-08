@@ -4,6 +4,26 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kanzankazu.kanzanutil.kanzanextension.type.DebugType
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
 
+fun Throwable.getFullErrorLog(): String {
+    return buildString {
+        appendLine("❌ Throwable: ${this@getFullErrorLog::class.java.name}")
+        appendLine("📄 Message: $message")
+        appendLine("📄 Localized: $localizedMessage")
+        appendLine("➡️ Cause: $cause")
+        appendLine("🔍 StackTrace:\n${stackTraceToString()}")
+    }
+}
+
+fun Exception.getFullErrorLog(): String {
+    return buildString {
+        appendLine("❌ Throwable: ${this@getFullErrorLog::class.java.name}")
+        appendLine("📄 Message: $message")
+        appendLine("📄 Localized: $localizedMessage")
+        appendLine("➡️ Cause: $cause")
+        appendLine("🔍 StackTrace:\n${stackTraceToString()}")
+    }
+}
+
 /**
  * Sends crash reports to Firebase Crashlytics.
  *

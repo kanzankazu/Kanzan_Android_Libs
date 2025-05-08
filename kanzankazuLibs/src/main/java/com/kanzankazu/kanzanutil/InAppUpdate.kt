@@ -18,6 +18,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import java.lang.ref.WeakReference
 
 /**
@@ -91,6 +92,7 @@ class InAppUpdate(
                 REQUEST_CODE_IN_APP_UPDATE
             )
         } catch (e: Exception) {
+            e.debugMessageError("InAppUpdate - updateStart")
             logErrorAndShowSnackbar("Failed to start in-app update: ${e.message}")
         }
     }

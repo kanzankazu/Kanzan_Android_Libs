@@ -10,6 +10,7 @@ import com.google.zxing.Result
 import com.kanzankazu.kanzanutil.kanzanextension.PermissionEnumArray
 import com.kanzankazu.kanzanutil.kanzanextension.PermissionState
 import com.kanzankazu.kanzanutil.kanzanextension.getPermissionState
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 
 /**
  * A wrapper class for the 'com.budiyev.android:code-scanner:2.1.0' library, simplifying QR code scanning.
@@ -84,6 +85,7 @@ class KanzanQrScanner(
                 try {
                     listener.successScan(result)
                 } catch (e: Exception) {
+                    e.debugMessageError("KanzanQrScanner - qrScannerInit")
                     mCodeScanner?.startPreview()
                     listener.failedScan(e)
                 }

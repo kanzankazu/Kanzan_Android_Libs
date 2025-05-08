@@ -1,12 +1,12 @@
 package com.kanzankazu.kanzanutil.kanzanextension
 
 import android.content.Context
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.annotation.MenuRes
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 fun MenuItem.visible() {
     isVisible = true
@@ -33,8 +33,8 @@ fun Context.setupPopupMenu(targetView: View?, @MenuRes menuRes: Int, listener: (
 fun Context.setupPopupMenu(targetView: View?, arrayList: ArrayList<String>, listener: (MenuItem) -> Unit) {
     val popup = PopupMenu(this, targetView)
     popup.setOnMenuItemClickListener {
-        Log.d("Lihat KanzanKazu", "setupPopupMenu  ${it.groupId}")
-        Log.d("Lihat KanzanKazu", "setupPopupMenu  ${it.itemId}")
+        "setupPopupMenu  ${it.groupId}".debugMessageDebug(" - setupPopupMenu")
+        "setupPopupMenu  ${it.itemId}".debugMessageDebug(" - setupPopupMenu")
         listener(it)
         false
     }

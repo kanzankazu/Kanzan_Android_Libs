@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 
 abstract class BaseAppWidgetProvider : AppWidgetProvider() {
 
@@ -34,7 +35,7 @@ abstract class BaseAppWidgetProvider : AppWidgetProvider() {
                 )
                 appWidgetManager.updateAppWidget(appWidgetId, updatedViews)
             } catch (e: Exception) {
-                e.printStackTrace() // Log error, biasanya sebaiknya gunakan library logging
+                e.printStackTrace().debugMessageError("BaseAppWidgetProvider - onUpdate")
             }
         }
     }
@@ -56,7 +57,7 @@ abstract class BaseAppWidgetProvider : AppWidgetProvider() {
             val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidgetComponentName)
             onUpdate(context, appWidgetManager, appWidgetIds)
         } catch (e: Exception) {
-            e.printStackTrace() // Optional: log jika ada masalah
+            e.printStackTrace().debugMessageError("BaseAppWidgetProvider - handleRefresh")
         }
     }
 

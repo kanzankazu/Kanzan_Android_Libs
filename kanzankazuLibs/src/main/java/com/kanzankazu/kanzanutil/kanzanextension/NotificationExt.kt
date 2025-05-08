@@ -15,10 +15,10 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.os.Build
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import com.kanzankazu.R
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 
 fun setNotification(context: Context, title: String?, text: String?, smallIcon: Int, largerIcon: Int, isNotCancelAble: Boolean, pendingIntent: PendingIntent?, NOTIFICATION_ID: Int) {
     val bitmap = BitmapFactory.decodeResource(context.resources, largerIcon)
@@ -79,15 +79,15 @@ fun createBitmapFromString(speed: String, units: String): Bitmap {
     val canvas = Canvas(bitmap)
     canvas.drawText(speed, (width / 2 + 5).toFloat(), 50f, speedPaint)
     canvas.drawText(units, (width / 2).toFloat(), 90f, unitsPaint)
-    Log.d("Lihat", "createBitmapFromString PictureUtil textBounds : " + textBounds.width())
-    Log.d("Lihat", "createBitmapFromString PictureUtil textBounds : " + textBounds.height())
-    Log.d("Lihat", "createBitmapFromString PictureUtil unitsTextBounds : " + unitsTextBounds.width())
-    Log.d("Lihat", "createBitmapFromString PictureUtil unitsTextBounds : " + unitsTextBounds.height())
-    Log.d("Lihat", "createBitmapFromString PictureUtil bitmap.getHeight : " + bitmap.height)
-    Log.d("Lihat", "createBitmapFromString PictureUtil bitmap.getWidth : " + bitmap.width)
-    Log.d("Lihat", "createBitmapFromString PictureUtil canvas.getHeight: " + canvas.height)
-    Log.d("Lihat", "createBitmapFromString PictureUtil canvas.getWidth: " + canvas.width)
-    Log.d("Lihat", "createBitmapFromString PictureUtil width : $width")
+    "createBitmapFromString PictureUtil textBounds : ${textBounds.width()}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil textBounds : ${textBounds.height()}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil unitsTextBounds : ${unitsTextBounds.width()}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil unitsTextBounds : ${unitsTextBounds.height()}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil bitmap.getHeight : ${bitmap.height}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil bitmap.getWidth : ${bitmap.width}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil canvas.getHeight: ${canvas.height}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil canvas.getWidth: ${canvas.width}".debugMessageDebug(" - createBitmapFromString")
+    "createBitmapFromString PictureUtil width : $width".debugMessageDebug(" - createBitmapFromString")
     return bitmap
 }
 
