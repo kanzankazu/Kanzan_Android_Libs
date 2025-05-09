@@ -6,16 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kanzankazu.kanzanwidget.recyclerview.utils.extension.RecyclerViewLayoutType
 import com.kanzankazu.kanzanwidget.recyclerview.utils.extension.setRecyclerView
 
-class GenericRecyclerviewSingleAdapter<T>(
+class SimpleRecyclerviewAdapter<T>(
     private val view: (parent: ViewGroup) -> View,
     private val onBindView: (itemView: View, data: T, position: Int) -> Unit,
 ) : BaseRecyclerViewFilterAdapter<T>() {
 
-    private lateinit var holder1: Holder<T>
+    private lateinit var tHolder: Holder<T>
 
     override fun onCreateView(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        holder1 = Holder(view(parent))
-        return holder1
+        tHolder = Holder(view(parent))
+        return tHolder
     }
 
     override fun onBindView(data: T, position: Int, holder: RecyclerView.ViewHolder) {
@@ -24,9 +24,9 @@ class GenericRecyclerviewSingleAdapter<T>(
 }
 
 /**
- * Sets up the RecyclerView with a [GenericRecyclerviewSingleAdapter].
+ * Sets up the RecyclerView with a [SimpleRecyclerviewAdapter].
  *
- * This function simplifies the process of configuring a RecyclerView by creating and setting up a [GenericRecyclerviewSingleAdapter] for you.
+ * This function simplifies the process of configuring a RecyclerView by creating and setting up a [SimpleRecyclerviewAdapter] for you.
  *
  * @param T The type of data that will be displayed in the RecyclerView.
  * @param view A lambda function that creates the view for each item in the RecyclerView. It takes the parent ViewGroup as a parameter and should return the created View.
@@ -35,7 +35,7 @@ class GenericRecyclerviewSingleAdapter<T>(
  * @param spanCountGrid The number of columns in the grid if the LayoutManager is a GridLayoutManager. Defaults to 2.
  * @param spacingItemDecoration The spacing between items in the RecyclerView. Defaults to 8.
  * @param isNestedScrollingEnabledParam Whether nested scrolling is enabled for the RecyclerView. Defaults to true.
- * @return The created [GenericRecyclerviewSingleAdapter].
+ * @return The created [SimpleRecyclerviewAdapter].
  *
  * ## Usage Example:
  *
@@ -58,15 +58,16 @@ class GenericRecyclerviewSingleAdapter<T>(
  * }
  * ```
  */
-inline fun <reified T> RecyclerView.setUp(
+inline fun <reified T> RecyclerView.setSimpleAdapter(
     noinline view: (parent: ViewGroup) -> View,
     noinline onBindView: (itemView: View, data: T, position: Int) -> Unit,
     layoutManagerIndex: RecyclerViewLayoutType = RecyclerViewLayoutType.RECYCLER_VIEW_LIN_VERTICAL,
     spanCountGrid: Int = 2,
     spacingItemDecoration: Int = 8,
     isNestedScrollingEnabledParam: Boolean = true,
-): GenericRecyclerviewSingleAdapter<T> {
-    val genericRecyclerviewAdapter = GenericRecyclerviewSingleAdapter(view, onBindView)
-    this.setRecyclerView(genericRecyclerviewAdapter, layoutManagerIndex, spanCountGrid, spacingItemDecoration, isNestedScrollingEnabledParam)
+    isAll: Boolean = true,
+): SimpleRecyclerviewAdapter<T> {
+    val genericRecyclerviewAdapter = SimpleRecyclerviewAdapter(view, onBindView)
+    this.setRecyclerView(genericRecyclerviewAdapter, layoutManagerIndex, spanCountGrid, spacingItemDecoration, isNestedScrollingEnabledParam, isAll)
     return genericRecyclerviewAdapter
 }
