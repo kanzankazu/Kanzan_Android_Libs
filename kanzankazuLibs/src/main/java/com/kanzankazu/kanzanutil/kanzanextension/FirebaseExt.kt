@@ -15,7 +15,7 @@ fun <T> DataSnapshot.toObject(targetClass: Class<T>) =
     try {
         getValue(targetClass)
     } catch (e: Exception) {
-        e.debugMessageError()
+        e.debugMessageError("FirebaseExt - toObject")
         null
     }
 
@@ -28,7 +28,7 @@ fun <T> DataSnapshot.toObjectList(targetClass: Class<T>) =
         }
         datas
     } catch (e: Exception) {
-        e.debugMessageError()
+        e.debugMessageError("FirebaseExt - toObjectList")
         arrayListOf()
     }
 

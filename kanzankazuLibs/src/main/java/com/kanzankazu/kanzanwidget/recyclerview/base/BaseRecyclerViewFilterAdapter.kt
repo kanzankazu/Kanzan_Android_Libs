@@ -1,4 +1,4 @@
-@file:Suppress("PackageName", "UNCHECKED_CAST", "KDocUnresolvedReference", "unused", "MemberVisibilityCanBePrivate", "KotlinConstantConditions")
+@file:Suppress("PackageName", "UNCHECKED_CAST", "KDocUnresolvedReference", "unused", "MemberVisibilityCanBePrivate")
 
 package com.kanzankazu.kanzanwidget.recyclerview.base
 
@@ -15,22 +15,22 @@ import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.kanzankazu.R
-import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessage
 
 abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
 
-    // Variables
-    var mainDatas = arrayListOf<T>()
     var swipeListener: SwipeListener<T>? = null
     var moveListener: MoveListener<T>? = null
-    var isLoading = false
 
-    //private var tempFilterDatas = arrayListOf<T>()
+    protected var mainDatas = arrayListOf<T>()
+
+    private var originalDatas = arrayListOf<T>()
+    private var isLoading = false
     private var filterModeData: Int = SINGLE_MODE
     private var checkPositionData: Int = 0
     private var lastPosition = -1
     private var recentlyDeletedItem: T? = null
     private var recentlyDeletedPosition: Int = -1
+    private var undoRemoveData: T? = null
 
     companion object {
         const val MULTIPLE_MODE = 0
@@ -41,16 +41,13 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         private const val TYPE_DATA = 2
     }
 
-    // Abstract Methods
     protected abstract fun onCreateView(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
     protected abstract fun onBindView(data: T, position: Int, holder: RecyclerView.ViewHolder)
 
-    // Open Methods
     open fun onMultipleViewType(position: Int, data: T): Int = -1
     open fun onFilterData(row: ArrayList<T>, charString: String): ArrayList<T> = arrayListOf()
     open fun onFilterListener(mainData: ArrayList<T>) {}
 
-    // Overrides
     override fun getItemViewType(position: Int): Int {
         val type = onMultipleViewType(position, mainDatas[position])
         return if (type == -1) super.getItemViewType(position) else type
@@ -67,34 +64,22 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
 
     override fun getItemCount(): Int = mainDatas.size
 
-    override fun getFilter(): Filter =
-        object : Filter() {
+    override fun getFilter(): Filter {
+        return object : Filter() {
             override fun performFiltering(charSequence: CharSequence): FilterResults {
                 val charString = charSequence.toString()
-                debugMessage(charSequence,"BaseRecyclerViewFilterAdapter - performFiltering")
-                debugMessage(charString,"BaseRecyclerViewFilterAdapter - performFiltering")
-                val filteredDatas = if (charString.isEmpty()) {
-                        debugMessage(mainDatas, "BaseRecyclerViewFilterAdapter - performFiltering - Empty")
-                        debugMessage(charString, "BaseRecyclerViewFilterAdapter - performFiltering - Empty")
-                        mainDatas
-                    } else {
-                        debugMessage(mainDatas, "BaseRecyclerViewFilterAdapter - performFiltering - NotEmpty")
-                        debugMessage(charString, "BaseRecyclerViewFilterAdapter - performFiltering - NotEmpty")
-                        onFilterData(mainDatas, charString)
-                    }
-                debugMessage(filteredDatas, "BaseRecyclerViewFilterAdapter - performFiltering")
-                return FilterResults().apply { values = filteredDatas }
+                mainDatas = (if (charString.isEmpty()) originalDatas else onFilterData(originalDatas, charString))
+                return FilterResults().apply { values = mainDatas }
             }
 
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
-                val onFilterData = filterResults.values as ArrayList<T>
-                debugMessage(onFilterData, "BaseRecyclerViewFilterAdapter - performFiltering")
-                onFilterListener(onFilterData)
+                mainDatas = filterResults.values as? ArrayList<T> ?: arrayListOf()
+                onFilterListener(mainDatas)
                 notifyDataSetChanged()
             }
         }
+    }
 
-    // Public Methods
     fun setFilterMode(filterMode: Int) {
         this.filterModeData = filterMode
     }
@@ -102,52 +87,55 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     fun getFilterMode() = filterModeData
 
     fun setCheckPosition(pos: Int) {
-        checkPositionData = pos
+        if (pos in mainDatas.indices) checkPositionData = pos
     }
 
     fun getCheckPosition(): Int = checkPositionData
 
-    fun getItemData(position: Int): T = mainDatas[position]
+    fun getItemData(position: Int): T? = mainDatas.getOrNull(position)
 
     fun getItemDataS(): ArrayList<T> = mainDatas
 
     fun setData(dataS: ArrayList<T>) {
-        this.mainDatas = dataS
+        mainDatas.clear()
+        mainDatas.addAll(dataS)
+
+        originalDatas.clear()
+        originalDatas.addAll(dataS)
+
         notifyDataSetChanged()
     }
 
     fun addDataS(dataS: ArrayList<T>) {
-        val lastSize = this.mainDatas.size
-        val arrayListOf = arrayListOf<T>()
-        arrayListOf.addAll(dataS)
-
-        this.mainDatas.addAll(dataS)
+        val lastSize = mainDatas.size
+        mainDatas.addAll(dataS)
+        originalDatas.addAll(dataS)
         notifyItemRangeInserted(lastSize, dataS.size)
     }
 
     fun addData(data: T) {
-        val arrayListOf = arrayListOf<T>()
-        arrayListOf.addAll(mainDatas)
-        arrayListOf.add(data)
-
         val lastSize = mainDatas.size
-        this.mainDatas.add(data)
-        notifyItemRangeInserted(lastSize, 1)
+        mainDatas.add(data)
+        originalDatas.add(data)
+        notifyItemInserted(lastSize)
     }
 
     fun addDataFirst(data: T) {
         val position = 0
         this.mainDatas.add(position, data)
+        this.originalDatas.add(position, data)
         notifyItemInserted(position)
     }
 
     fun addDataLast(data: T) {
         mainDatas.add(data)
+        originalDatas.add(data)
         notifyItemInserted(mainDatas.lastIndex)
     }
 
     fun addDataAt(data: T, pos: Int) {
         this.mainDatas.add(pos, data)
+        this.originalDatas.add(pos, data)
         notifyItemInserted(pos)
     }
 
@@ -159,17 +147,24 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     @SuppressLint("NotifyDataSetChanged")
     fun removeDataS() {
         this.mainDatas = arrayListOf()
+        this.originalDatas = arrayListOf()
         notifyDataSetChanged()
     }
 
     fun removeDataLast() {
-        mainDatas.removeAt(mainDatas.lastIndex)
-        notifyItemRemoved(mainDatas.lastIndex)
+        if (mainDatas.isNotEmpty()) {
+            mainDatas.removeAt(mainDatas.lastIndex)
+            originalDatas.removeAt(originalDatas.lastIndex)
+            notifyItemRemoved(mainDatas.lastIndex)
+        }
     }
 
     fun removeAt(position: Int) {
-        if (position in mainDatas.indices) mainDatas.removeAt(position)
-        notifyItemRemoved(position)
+        if (position in mainDatas.indices && position in originalDatas.indices) {
+            mainDatas.removeAt(position)
+            originalDatas.removeAt(position)
+            notifyItemRemoved(position)
+        }
     }
 
     fun refreshItemAt(position: Int) {
@@ -191,6 +186,7 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     fun undoDelete() {
         if (recentlyDeletedItem != null && recentlyDeletedPosition != -1) {
             mainDatas.add(recentlyDeletedPosition, recentlyDeletedItem!!)
+            originalDatas.add(recentlyDeletedPosition, recentlyDeletedItem!!)
             notifyItemInserted(recentlyDeletedPosition)
             recentlyDeletedItem = null
             recentlyDeletedPosition = -1
@@ -199,9 +195,14 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
 
     fun removeDataWithUndo(position: Int) {
         if (position in mainDatas.indices) {
-            recentlyDeletedItem = mainDatas[position]
-            recentlyDeletedPosition = position
+            undoRemoveData = mainDatas[position]
             mainDatas.removeAt(position)
+
+            val indexInOriginal = originalDatas.indexOf(undoRemoveData)
+            if (indexInOriginal != -1) {
+                originalDatas.removeAt(indexInOriginal)
+            }
+
             notifyItemRemoved(position)
         }
     }
@@ -220,17 +221,15 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         this.swipeListener = swipeListener
         this.moveListener = moveListener
 
-        // Swipe dan drag handler
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, // Untuk drag
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // Untuk swipe
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder,
             ): Boolean {
-                // Swap data dalam adapter
                 val startPosition = viewHolder.absoluteAdapterPosition
                 val endPosition = target.absoluteAdapterPosition
                 adapter.swapData(startPosition, endPosition)
@@ -238,13 +237,11 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // Hapus item dalam adapter (dengan undo jika dibutuhkan)
                 val position = viewHolder.absoluteAdapterPosition
                 adapter.removeDataWithUndo(position)
             }
         }
 
-        // Tambahkan ItemTouchHelper ke RecyclerView
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
@@ -253,6 +250,7 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         if (position in mainDatas.indices) {
             val removedItem = mainDatas[position]
             mainDatas.removeAt(position)
+            originalDatas.removeAt(position)
             notifyItemRemoved(position)
             swipeListener?.onSwipe(position, removedItem)
         }
@@ -260,15 +258,9 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
 
     fun swapData(startPosition: Int, endPosition: Int) {
         if (startPosition in mainDatas.indices && endPosition in mainDatas.indices) {
-            // Swap posisi data utama
-            mainDatas[startPosition] = mainDatas[endPosition].also {
-                mainDatas[endPosition] = mainDatas[startPosition]
-            }
-
-            // Notifikasi perubahan posisi
+            mainDatas.swap(startPosition, endPosition)
+            originalDatas.swap(startPosition, endPosition)
             notifyItemMoved(startPosition, endPosition)
-
-            // Trigger listener
             moveListener?.onMove(startPosition, endPosition, mainDatas[endPosition])
         }
     }
@@ -276,19 +268,16 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
     fun setupLazyLoad(
         recyclerView: RecyclerView,
         nestedScrollView: NestedScrollView? = null,
-        thresholdItemCount: Int = 3, // Default: Load more saat tersisa 3 item terlihat
-        onLoadMore: () -> Unit, // Callback untuk memuat data baru
+        thresholdItemCount: Int = 3,
+        onLoadMore: () -> Unit,
     ) {
-        // Cek apakah NestedScrollView diberikan
         val nestedScrollViewParent = nestedScrollView ?: findParentNestedScrollView(recyclerView)
 
-        // Jika RecyclerView berada dalam NestedScrollView
         if (nestedScrollViewParent != null) {
             nestedScrollViewParent.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, scrollRange ->
-                if (scrollY == scrollRange) { // Jika scroll mencapai akhir
+                if (scrollY == scrollRange) {
                     if (!isLoading) {
                         isLoading = true
-                        // Callback untuk memuat data baru
                         onLoadMore()
                     }
                 }
@@ -306,10 +295,8 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
                         else -> return
                     }
 
-                    // Cek apakah sudah mendekati akhir (thresholdItemCount)
                     if (!isLoading && totalItemCount <= lastVisibleItemPosition + thresholdItemCount) {
                         isLoading = true
-                        // Callback untuk memuat data baru
                         onLoadMore()
                     }
                 }
@@ -317,9 +304,9 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         }
     }
 
-    // Protected Methods
-    protected fun convertLayout2View(parent: ViewGroup, layout: Int) =
-        parent.inflate(layout)
+    protected fun convertLayout2View(parent: ViewGroup, layout: Int): View {
+        return parent.inflate(layout)
+    }
 
     protected fun setAnimation(view: View, position: Int) {
         if (position > lastPosition) {
@@ -346,31 +333,32 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         }
     }
 
+    private fun <T> MutableList<T>.swap(i: Int, j: Int) {
+        val temp = this[i]
+        this[i] = this[j]
+        this[j] = temp
+    }
+
     private fun ViewGroup.inflate(@LayoutRes layout: Int): View {
         return LayoutInflater.from(context).inflate(layout, this, false)
     }
 
-    /**
-     * Fungsi untuk mendeteksi secara otomatis apakah RecyclerView berada di dalam NestedScrollView.
-     */
     private fun findParentNestedScrollView(view: View?): NestedScrollView? {
         var parentView = view?.parent
         while (parentView != null) {
             if (parentView is NestedScrollView) {
-                return parentView // Return jika menemukan NestedScrollView
+                return parentView
             }
             parentView = parentView.parent
         }
-        return null // Return null jika tidak ada NestedScrollView
+        return null
     }
-
     open class ListItem<out T> {
-        data class DataItem<T>(val data: T) : ListItem<T>() // Data reguler
+        data class DataItem<T>(val data: T) : ListItem<T>()
         object Loading : ListItem<Nothing>()
         object Empty : ListItem<Nothing>()
     }
 
-    // Interfaces
     interface ListenerSelectItem {
         fun onUnSelect(intBooleanPair: Pair<Int, Boolean>)
         fun onCheckSingleMode(intBooleanPair: Pair<Int, Boolean>)

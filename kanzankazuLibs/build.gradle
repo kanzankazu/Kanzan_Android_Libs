@@ -24,11 +24,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_1_7
     }
     buildFeatures {
         viewBinding true
@@ -97,7 +97,6 @@ dependencies {
     api "androidx.recyclerview:recyclerview:1.2.1"
     api "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     api "androidx.security:security-crypto:1.0.0"
-    implementation libs.featureDeliveryKtx
     /*Lifecycle_Mvvm*/
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.4.1'
     api "androidx.lifecycle:lifecycle-common-java8:2.4.1"
@@ -162,6 +161,7 @@ dependencies {
     api "com.google.firebase:firebase-database-ktx:20.1.0"
     api "com.google.firebase:firebase-database:20.1.0"
     api "com.google.firebase:firebase-dynamic-links:19.1.0"
+    api "com.google.android.play:feature-delivery-ktx:2.1.0"
     api "com.google.firebase:firebase-firestore-ktx:21.7.0"
     api "com.google.firebase:firebase-invites:17.0.0"
     //api "com.google.firebase:firebase-messaging:20.2.4"

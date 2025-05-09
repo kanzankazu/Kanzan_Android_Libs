@@ -76,7 +76,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
         duration: Int = Toast.LENGTH_LONG,
     ) {
         if (message.isNotEmpty()) this.simpleToast(message, duration)
-        else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessageDebug()
+        else "showToast BaseActivitySuper message.isNullOrEmpty()".debugMessageDebug("BaseActivitySuper - toast")
     }
 
     fun snackBar(
@@ -93,7 +93,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
                 snackbar.setAction(actionText, actionListener)
             }
             snackbar.show()
-        } else "showSnackbar BaseActivity message.isNullOrEmpty()".debugMessageDebug()
+        } else "showSnackbar BaseActivity message.isNullOrEmpty()".debugMessageDebug("BaseActivitySuper - snackBar")
     }
 
     fun snackBarNoConnection(

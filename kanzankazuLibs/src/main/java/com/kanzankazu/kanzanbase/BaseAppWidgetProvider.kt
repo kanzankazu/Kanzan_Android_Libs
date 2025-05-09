@@ -9,7 +9,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.kanzankazu.kanzanutil.kanzanextension.simpleToast
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 
 abstract class BaseAppWidgetProvider : AppWidgetProvider() {

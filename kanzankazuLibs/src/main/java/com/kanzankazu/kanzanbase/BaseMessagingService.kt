@@ -12,7 +12,7 @@ import org.json.JSONObject
 abstract class BaseMessagingService : FirebaseMessagingService() {
     val allUserTopic = NotifTopics.ALL_USER_APP.topic
     val adminChannelId = "admin_channel"
-    lateinit var notif: MyFirebaseNotificationModel
+    private lateinit var notif: MyFirebaseNotificationModel
         private set
 
     abstract fun onMessageReceivedListener(
@@ -21,7 +21,7 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
     )
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        "onMessageReceived: $remoteMessage".debugMessageDebug()
+        "onMessageReceived: $remoteMessage".debugMessageDebug("BaseMessagingService - onMessageReceived")
 
         // Default inisialisasi
         notif = MyFirebaseNotificationModel()
@@ -33,16 +33,16 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
                 notif = mapToObject.toString().json2Object(MyFirebaseNotificationModel::class.java)
             } catch (e: Exception) {
                 e.debugMessageError("BaseMessagingService - onMessageReceived")
-                "Error parsing notification data: ${e.message}".debugMessageDebug()
+                "Error parsing notification data: ${e.message}".debugMessageDebug("BaseMessagingService - onMessageReceived")
             }
         } else {
-            "RemoteMessage data is empty".debugMessageDebug()
+            "RemoteMessage data is empty".debugMessageDebug("BaseMessagingService - onMessageReceived")
         }
 
         onMessageReceivedListener(notif, remoteMessage)
     }
 
     override fun onNewToken(token: String) {
-        "onNewToken received: $token".debugMessageDebug()
+        "onNewToken received: $token".debugMessageDebug("BaseMessagingService - onNewToken")
     }
 }

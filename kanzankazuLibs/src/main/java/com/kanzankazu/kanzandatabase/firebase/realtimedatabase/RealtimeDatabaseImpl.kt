@@ -41,7 +41,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         value: T,
         function: (BaseResponse<String>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - setDataBaseResponse")
         getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
             .handleTaskBaseResponse(RealtimeDatabaseImplType.SAVE, function)
     }
@@ -51,7 +51,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKeyId: String,
         value: T,
     ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - setDataBaseResponse")
         return getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
             .handleTaskBaseResponse(RealtimeDatabaseImplType.SAVE)
     }
@@ -62,7 +62,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         value: T,
         function: (BaseResponse<String>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
         getRootRefKt(tableChildKey)
             .child(tableChildKeyId)
             .setValue(value)
@@ -74,7 +74,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKeyId: String,
         value: T,
     ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
         return getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
             .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE)
     }
@@ -86,7 +86,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildValue: String,
         function: (BaseResponse<String>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
         getRootRefKt(tableChildKey).child(tableChildKeyId).child(rowChildKey)
             .setValue(rowChildValue)
             .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE, function)
@@ -98,7 +98,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         rowChildValue: String,
     ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
         return getRootRefKt(tableChildKey)
             .child(tableChildKeyId)
             .child(rowChildKey)
@@ -111,7 +111,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKeyId: String,
         function: (BaseResponse<String>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - removeDataBaseResponse")
         getRootRefKt(tableChildKey).child(tableChildKeyId).removeValue()
             .handleTaskBaseResponse(RealtimeDatabaseImplType.REMOVE, function)
     }
@@ -120,7 +120,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKey: String,
         tableChildKeyId: String,
     ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - removeDataBaseResponse")
         return getRootRefKt(tableChildKey).child(tableChildKeyId).removeValue()
             .handleTaskBaseResponse(RealtimeDatabaseImplType.REMOVE)
     }
@@ -130,7 +130,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         isSingleCall: Boolean,
         function: (BaseResponse<DataSnapshot>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug()
+        "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataAllBaseResponse")
         getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall, function)
     }
 
@@ -138,7 +138,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKey: String,
         isSingleCall: Boolean,
     ): BaseResponse<DataSnapshot> {
-        "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug()
+        "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataAllBaseResponse")
         return getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall)
     }
 
@@ -149,7 +149,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         isSingleCall: Boolean,
         function: (BaseResponse<T>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - getDataByIdBaseResponse")
         val reference = getRootRefKt(tableChildKey).child(tableChildKeyId)
         reference.handleTaskBaseResponse(isSingleCall) { dataSnapshotKanzanBaseResponse ->
             function.invoke(dataSnapshotKanzanBaseResponse.handleBaseResponseConvert {
@@ -168,7 +168,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         targetClass: Class<T>,
         isSingleCall: Boolean,
     ): BaseResponse<T> {
-        "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - getDataByIdBaseResponse")
         return querySelectTableDataByPrimaryKey(
             tableChildKey,
             tableChildKeyId
@@ -182,7 +182,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         targetClass: Class<T>,
         isSingleCall: Boolean,
     ): Flow<BaseResponse<T>> {
-        "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponseFlow - $tableChildKey - $tableChildKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponseFlow - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - getDataByIdBaseResponseFlow")
         return flow {
             val response = querySelectTableDataByPrimaryKey(
                 tableChildKey,
@@ -200,7 +200,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKey: String,
         tableChildPrimaryKeyId: String,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableDataByPrimaryKey - $tableChildKey - $tableChildPrimaryKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableDataByPrimaryKey - $tableChildKey - $tableChildPrimaryKeyId".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByPrimaryKey")
         return getRootRefKt(tableChildKey).child(tableChildPrimaryKeyId)
     }
 
@@ -209,7 +209,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         rowChildValue: String,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue)
     }
 
@@ -218,7 +218,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         rowChildValue: Int,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue.toDouble())
     }
 
@@ -227,7 +227,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         rowChildValue: Double,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue)
     }
 
@@ -236,7 +236,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         rowChildValue: Boolean,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue)
     }
 
@@ -244,12 +244,12 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildKey: String,
         rowChildKeySlashValue: String,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKeySlashValue".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKeySlashValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKeySlashValue)
     }
 
     override fun querySelectTableLimit(tableChildKey: String, limit: Int): Query {
-        "RealtimeDatabaseImpl - querySelectTableLimit - $tableChildKey - $limit".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableLimit - $tableChildKey - $limit".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableLimit")
         return getRootRefKt(tableChildKey).orderByKey().limitToFirst(limit)
     }
 
@@ -258,7 +258,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         string: String,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableValueWithStart - $tableChildKey - $rowChildKey - $string".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableValueWithStart - $tableChildKey - $rowChildKey - $string".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableValueWithStart")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).startAt(string)
             .endAt("${string}\uf8ff")
     }
@@ -269,7 +269,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         digits: Any,
         isMore: Boolean,
     ): Query {
-        "RealtimeDatabaseImpl - querySelectTableValueWithMoreLessDigits - $tableChildKey - $rowChildKey - $digits".debugMessageDebug()
+        "RealtimeDatabaseImpl - querySelectTableValueWithMoreLessDigits - $tableChildKey - $rowChildKey - $digits".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableValueWithMoreLessDigits")
         val d = when (digits) {
             is Int -> digits.toDouble()
             is Long -> digits.toDouble()
@@ -323,7 +323,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "getDataByQueryKanzanBaseResponse - addListenerForSingleValueEvent - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "getDataByQueryKanzanBaseResponse - addListenerForSingleValueEvent - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     continuation.resume(BaseResponse.Error(databaseError.message))
                 }
             }) else query.addValueEventListener(object : ValueEventListener {
@@ -332,7 +332,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "getDataByQueryKanzanBaseResponse - addListenerForSingleValueEvent - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "getDataByQueryKanzanBaseResponse - addListenerForSingleValueEvent - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     continuation.resume(BaseResponse.Error(databaseError.message))
                 }
             })
@@ -344,24 +344,24 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         rowChildKey: String,
         rowChildValue: String,
     ): Pair<Boolean, String> {
-        "RealtimeDatabaseImpl - isExistData - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug()
+        "RealtimeDatabaseImpl - isExistData - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - isExistData")
         return suspendCancellableCoroutine {
             querySelectTableDataByKeyValue(
                 tableChildKey, rowChildKey, rowChildValue
             ).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    "RealtimeDatabaseImpl - isExistData - onDataChange - $dataSnapshot".debugMessageDebug()
+                    "RealtimeDatabaseImpl - isExistData - onDataChange - $dataSnapshot".debugMessageDebug("RealtimeDatabaseImpl - onDataChange")
                     it.resume(Pair(dataSnapshot.exists(), ""))
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "RealtimeDatabaseImpl - isExistData - onCancelled - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "RealtimeDatabaseImpl - isExistData - onCancelled - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     it.resume(Pair(false, "Anda sudah mengirim pengingat hari ini"))
                 }
             })
 
             it.invokeOnCancellation { throwable ->
-                "RealtimeDatabaseImpl - isExistData - invokeOnCancellation - ${throwable?.stackTraceToString()}".debugMessageError()
+                "RealtimeDatabaseImpl - isExistData - invokeOnCancellation - ${throwable?.stackTraceToString()}".debugMessageError("RealtimeDatabaseImpl - isExistData")
             }
         }
     }
@@ -392,7 +392,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         tableChildPrimaryKeyId: String,
         function: (pair: Pair<Boolean, String>) -> Unit,
     ) {
-        "RealtimeDatabaseImpl - isExistData - $tableChildKey - $tableChildPrimaryKeyId".debugMessageDebug()
+        "RealtimeDatabaseImpl - isExistData - $tableChildKey - $tableChildPrimaryKeyId".debugMessageDebug("RealtimeDatabaseImpl - isExistData")
         getRootRefKt(tableChildKey).child(tableChildPrimaryKeyId)
             .addListenerForSingleValueEvent(handleTaskListenerIsExist(function))
     }
@@ -427,7 +427,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             )
         }.addOnFailureListener { exception ->
             exception.message?.let {
-                exception.message.toString().debugMessageDebug()
+                exception.message.toString().debugMessageDebug("RealtimeDatabaseImpl - handleTaskBaseResponse")
                 function.invoke(
                     BaseResponse.Error(
                         handleTaskKanzanBaseResponseMessageError(
@@ -470,7 +470,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             }
             addOnFailureListener { exception ->
                 exception.message?.let {
-                    exception.message.toString().debugMessageDebug()
+                    exception.message.toString().debugMessageDebug("RealtimeDatabaseImpl - handleTaskBaseResponse")
                     continuation.resume(
                         BaseResponse.Error(
                             handleTaskKanzanBaseResponseMessageError(
@@ -539,7 +539,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
     private suspend fun DatabaseReference.handleTaskBaseResponse(
         isSingleCall: Boolean,
     ): BaseResponse<DataSnapshot> {
-        "handleTaskKanzanBaseResponse".debugMessageDebug()
+        "handleTaskKanzanBaseResponse".debugMessageDebug("RealtimeDatabaseImpl - handleTaskBaseResponse")
         return suspendCancellableCoroutine { continuation ->
             if (isSingleCall) this.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -547,7 +547,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     continuation.resume(BaseResponse.Error("${databaseError.message}|${databaseError.details}|${databaseError.code}"))
                 }
             })
@@ -557,7 +557,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     continuation.resume(BaseResponse.Error("${databaseError.message}|${databaseError.details}|${databaseError.code}"))
                 }
             })
@@ -574,7 +574,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     continuation.resume(BaseResponse.Error("${databaseError.message}|${databaseError.details}|${databaseError.code}"))
                 }
             })
@@ -584,7 +584,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                    "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                     continuation.resume(BaseResponse.Error("${databaseError.message}|${databaseError.details}|${databaseError.code}"))
                 }
             })
@@ -639,7 +639,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                "handleTaskListenerKanzanBaseResponse - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                 function.invoke(BaseResponse.Error("${databaseError.message}|${databaseError.details}|${databaseError.code}"))
             }
         }
@@ -652,7 +652,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                "handleTaskListenerIsExist - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+                "handleTaskListenerIsExist - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
                 function.invoke(Pair(false, databaseError.message))
             }
         }
@@ -666,7 +666,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
-            "handleTaskListenerDataSnapshot - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError()
+            "handleTaskListenerDataSnapshot - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
             onCancelled.invoke(databaseError)
         }
     }

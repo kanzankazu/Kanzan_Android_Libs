@@ -28,7 +28,7 @@ class GlobalExceptionHandler private constructor(
             launchActivity(applicationContext, activityToBeLaunched, p1)
             exitProcess(0)
         } catch (e: Exception) {
-            e.debugMessageError()
+            e.debugMessageError("GlobalExceptionHandler - uncaughtException")
             defaultHandler.uncaughtException(p0, p1)
         }
     }

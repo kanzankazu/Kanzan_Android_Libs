@@ -19,7 +19,7 @@ class BaseProgressDialog {
 
     /**@param color example(R.color.baseBlack)*/
     fun showDialog(context: Context, color: Int = R.color.baseBlack, message: String = "") {
-        "BaseProgressDialog - showDialog".debugMessageDebug()
+        "BaseProgressDialog - showDialog".debugMessageDebug("BaseProgressDialog - showDialog")
         if (!isShowingDialog()) {
             this.color = color
             try {

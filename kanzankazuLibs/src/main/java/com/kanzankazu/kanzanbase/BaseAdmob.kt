@@ -72,12 +72,12 @@ class BaseAdmob(activity: Activity) {
                     }
 
                     override fun onAdFailedToLoad(error: LoadAdError) {
-                        "BannerAd failed to load: $error".debugMessageError()
+                        "BannerAd failed to load: $error".debugMessageError("BaseAdmob - onAdFailedToLoad")
                     }
                 }
             }
         } ?: run {
-            "setupBannerAds: Invalid AdView.".debugMessageError()
+            "setupBannerAds: Invalid AdView.".debugMessageError("BaseAdmob - setupBannerAds")
         }
     }
 
@@ -101,7 +101,7 @@ class BaseAdmob(activity: Activity) {
      */
     fun setupInterstitialAds(idInterstitialAd: String) {
         if (idInterstitialAd.isBlank()) {
-            "Invalid Interstitial Ad Unit ID.".debugMessageError()
+            "Invalid Interstitial Ad Unit ID.".debugMessageError("BaseAdmob - setupInterstitialAds")
             return
         }
 
@@ -119,12 +119,12 @@ class BaseAdmob(activity: Activity) {
 
                     override fun onAdFailedToLoad(error: LoadAdError) {
                         mInterstitialAd = null
-                        "InterstitialAd failed to load: $error".debugMessageError()
+                        "InterstitialAd failed to load: $error".debugMessageError("BaseAdmob - onAdFailedToLoad")
                     }
                 }
             )
         } ?: run {
-            "Activity invalid or destroyed.".debugMessageError()
+            "Activity invalid or destroyed.".debugMessageError("BaseAdmob - setupInterstitialAds")
         }
     }
 
@@ -154,7 +154,7 @@ class BaseAdmob(activity: Activity) {
                 show(activity)
                 setupInterstitialAds(adUnitId)
             } ?: run {
-                "showInterstitialAds: Interstitial Ad is not ready.".debugMessageError()
+                "showInterstitialAds: Interstitial Ad is not ready.".debugMessageError("BaseAdmob - showInterstitialAds")
             }
         }
     }
@@ -172,7 +172,7 @@ class BaseAdmob(activity: Activity) {
      */
     fun setupRewardAd(idAdsRewardVideo: String) {
         if (idAdsRewardVideo.isBlank()) {
-            "Invalid Reward Video Ad Unit ID.".debugMessageError()
+            "Invalid Reward Video Ad Unit ID.".debugMessageError("BaseAdmob - setupRewardAd")
             return
         }
 
@@ -195,7 +195,7 @@ class BaseAdmob(activity: Activity) {
                     mRewardedAd = null
                     onRewardAdLoading.invoke(false)
                     onRewardAdReady.invoke(false)
-                    "RewardAd failed to load: $error".debugMessageError()
+                    "RewardAd failed to load: $error".debugMessageError("BaseAdmob - onAdFailedToLoad")
                 }
 
                 override fun onAdLoaded(rewardedAd: RewardedAd) {
@@ -209,18 +209,18 @@ class BaseAdmob(activity: Activity) {
                         override fun onAdFailedToShowFullScreenContent(error: AdError) {
                             mRewardedAd = null
                             onRewardAdReady.invoke(false)
-                            "RewardAd failed to show: $error".debugMessageError()
+                            "RewardAd failed to show: $error".debugMessageError("BaseAdmob - onAdFailedToShowFullScreenContent")
                         }
 
                         override fun onAdShowedFullScreenContent() {
-                            "RewardAd showing.".debugMessageDebug()
+                            "RewardAd showing.".debugMessageDebug("BaseAdmob - onAdShowedFullScreenContent")
                         }
 
                         override fun onAdDismissedFullScreenContent() {
                             mRewardedAd = null
                             onRewardAdReady.invoke(false)
                             onRewardAdFinish.invoke()
-                            "RewardAd dismissed.".debugMessageDebug()
+                            "RewardAd dismissed.".debugMessageDebug("BaseAdmob - onAdDismissedFullScreenContent")
                         }
                     }
                 }
@@ -259,7 +259,7 @@ class BaseAdmob(activity: Activity) {
                 idRewardAd.takeIf { it.isNotBlank() }?.let {
                     onRetryShowRewardAd.invoke()
                     setupRewardAd(it)
-                } ?: "No Reward Ad to show.".debugMessageError()
+                } ?: "No Reward Ad to show.".debugMessageError("BaseAdmob - showRewardAd")
             }
         }
     }

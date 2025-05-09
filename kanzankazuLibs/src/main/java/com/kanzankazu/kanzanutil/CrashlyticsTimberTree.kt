@@ -1,5 +1,6 @@
 package com.kanzankazu.kanzanutil
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.kanzankazu.kanzanutil.kanzanextension.sendCrashlytics
 import timber.log.Timber
@@ -17,8 +18,28 @@ class CrashlyticsTimberTree @Inject constructor(
     private val minLogPriority: Int = Log.WARN,
 ) : Timber.Tree() {
 
+    companion object {
+        // Default log tag used when no tag is provided
+        private const val DEFAULT_TAG = "CrashlyticsTimberTree"
+    }
+
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        val newThrowable = t ?: Throwable(message)
-        if (priority < minLogPriority) newThrowable.sendCrashlytics(userid = "", isLog = false, isForce = true)
+        val finalTag = tag ?: DEFAULT_TAG
+        if (isDebug) logToLogcat(priority, finalTag, message, t)
+        if (priority < minLogPriority) return
+        logToCrashlytics(finalTag, message, t)
+    }
+
+    @SuppressLint("LogNotTimber")
+    private fun logToLogcat(priority: Int, tag: String, message: String, throwable: Throwable?) {
+        Log.println(priority, tag, message)
+        throwable?.let { Log.e(tag, "Error: ", it) }
+    }
+
+    private fun logToCrashlytics(tag: String, message: String, throwable: Throwable?) {
+        throwable?.sendCrashlytics(
+            tag = tag,
+            logMessage = message
+        )
     }
 }

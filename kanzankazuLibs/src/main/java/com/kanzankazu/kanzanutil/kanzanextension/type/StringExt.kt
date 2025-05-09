@@ -8,6 +8,7 @@ import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.kanzankazu.kanzanutil.BaseConst
 import com.kanzankazu.kanzanutil.kanzanextension.getFullErrorLog
+import com.kanzankazu.kanzanutil.kanzanextension.ifEmptyOrNull
 import com.kanzankazu.kanzanutil.kanzanextension.isDebugPublic
 import com.kanzankazu.kanzanutil.kanzanextension.toDateFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toDigits
@@ -146,37 +147,38 @@ enum class DebugType {
  */
 @SuppressLint("LogNotTimber")
 fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
-    val newLog = when (log) {
-        is Exception -> log.getFullErrorLog()
-        is Throwable -> log.getFullErrorLog()
-        else -> log
-    }
-
-    if (newLog != null) {
+    if (log != null) {
         if (isDebugPublic()) {
             val maxLogSize = 4000
-            repeat(newLog.toString().chunked(maxLogSize).size) { i ->
-                when (debugType) {
-                    DebugType.VERBOSE -> Timber.tag("Lihat").v(if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.DEBUG -> Timber.tag("Lihat").d(if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.INFO -> Timber.tag("Lihat").i(if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.WARNING -> Timber.tag("Lihat").w(if (i == 0) "$i == $location >> $log" else "$log")
-                    DebugType.ERROR -> Timber.tag("Lihat").e(if (i == 0) "$i == $location >> $log" else "$log")
+            repeat(log.toString().chunked(maxLogSize).size) { i ->
+                when (log) {
+                    is Exception -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
+                    is Throwable -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
+                    else -> {
+                        val message = if (i == 0) "${location.ifEmptyOrNull { "-" }} >>>>---->> $log" else "$i == ${location.ifEmptyOrNull { "-" }} >>>>---->> $log"
+                        when (debugType) {
+                            DebugType.VERBOSE -> Timber.tag("Lihat").v(message)
+                            DebugType.DEBUG -> Timber.tag("Lihat").d(message)
+                            DebugType.INFO -> Timber.tag("Lihat").i(message)
+                            DebugType.WARNING -> Timber.tag("Lihat").w(message)
+                            DebugType.ERROR -> Timber.tag("Lihat").e(message)
+                        }
+                    }
                 }
             }
         }
-    } else Timber.tag("Lihat").e("$location >> log is null")
+    } else Timber.tag("Lihat").w("$location >> log is null")
 }
 
-fun Any?.debugMessageDebug(location: String = "StringExt - debugMessage - debug") {
+fun Any?.debugMessageDebug(location: String = "") {
     debugMessage(this, location, DebugType.DEBUG)
 }
 
-fun Any?.debugMessageWarning(location: String = "StringExt - debugMessage - warning") {
+fun Any?.debugMessageWarning(location: String) {
     debugMessage(this, location, DebugType.WARNING)
 }
 
-fun Any?.debugMessageError(location: String = "StringExt - debugMessage - error") {
+fun Any?.debugMessageError(location: String) {
     debugMessage(this, location, DebugType.ERROR)
 }
 

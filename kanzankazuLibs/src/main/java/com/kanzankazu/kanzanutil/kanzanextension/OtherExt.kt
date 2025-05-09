@@ -48,7 +48,7 @@ fun Fragment.delayFun(delayMillis: Long = 500, r: () -> Unit) {
     try {
         requireActivity().delayFun(delayMillis, r)
     } catch (i: IllegalStateException) {
-        i.message.toString().debugMessageError()
+        i.message.toString().debugMessageError("OtherExt - delayFun")
     }
 }
 

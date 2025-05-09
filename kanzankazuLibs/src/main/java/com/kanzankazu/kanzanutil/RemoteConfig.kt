@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.kanzankazu.kanzanutil
 
 import com.google.android.gms.tasks.Task
@@ -21,7 +19,7 @@ class RemoteConfig {
         onFirebaseRemoteConfig: (FirebaseRemoteConfig) -> Unit = {},
         onFailed: (errorMessage: String) -> Unit = {},
     ) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             try {
                 val configSettings = FirebaseRemoteConfigSettings.Builder()
                     .setMinimumFetchIntervalInSeconds(10)
@@ -33,7 +31,7 @@ class RemoteConfig {
                 firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener { task -> handleTaskResult(task, onFirebaseRemoteConfig, onFailed) }
             } catch (e: Exception) {
                 e.debugMessageError("RemoteConfig - getFirebaseRemoteConfig")
-                handleException(e, "initializeRemoteConfig", onFailed)
+                handleException(e, onFailed)
             }
         }
     }
@@ -44,24 +42,22 @@ class RemoteConfig {
                 onFirebaseRemoteConfig.invoke(firebaseRemoteConfig)
             } catch (e: NumberFormatException) {
                 val message = "Failed to parse configuration: ${e.message}"
-                logError(message, e)
+                logError(e)
                 onFailed.invoke(message)
             }
         } else {
             val message = task.exception?.message ?: "Unknown error occurred during fetch"
-            logError("Fetch not successful: $message", task.exception)
+            logError(task.exception)
             onFailed.invoke(message)
         }
     }
 
-    private fun handleException(e: Exception, methodName: String, onFailed: (errorMessage: String) -> Unit) {
-        val message = "$methodName - Error occurred: ${e.message}"
-        logError(message, e)
+    private fun handleException(e: Exception, onFailed: (errorMessage: String) -> Unit) {
+        logError(e)
         onFailed.invoke(e.message.orEmpty())
     }
 
-    private fun logError(message: String, throwable: Throwable?) {
-        val errorDetails = "RemoteConfig - $message >> ${throwable?.stackTraceToString()}"
-        errorDetails.debugMessageError()
+    private fun logError(throwable: Throwable?) {
+        throwable.debugMessageError("RemoteConfig - logError")
     }
 }
