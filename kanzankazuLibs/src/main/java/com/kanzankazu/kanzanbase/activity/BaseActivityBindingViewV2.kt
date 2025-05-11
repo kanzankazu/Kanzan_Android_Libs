@@ -23,7 +23,7 @@ abstract class BaseActivityBindingViewV2<VB : ViewBinding> : BaseActivitySuper()
         setContentView(bindActivity.root)
 
         setActivityResult()
-        getBundleData()
+        parseIntentData()
         setContent()
         setListener()
         getData()

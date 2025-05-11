@@ -19,7 +19,7 @@ abstract class BaseActivityStandart : BaseActivitySuper() {
         setContentView(getBindView())
 
         setActivityResult()
-        getBundleData()
+        parseIntentData()
         setContent()
         setListener()
         getData()

@@ -74,11 +74,12 @@ inline fun <reified T : Fragment> T.createFragmentWithArgs(intentHandle: Bundle.
     return fragment
 }
 
-inline fun<reified T : Fragment> T.handleFragmentArgs(listener: Bundle.() -> Unit) {
+inline fun <reified T : Fragment> T.handleFragmentArgs(listener: Bundle.() -> Unit) {
     arguments?.let { listener.invoke(it) }
 }
 
-inline fun <reified T> Context.makeIntent() = Intent(this, T::class.java)
+inline fun <reified T> Context.makeIntent(intentHandle: Intent.() -> Unit = {}) =
+    Intent(this, T::class.java).apply { intentHandle.invoke(this) }
 
 inline fun <reified T> Activity.changePage(bundle: Bundle? = null, finish: Boolean = false, intent: Intent? = null, optionBundle: Bundle? = null, intentHandle: Intent.() -> Unit = {}) {
     val newIntent = intent ?: Intent(this, T::class.java)

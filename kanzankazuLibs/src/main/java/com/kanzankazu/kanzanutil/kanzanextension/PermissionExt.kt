@@ -3,6 +3,7 @@ package com.kanzankazu.kanzanutil.kanzanextension
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PermissionInfo
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -13,6 +14,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 
 /**
  * Represents the state of a permission.
@@ -32,36 +34,67 @@ fun isTiramisuAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
 fun isSAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
-fun FragmentActivity.getPermissionState(permission: PermissionEnum): PermissionState {
-    return when {
-        ContextCompat.checkSelfPermission(this, permission.permission) == PackageManager.PERMISSION_GRANTED -> PermissionState.GRANTED
-        !shouldShowRequestPermissionRationale(permission.permission) &&
-                ContextCompat.checkSelfPermission(this, permission.permission) == PackageManager.PERMISSION_DENIED -> PermissionState.PERMANENTLY_DENIED
+fun FragmentActivity.getDeclaredPermissions(
+    isOnlyAndroidPermission: Boolean = true,
+    isRuntimeOnly: Boolean = false,
+): List<String> = try {
+    val packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+    val permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
 
-        shouldShowRequestPermissionRationale(permission.permission) -> PermissionState.SHOW_RATIONALE
-        else -> PermissionState.DENIED
+    val filtered = permissions.filter { permission ->
+        val isAndroidPermission = !isOnlyAndroidPermission || permission.startsWith("android.permission.")
+
+        val isRuntimePermission = if (isRuntimeOnly) {
+            try {
+                val permInfo = packageManager.getPermissionInfo(permission, 0)
+                permInfo.protectionLevel and PermissionInfo.PROTECTION_DANGEROUS != 0
+            } catch (e: Exception) {
+                e.debugMessageError(" - getDeclaredPermissions - isRuntimePermission")
+                false
+            }
+        } else true
+
+        isAndroidPermission && isRuntimePermission
+    }
+
+    filtered
+} catch (e: Exception) {
+    e.debugMessageError(" - getDeclaredPermissions - getPackageInfo")
+    emptyList()
+}
+
+fun FragmentActivity.getDeclarePermissionsRuntimeWithStatus(): List<Pair<PermissionEnum, PermissionState>> = getDeclaredPermissions(
+    isOnlyAndroidPermission = true,
+    isRuntimeOnly = true
+).mapNotNull { permissionString ->
+    PermissionEnum.stringToPermissionEnum(permissionString)?.let { permissionEnum ->
+        permissionEnum to getPermissionState(permissionEnum)
     }
 }
 
-fun FragmentActivity.getPermissionState(permissions: Array<PermissionEnum>): PermissionState {
-    return when {
-        permissions.all { ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_GRANTED } -> PermissionState.GRANTED
-        permissions.any {
-            !shouldShowRequestPermissionRationale(it.permission) &&
-                    ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_DENIED
-        } -> PermissionState.PERMANENTLY_DENIED
+fun FragmentActivity.getPermissionState(permissions: Array<PermissionEnum>): PermissionState = when {
+    permissions.all { ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_GRANTED } -> PermissionState.GRANTED
+    permissions.any {
+        !shouldShowRequestPermissionRationale(it.permission) &&
+                ContextCompat.checkSelfPermission(this, it.permission) == PackageManager.PERMISSION_DENIED
+    } -> PermissionState.PERMANENTLY_DENIED
 
-        permissions.any { shouldShowRequestPermissionRationale(it.permission) } -> PermissionState.SHOW_RATIONALE
-        else -> PermissionState.DENIED
-    }
+    permissions.any { shouldShowRequestPermissionRationale(it.permission) } -> PermissionState.SHOW_RATIONALE
+    else -> PermissionState.DENIED
 }
 
-fun FragmentActivity.getPermissionState(permissions: PermissionEnumArray): PermissionState {
-    return getPermissionState(permissions.permissions) // Reuse the existing function
-}
+fun FragmentActivity.getPermissionState(permission: PermissionEnum): PermissionState =
+    getPermissionState(arrayOf(permission))
 
-fun FragmentActivity.getPermissionState(permissions: Array<PermissionEnumArray>): PermissionState {
-    return getPermissionState(permissions.convertToArray()) // Reuse the existing function (after fix)
+fun FragmentActivity.getPermissionState(permissions: PermissionEnumArray): PermissionState =
+    getPermissionState(permissions.permissions)
+
+fun FragmentActivity.getPermissionState(permissions: Array<PermissionEnumArray>): PermissionState =
+    getPermissionState(permissions.convertToArray())
+
+@JvmOverloads
+fun FragmentActivity.requestPermissions(permissions: PermissionEnum, activityResultLauncher: ActivityResultLauncher<Array<String>>? = null, requestCode: Int = 0, isWithDialog: Boolean = true) {
+    requestPermissions(arrayOf(permissions), activityResultLauncher, requestCode, isWithDialog)
 }
 
 @JvmOverloads
@@ -143,7 +176,12 @@ enum class PermissionEnum(val permission: String) {
     READ_MEDIA_IMAGES("android.permission.READ_MEDIA_IMAGES"),
     READ_MEDIA_VIDEO("android.permission.READ_MEDIA_VIDEO"),
     RECORD_AUDIO("android.permission.RECORD_AUDIO"),
-    READ_SMS("android.permission.READ_SMS"),
+    READ_SMS("android.permission.READ_SMS");
+
+    companion object {
+        fun stringToPermissionEnum(string: String): PermissionEnum? =
+            values().firstOrNull { it.permission == string }
+    }
 }
 
 enum class PermissionEnumArray(val permissions: Array<PermissionEnum>) {

@@ -3,9 +3,15 @@
 package com.kanzankazu.kanzanutil.kanzanextension.view
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.text.Selection
 import android.text.Spannable
@@ -21,6 +27,7 @@ import android.view.View
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.kanzankazu.kanzanutil.kanzanextension.toDigits
 import com.kanzankazu.kanzanutil.kanzanextension.type.getRibuan
@@ -30,6 +37,7 @@ import com.kanzankazu.kanzanutil.kanzanextension.type.setRupiah
 import com.kanzankazu.kanzanutil.kanzanextension.type.toIntOrDefault
 import java.lang.Double.parseDouble
 import java.text.DecimalFormat
+import androidx.core.graphics.drawable.toDrawable
 
 /**
  * Retrieves the trimmed text content of the TextView. If the text content is empty or contains only whitespace,
@@ -553,4 +561,39 @@ fun TextView.makeLinks(vararg links: Pair<String, View.OnClickListener>) {
     this.movementMethod =
         LinkMovementMethod.getInstance() // without LinkMovementMethod, link can not click
     this.setText(spannableString, TextView.BufferType.SPANNABLE)
+}
+
+fun TextView.rotateDrawable(@DrawableRes drawableResId: Int, angle: Float) {
+    fun drawableToBitmap(drawable: Drawable): Bitmap {
+        if (drawable is BitmapDrawable) {
+            return drawable.bitmap
+        }
+
+        val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: 1
+        val height = drawable.intrinsicHeight.takeIf { it > 0 } ?: 1
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+
+        return bitmap
+    }
+
+    fun rotateDrawableView(context: Context, @DrawableRes drawableResId: Int, angle: Float): Drawable? {
+        val originalDrawable = ContextCompat.getDrawable(context, drawableResId) ?: return null
+        val bitmap = drawableToBitmap(originalDrawable)
+
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+
+        val rotatedBitmap = Bitmap.createBitmap(
+            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+        )
+
+        return rotatedBitmap.toDrawable(context.resources)
+    }
+
+    val rotatedDrawable = rotateDrawableView(context, drawableResId, angle)
+    setCompoundDrawablesWithIntrinsicBounds(null, null, rotatedDrawable, null)
 }

@@ -37,7 +37,7 @@ abstract class BaseActivitySuper : AppCompatActivity() {
 
     protected open fun setActivityResult() {}
     protected open fun setSubscribeToLiveData() {}
-    protected open fun getBundleData() {}
+    protected open fun parseIntentData() {}
     open fun handleConnection(internetConnection: NetworkStatus) {}
     protected abstract fun setContent()
     protected open fun setListener() {}
