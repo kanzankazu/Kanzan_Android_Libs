@@ -23,4 +23,9 @@ abstract class BaseFragmentBindingView<VB : ViewBinding?> : BaseFragmentSuper() 
         if (rootView == null) _binding = bindingInflater(inflater, container, false)
         return getPersistentView(_binding)
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

@@ -159,17 +159,17 @@ class KanzanEditText @JvmOverloads constructor(context: Context, attrs: Attribut
     private fun isPriceKeyboard() = inputType == 2
     private fun isAllCapKeyboard() = inputType == 5
 
-    lateinit  var tvComponentKanzanEditText2Title: TextView
-    lateinit  var tvComponentKanzanEditText2Prefix: TextView
-    lateinit  var tilComponentKanzanEditText2: TextInputLayout
-    lateinit  var etComponentKanzanEditText2: EditText
-    lateinit  var ivComponentKanzanEditText2Clear: ImageView
-    lateinit  var ivComponentKanzanEditText2Right: ImageView
-    lateinit  var ivComponentKanzanEditText2Success: ImageView
-    lateinit  var pbComponentKanzanEditText2: ProgressBar
-    lateinit  var tvComponentKanzanEditText2Error: TextView
-    lateinit  var tvComponentKanzanEditText2Success: TextView
-    lateinit  var layComponentKanzanEditText2Support: LinearLayout
+    lateinit var tvComponentKanzanEditText2Title: TextView
+    lateinit var tvComponentKanzanEditText2Prefix: TextView
+    lateinit var tilComponentKanzanEditText2: TextInputLayout
+    lateinit var etComponentKanzanEditText2: EditText
+    lateinit var ivComponentKanzanEditText2Clear: ImageView
+    lateinit var ivComponentKanzanEditText2Right: ImageView
+    lateinit var ivComponentKanzanEditText2Success: ImageView
+    lateinit var pbComponentKanzanEditText2: ProgressBar
+    lateinit var tvComponentKanzanEditText2Error: TextView
+    lateinit var tvComponentKanzanEditText2Success: TextView
+    lateinit var layComponentKanzanEditText2Support: LinearLayout
 
     init {
         initView(context)
@@ -195,7 +195,7 @@ class KanzanEditText @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     private fun initView(context: Context) {
-        this.initCustomView(context, R.layout.component_kanzan_edit_text_2){
+        this.initCustomView(context, R.layout.component_kanzan_edit_text_2) {
             tvComponentKanzanEditText2Title = findViewById(R.id.tv_component_kanzan_edit_text_2_title)
             tvComponentKanzanEditText2Prefix = findViewById(R.id.tv_component_kanzan_edit_text_2_prefix)
             tilComponentKanzanEditText2 = findViewById(R.id.til_component_kanzan_edit_text_2)
@@ -273,4 +273,5 @@ class KanzanEditText @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun et() = etComponentKanzanEditText2
+
 }

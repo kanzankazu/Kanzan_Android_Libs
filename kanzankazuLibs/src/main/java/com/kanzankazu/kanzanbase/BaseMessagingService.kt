@@ -2,7 +2,7 @@ package com.kanzankazu.kanzanbase
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.kanzankazu.kanzanmodel.MyFirebaseNotificationModel
+import com.kanzankazu.kanzanmodel.KanzanFirebaseNotificationModel
 import com.kanzankazu.kanzanutil.enums.NotifTopics
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
@@ -12,11 +12,11 @@ import org.json.JSONObject
 abstract class BaseMessagingService : FirebaseMessagingService() {
     val allUserTopic = NotifTopics.ALL_USER_APP.topic
     val adminChannelId = "admin_channel"
-    private lateinit var notif: MyFirebaseNotificationModel
+    private lateinit var notif: KanzanFirebaseNotificationModel
         private set
 
     abstract fun onMessageReceivedListener(
-        notif: MyFirebaseNotificationModel,
+        notif: KanzanFirebaseNotificationModel,
         remoteMessage: RemoteMessage,
     )
 
@@ -24,13 +24,13 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
         "onMessageReceived: $remoteMessage".debugMessageDebug("BaseMessagingService - onMessageReceived")
 
         // Default inisialisasi
-        notif = MyFirebaseNotificationModel()
+        notif = KanzanFirebaseNotificationModel()
 
         if (remoteMessage.data.isNotEmpty()) {
             try {
                 val map = remoteMessage.data
                 val mapToObject = JSONObject(map as Map<*, *>)
-                notif = mapToObject.toString().json2Object(MyFirebaseNotificationModel::class.java)
+                notif = mapToObject.toString().json2Object(KanzanFirebaseNotificationModel::class.java)
             } catch (e: Exception) {
                 e.debugMessageError("BaseMessagingService - onMessageReceived")
                 "Error parsing notification data: ${e.message}".debugMessageDebug("BaseMessagingService - onMessageReceived")

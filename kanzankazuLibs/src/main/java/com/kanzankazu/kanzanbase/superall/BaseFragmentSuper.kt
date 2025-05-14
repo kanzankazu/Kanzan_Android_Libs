@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.kanzankazu.kanzanbase.BaseAdmob
@@ -29,7 +28,7 @@ abstract class BaseFragmentSuper : Fragment() {
 
     protected open fun setActivityResult() {}
     protected open fun setSubscribeToLiveData() {}
-    protected open fun getBundleData() {}
+    protected open fun parseArgumentData(arguments: Bundle) {}
     protected open fun handleConnection(networkStatus: NetworkStatus) {}
     protected abstract fun setContent()
     protected open fun setListener() {}
@@ -41,7 +40,7 @@ abstract class BaseFragmentSuper : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if (!hasInitializedRootView) {
             hasInitializedRootView = true
-            getBundleData()
+            arguments?.let { argumentData -> parseArgumentData(argumentData) }
             setContent()
             setListener()
             getData()
