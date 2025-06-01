@@ -96,21 +96,23 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
 
     fun getItemDataS(): ArrayList<T> = mainDatas
 
-    fun setData(dataS: ArrayList<T>) {
+    fun ArrayList<T>?.toSafe(): ArrayList<T> = this?.filterNotNull()?.toCollection(ArrayList()) ?: arrayListOf()
+
+    fun setData(dataS: ArrayList<T>?) {
         mainDatas.clear()
-        mainDatas.addAll(dataS)
+        mainDatas.addAll(dataS.toSafe())
 
         originalDatas.clear()
-        originalDatas.addAll(dataS)
+        originalDatas.addAll(dataS.toSafe())
 
         notifyDataSetChanged()
     }
 
-    fun addDataS(dataS: ArrayList<T>) {
+    fun addDataS(dataS: ArrayList<T>?) {
         val lastSize = mainDatas.size
-        mainDatas.addAll(dataS)
-        originalDatas.addAll(dataS)
-        notifyItemRangeInserted(lastSize, dataS.size)
+        mainDatas.addAll(dataS.toSafe())
+        originalDatas.addAll(dataS.toSafe())
+        notifyItemRangeInserted(lastSize, dataS.toSafe().size)
     }
 
     fun addData(data: T) {

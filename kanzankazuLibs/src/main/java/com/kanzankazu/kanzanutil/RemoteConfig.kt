@@ -15,24 +15,22 @@ import kotlinx.coroutines.withContext
 class RemoteConfig {
     private val firebaseRemoteConfig: FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
-    suspend fun getFirebaseRemoteConfig(
+    fun getFirebaseRemoteConfig(
         onFirebaseRemoteConfig: (FirebaseRemoteConfig) -> Unit = {},
         onFailed: (errorMessage: String) -> Unit = {},
     ) {
-        withContext(Dispatchers.IO) {
-            try {
-                val configSettings = FirebaseRemoteConfigSettings.Builder()
-                    .setMinimumFetchIntervalInSeconds(10)
-                    .build()
+        try {
+            val configSettings = FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(10)
+                .build()
 
-                firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
-                firebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default)
+            firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
+            firebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default)
 
-                firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener { task -> handleTaskResult(task, onFirebaseRemoteConfig, onFailed) }
-            } catch (e: Exception) {
-                e.debugMessageError("RemoteConfig - getFirebaseRemoteConfig")
-                handleException(e, onFailed)
-            }
+            firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener { task -> handleTaskResult(task, onFirebaseRemoteConfig, onFailed) }
+        } catch (e: Exception) {
+            e.debugMessageError("RemoteConfig - getFirebaseRemoteConfig")
+            handleException(e, onFailed)
         }
     }
 

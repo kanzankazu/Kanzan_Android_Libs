@@ -4,22 +4,20 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 fun Throwable.getFullErrorLog(): String {
     return buildString {
-        appendLine("❌ Throwable: ${this@getFullErrorLog::class.java.name}")
-        appendLine("📄 Message: $message")
-        appendLine("📄 Localized: $localizedMessage")
-        appendLine("➡️ Cause: $cause")
-        appendLine("🔍 StackTrace:\n${stackTraceToString()}")
+        appendLine("❌ Throwable: ${this@getFullErrorLog::class.java.name}\n")
+        appendLine("📄 Message: $message\n")
+        appendLine("📄 Localized: $localizedMessage\n")
+        appendLine("➡️ Cause: $cause\n")
+        appendLine("🔍 StackTrace:\n${stackTraceToString()}\n")
     }
 }
 
-fun Exception.getFullErrorLog(): String {
-    return buildString {
-        appendLine("❌ Throwable: ${this@getFullErrorLog::class.java.name}")
-        appendLine("📄 Message: $message")
-        appendLine("📄 Localized: $localizedMessage")
-        appendLine("➡️ Cause: $cause")
-        appendLine("🔍 StackTrace:\n${stackTraceToString()}")
-    }
+fun Exception.getFullErrorLog() = buildString {
+    appendLine("❌ Throwable: ${this@getFullErrorLog::class.java.name}\n")
+    appendLine("📄 Message: $message\n")
+    appendLine("📄 Localized: $localizedMessage\n")
+    appendLine("➡️ Cause: $cause\n")
+    appendLine("🔍 StackTrace:\n${stackTraceToString()}\n")
 }
 
 fun Throwable.sendCrashlytics(
