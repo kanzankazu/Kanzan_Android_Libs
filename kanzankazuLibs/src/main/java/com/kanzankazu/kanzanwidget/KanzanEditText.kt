@@ -20,6 +20,7 @@ import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.kanzanextension.view.afterTextChanged
 import com.kanzankazu.kanzanutil.kanzanextension.view.initCustomAttribute
 import com.kanzankazu.kanzanutil.kanzanextension.view.initCustomView
+import com.kanzankazu.kanzanutil.kanzanextension.view.setupAutocomplete
 import com.kanzankazu.kanzanutil.kanzanextension.view.visibleView
 
 class KanzanEditText @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr) {
@@ -274,4 +275,12 @@ class KanzanEditText @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun et() = etComponentKanzanEditText2
 
+    fun setupAutocomplete(suggestions: List<String>, onItemSelected: ((String) -> Unit)? = null) {
+        etComponentKanzanEditText2.setupAutocomplete(
+            this.context,
+            suggestions = suggestions,
+            triggerOnClick = true,
+            onItemSelected = onItemSelected
+        )
+    }
 }

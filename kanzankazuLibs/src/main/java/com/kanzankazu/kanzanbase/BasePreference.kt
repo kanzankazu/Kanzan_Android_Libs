@@ -3,6 +3,7 @@
 package com.kanzankazu.kanzanbase
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.text.TextUtils
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -10,8 +11,9 @@ import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
 import com.kanzankazu.BuildConfig
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
+import com.kanzankazu.kanzanutil.kanzanextension.type.toArrayList
 
-abstract class BasePreference(context: Context) {
+abstract class BasePreference(private val context: Context) {
 
     private val prefsName = "${BuildConfig.LIBRARY_PACKAGE_NAME}.secure_preferences"
 
@@ -36,10 +38,30 @@ abstract class BasePreference(context: Context) {
         context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
     }
 
+    fun getAllSharedPreferences(): ArrayList<Pair<String, String>> {
+        return getAllSharedPreferencesMap().map { Pair(it.key, it.value) }.toArrayList()
+    }
+
+    fun getAllSharedPreferencesMap(): Map<String, String> {
+        val allEntries = sharedPreferences.all // Gunakan instance sharedPreferences yang sudah dienkripsi
+        val result: MutableMap<String, String> = HashMap()
+
+        for ((key, value) in allEntries) {
+            // Decode nilai yang dienkripsi
+            val decodedValue = when (value) {
+                is String -> value.decodedString()
+                else -> value.toString()
+            }
+            result[key] = decodedValue
+        }
+
+        return result
+    }
+
     /**
      * Utility method for safely editing shared preferences
      */
-    private inline fun editPreferences(action: (android.content.SharedPreferences.Editor) -> Unit): Boolean {
+    private inline fun editPreferences(action: (SharedPreferences.Editor) -> Unit): Boolean {
         return sharedPreferences.edit().apply(action).commit()
     }
 

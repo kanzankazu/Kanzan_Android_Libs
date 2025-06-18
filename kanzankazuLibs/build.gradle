@@ -226,6 +226,7 @@ dependencies {
     api "com.airbnb.android:lottie:3.4.0"
     api "androidmads.library.qrgenearator:QRGenearator:1.0.3"
     api "com.afollestad.material-dialogs:core:3.3.0"
+    api "com.github.mreram:showcaseview:1.4.1"
     api "com.amulyakhare:com.amulyakhare.textdrawable:1.0.1"
     api "com.andkulikov:transitionseverywhere:1.7.6"
     api "com.budiyev.android:code-scanner:2.1.0"
@@ -283,4 +284,3 @@ dependencies {
 }
 
 makeJar.dependsOn(clearJar, build)
-
