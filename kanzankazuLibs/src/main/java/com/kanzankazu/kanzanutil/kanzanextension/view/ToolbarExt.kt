@@ -49,8 +49,8 @@ fun MaterialToolbar.setupToolbar(
     _isSubtitleCentered: Boolean = false,
     _titleColor: Int = R.color.baseBlack,
     _subTitleColor: Int = R.color.baseBlack,
-    _titleFontStyle: Int = R.style.TvStandart,
-    _SubTitleFontStyle: Int = R.style.TvStandart,
+    _titleFontStyle: Int = R.style.TvStandard,
+    _SubTitleFontStyle: Int = R.style.TvStandard,
     _navigationIcon: Int = R.drawable.ic_arrow_head_left,
     _navBackgroundColor: Int,
     _navColor: Int = R.color.baseBlack,
@@ -109,8 +109,8 @@ fun Toolbar.setupToolbar(
     mTitleColor: Int = R.color.baseBlack,
     mSubTitleColor: Int = R.color.baseBlack,
     mNavColor: Int = R.color.baseBlack,
-    mTitleFontStyle: Int = R.style.TvStandart,
-    mSubTitleFontStyle: Int = R.style.TvStandart,
+    mTitleFontStyle: Int = R.style.TvStandard,
+    mSubTitleFontStyle: Int = R.style.TvStandard,
     mListener: View.OnClickListener,
 ) {
     title = mTitle
@@ -122,4 +122,42 @@ fun Toolbar.setupToolbar(
     setSubtitleTextColor(ContextCompat.getColor(this.context, mSubTitleColor))
 
     setNavigationOnClickListener(mListener)
+}
+
+/**
+ * Mendapatkan action view dari Toolbar berdasarkan ID menu item.
+ *
+ * @param menuItemId ID dari menu item yang ingin diambil action view-nya
+ * @return View? yang merupakan action view dari menu item, atau null jika tidak ditemukan
+ *
+ * Contoh penggunaan:
+ * ```kotlin
+ * // Di dalam Activity/Fragment
+ * val actionView = toolbar.getActionView(R.id.action_search)
+ * actionView?.setOnClickListener {
+ *     // Handle click pada action view
+ * }
+ * ```
+ */
+fun Toolbar.getActionView(menuItemId: Int): View? {
+    return menu.findItem(menuItemId)?.actionView
+}
+
+/**
+ * Mendapatkan action view dari MaterialToolbar berdasarkan ID menu item.
+ *
+ * @param menuItemId ID dari menu item yang ingin diambil action view-nya
+ * @return View? yang merupakan action view dari menu item, atau null jika tidak ditemukan
+ *
+ * Contoh penggunaan:
+ * ```kotlin
+ * // Di dalam Activity/Fragment
+ * val actionView = materialToolbar.getActionView(R.id.action_search)
+ * actionView?.setOnClickListener {
+ *     // Handle click pada action view
+ * }
+ * ```
+ */
+fun MaterialToolbar.getActionView(menuItemId: Int): View? {
+    return menu.findItem(menuItemId)?.actionView
 }

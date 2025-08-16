@@ -31,4 +31,6 @@
     <string name="label_yes">Yes</string>
     <string name="text_error_connection">Koneksi terputus. Cek sinyal kamu dan coba lagi, ya.</string>
     <string name="text_error_server">Terjadi kesalahan server. Coba beberapa saat lagi, ya.</string>
+    <string name="label_oke">Oke</string>
+    <string name="label_lewati">Lewati</string>
 </resources>

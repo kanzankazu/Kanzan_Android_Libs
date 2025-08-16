@@ -36,7 +36,7 @@
 
             <TextView
                 android:id="@+id/tvCollapseToolbarTitle"
-                style="@style/TvStandartBold"
+                style="@style/TvStandardBold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
@@ -49,7 +49,7 @@
 
             <TextView
                 android:id="@+id/tvCollapseToolbarDesc"
-                style="@style/TvStandart"
+                style="@style/TvStandard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"

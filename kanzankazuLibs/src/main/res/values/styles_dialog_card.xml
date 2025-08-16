@@ -12,7 +12,7 @@
         <item name="android:elevation" tools:ignore="NewApi">@dimen/activity_margin_quarter</item>
     </style>
 
-    <style name="CardViewStandart">
+    <style name="CardViewStandard">
         <item name="android:layout_marginLeft">@dimen/activity_margin_half</item>
         <item name="android:layout_marginRight">@dimen/activity_margin_half</item>
         <item name="android:layout_marginTop">@dimen/activity_margin_half</item>
@@ -22,13 +22,13 @@
         <item name="cardPreventCornerOverlap">true</item>
     </style>
 
-    <style name="CardViewStandartButton" parent="CardViewStandart">
+    <style name="CardViewStandardButton" parent="CardViewStandard">
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:foreground">?selectableItemBackground</item>
     </style>
 
-    <style name="CardViewStandartDialog">
+    <style name="CardViewStandardDialog">
         <item name="android:layout_margin">0dp</item>
         <item name="cardElevation">@dimen/activity_margin_quarter</item>
         <item name="cardCornerRadius">@dimen/activity_margin_half</item>
@@ -36,7 +36,7 @@
         <item name="cardPreventCornerOverlap">true</item>
     </style>
 
-    <style name="CardViewStandartPaddingCompat" parent="CardViewStandart">
+    <style name="CardViewStandardPaddingCompat" parent="CardViewStandard">
         <item name="cardUseCompatPadding">true</item>
     </style>
 

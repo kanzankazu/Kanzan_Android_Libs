@@ -8,8 +8,7 @@ import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.kanzankazu.kanzanutil.BaseConst
 import com.kanzankazu.kanzanutil.kanzanextension.getFullErrorLog
-import com.kanzankazu.kanzanutil.kanzanextension.ifEmptyOrNull
-import com.kanzankazu.kanzanutil.kanzanextension.isDebugPublic
+import com.kanzankazu.kanzanutil.kanzanextension.ifNullOrEmpty
 import com.kanzankazu.kanzanutil.kanzanextension.toDateFormat
 import com.kanzankazu.kanzanutil.kanzanextension.toDigits
 import com.kanzankazu.kanzanutil.kanzanextension.toRupiahFormat
@@ -148,26 +147,24 @@ enum class DebugType {
 @SuppressLint("LogNotTimber")
 fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
     if (log != null) {
-        if (isDebugPublic()) {
-            val maxLogSize = 4000
-            repeat(log.toString().chunked(maxLogSize).size) { i ->
-                when (log) {
-                    is Exception -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
-                    is Throwable -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
-                    else -> {
-                        val message = if (i == 0) "${location.ifEmptyOrNull { "-" }} >>>>---->> $log" else "$i == ${location.ifEmptyOrNull { "-" }} >>>>---->> $log"
-                        when (debugType) {
-                            DebugType.VERBOSE -> Timber.tag("Lihat").v(message)
-                            DebugType.DEBUG -> Timber.tag("Lihat").d(message)
-                            DebugType.INFO -> Timber.tag("Lihat").i(message)
-                            DebugType.WARNING -> Timber.tag("Lihat").w(message)
-                            DebugType.ERROR -> Timber.tag("Lihat").e(message)
-                        }
+        val maxLogSize = 4000
+        repeat(log.toString().chunked(maxLogSize).size) { i ->
+            when (log) {
+                is Exception -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
+                is Throwable -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
+                else -> {
+                    val message = if (i == 0) "${location.ifNullOrEmpty { "-" }} >>>>---->> $log" else "$i == ${location.ifNullOrEmpty { "-" }} >>>>---->> $log"
+                    when (debugType) {
+                        DebugType.VERBOSE -> Timber.tag("Lihat").v(message)
+                        DebugType.DEBUG -> Timber.tag("Lihat").d(message)
+                        DebugType.INFO -> Timber.tag("Lihat").i(message)
+                        DebugType.WARNING -> Timber.tag("Lihat").w(message)
+                        DebugType.ERROR -> Timber.tag("Lihat").e(message)
                     }
                 }
             }
         }
-    } else Timber.tag("Lihat").w("$location >> log is null")
+    } else Timber.tag("Lihat").i("$location >> log is null")
 }
 
 fun Any?.debugMessageDebug(location: String = "") {
@@ -574,17 +571,23 @@ fun String.countdown(): Long {
  * val emptyInitials = emptyName.getInitialName() // Result: ""
  * ```
  */
+/**
+ * Mengambil inisial dari string dengan maksimal 2 karakter.
+ * @return String yang berisi maksimal 2 inisial
+ * @example "John Doe".getInitialName() // "JD"
+ * @example "John".getInitialName() // "J"
+ * @example "John Middle Doe".getInitialName() // "JD"
+ */
 fun String.getInitialName(): String {
     return if (this.isEmpty()) {
         ""
     } else {
-        val words = split(" ").toTypedArray()
-        val s1 = StringBuilder()
-        for (word in words) {
-            val s = Character.toUpperCase(word[0]).toString() + ""
-            s1.append(s)
-        }
-        s1.toString()
+        val words = split(" ").filter { it.isNotEmpty() }
+        val maxInitials = 2
+        return words.take(maxInitials)
+            .filter { it.isNotEmpty() }
+            .map { it[0].uppercaseChar() }
+            .joinToString("")
     }
 }
 

@@ -12,7 +12,7 @@
     <!-- Tambahkan tampilan (misalnya, TextView) yang ingin Anda tampilkan dalam toast -->
     <TextView
         android:id="@+id/toastText"
-        style="@style/TvStandartBold"
+        style="@style/TvStandardBold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"

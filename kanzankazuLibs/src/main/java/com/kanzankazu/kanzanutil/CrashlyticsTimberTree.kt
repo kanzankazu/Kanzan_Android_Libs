@@ -1,7 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package com.kanzankazu.kanzanutil
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import com.chuckerteam.chucker.api.ChuckerCollector
 import com.kanzankazu.kanzanutil.kanzanextension.sendCrashlytics
 import timber.log.Timber
 import javax.inject.Inject
@@ -14,9 +18,12 @@ import javax.inject.Inject
  * @param minLogPriority The minimum log priority that will be handled by this logging tree. Defaults to Log.INFO.
  */
 class CrashlyticsTimberTree @Inject constructor(
+    private val context: Context,
     private val isDebug: Boolean,
     private val minLogPriority: Int = Log.WARN,
 ) : Timber.Tree() {
+
+    private val chuckerCollector: ChuckerCollector by lazy { ChuckerCollector(context) }
 
     companion object {
         // Default log tag used when no tag is provided
@@ -25,7 +32,14 @@ class CrashlyticsTimberTree @Inject constructor(
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         val finalTag = tag ?: DEFAULT_TAG
-        if (isDebug) logToLogcat(priority, finalTag, message, t)
+        if (isDebug) {
+            logToLogcat(priority, finalTag, message, t)
+            t?.let {
+                chuckerCollector.onError(finalTag, it)
+            } ?: kotlin.run {
+                chuckerCollector.onError(finalTag, Throwable(message))
+            }
+        }
         if (priority < minLogPriority) return
         logToCrashlytics(finalTag, message, t)
     }

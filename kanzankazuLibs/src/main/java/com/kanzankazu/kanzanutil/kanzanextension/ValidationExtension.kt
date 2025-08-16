@@ -110,7 +110,7 @@ fun <T> T?.isNull(): Boolean = this == null
 fun <T> T?.isNotNull(): Boolean = this != null
 
 //TODO("IF_NULL")
-fun String?.ifEmptyOrNull(defaultValue: () -> String): String = if (this.isNullOrEmpty()) defaultValue.invoke() else this
+fun String?.ifNullOrEmpty(defaultValue: () -> String): String = if (this.isNullOrEmpty()) defaultValue.invoke() else this
 
 fun Int?.ifNull(defaultValue: () -> Int): Int = this ?: defaultValue.invoke()
 

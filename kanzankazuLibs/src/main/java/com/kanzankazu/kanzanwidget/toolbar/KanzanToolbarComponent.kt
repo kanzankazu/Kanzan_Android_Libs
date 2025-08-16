@@ -16,8 +16,8 @@ class KanzanToolbarComponent @JvmOverloads constructor(private val _context: Con
     private var mNavColor: Int = R.color.baseBlack
     private var mNavBackgroundColor: Int = R.color.baseWhite
     private var mNavigationIcon: Int = R.drawable.ic_arrow_head_left
-    private var mSubTitleFontStyle: Int = R.style.TvStandart
-    private var mTitleFontStyle: Int = R.style.TvStandart
+    private var mSubTitleFontStyle: Int = R.style.TvStandard
+    private var mTitleFontStyle: Int = R.style.TvStandard
     private var mSubTitleColor: Int = R.color.baseBlack
     private var mTitleColor: Int = R.color.baseBlack
     private var mIsSubtitleCentered: Boolean = false

@@ -159,6 +159,19 @@ fun <T> MutableLiveData<Triple<T, Boolean, Boolean>>.set(
     this.value = Triple(data, second, third)
 }
 
+/**
+ * Convert a list of [MutableLiveData] into a single [MediatorLiveData].
+ *
+ * The created [MediatorLiveData] will observe all the [MutableLiveData] in the list and
+ * call [onCheck] whenever any of them changes.
+ *
+ * If [isWithDistinct] is true, it will only call [onCheck] when the value of the observed
+ * [MutableLiveData] changes.
+ *
+ * @param isWithDistinct whether to call [onCheck] only when the value changes
+ * @param onCheck the function to call when any of the observed [MutableLiveData] changes
+ * @return a [MediatorLiveData] that observes all the [MutableLiveData] in the list
+ */
 fun <R> List<MutableLiveData<*>>.toMediator(isWithDistinct: Boolean = true, onCheck: (List<MutableLiveData<*>>) -> R): MediatorLiveData<R> {
     val mediatorLiveData = MediatorLiveData<R>().apply {
         forEach {
@@ -178,67 +191,37 @@ fun <R> List<MutableLiveData<*>>.toMediator(isWithDistinct: Boolean = true, onCh
     return mediatorLiveData
 }
 
+
 fun List<MutableLiveData<*>>.debugMessageLivedata() {
-    if (isDebugPublic()) {
-        "==========START==========".debugMessageDebug()
-        forEachIndexed { index, mutableLiveData ->
-            "index $index, ${mutableLiveData::class.simpleName} = ${mutableLiveData.value}".debugMessageDebug()
+    if (!isDebugPublic()) return
+
+    val logMessage = buildString {
+        appendLine("==========START==========")
+        this@debugMessageLivedata.forEachIndexed { index, liveData ->
+            appendLine("index $index, ${liveData::class.simpleName} = ${liveData.value}")
         }
-        "**********END**********".debugMessageDebug()
+        append("**********END**********")
     }
+
+    logMessage.debugMessageDebug()
 }
 
-fun List<MutableLiveData<*>>.isNotNullOrEmptyOrZero() =
-    this.all { it.isNotNullOrEmptyOrZero() }
-
-fun MutableLiveData<*>.isNullOrEmptyOrZero() =
-    this.value?.let { any ->
+private fun Any?.checkNullOrEmptyOrZero(isNegated: Boolean = false): Boolean {
+    return this?.let { any ->
         when (any) {
-            is String -> any.isEmpty()
-            is Int -> any.isNullOrZero()
-            is Long -> any.isNullOrZero()
-            is Boolean -> !any
-            is Double -> any.isNullOrZero()
-            is Float -> any.isNullOrZero()
-            else -> true
+            is String -> if (isNegated) any.isNotEmpty() else any.isEmpty()
+            is Int -> if (isNegated) !any.isNullOrZero() else any.isNullOrZero()
+            is Long -> if (isNegated) !any.isNullOrZero() else any.isNullOrZero()
+            is Boolean -> if (isNegated) any else !any
+            is Double -> if (isNegated) !any.isNullOrZero() else any.isNullOrZero()
+            is Float -> if (isNegated) !any.isNullOrZero() else any.isNullOrZero()
+            is List<*> -> if (isNegated) any.isNotEmpty() else any.isEmpty()
+            else -> !isNegated
         }
-    } ?: false
+    } ?: !isNegated
+}
 
-fun MutableLiveData<*>.isNotNullOrEmptyOrZero() =
-    this.value?.let { any ->
-        when (any) {
-            is String -> any.isNotEmpty()
-            is Int -> !any.isNullOrZero()
-            is Long -> !any.isNullOrZero()
-            is Boolean -> any
-            is Double -> !any.isNullOrZero()
-            is Float -> !any.isNullOrZero()
-            else -> true
-        }
-    } ?: false
-
-fun LiveData<*>.isNullOrEmptyOrZero() =
-    this.value?.let { any ->
-        when (any) {
-            is String -> any.isEmpty()
-            is Int -> any.isNullOrZero()
-            is Long -> any.isNullOrZero()
-            is Boolean -> !any
-            is Double -> any.isNullOrZero()
-            is Float -> any.isNullOrZero()
-            else -> true
-        }
-    } ?: false
-
-fun LiveData<*>.isNotNullOrEmptyOrZero() =
-    this.value?.let { any ->
-        when (any) {
-            is String -> any.isNotEmpty()
-            is Int -> !any.isNullOrZero()
-            is Long -> !any.isNullOrZero()
-            is Boolean -> any
-            is Double -> !any.isNullOrZero()
-            is Float -> !any.isNullOrZero()
-            else -> true
-        }
-    } ?: false
+fun MutableLiveData<*>.isNullOrEmptyOrZero() = value.checkNullOrEmptyOrZero()
+fun MutableLiveData<*>.isNotNullOrEmptyOrZero() = value.checkNullOrEmptyOrZero(true)
+fun LiveData<*>.isNullOrEmptyOrZero() = value.checkNullOrEmptyOrZero()
+fun LiveData<*>.isNotNullOrEmptyOrZero() = value.checkNullOrEmptyOrZero(true)

@@ -1,10 +1,11 @@
 import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
-import com.readystatesoftware.chuck.ChuckInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -70,7 +71,9 @@ abstract class BaseHttpClient<T> {
             level = HttpLoggingInterceptor.Level.BODY
         }
         httpClient.addInterceptor(loggingInterceptor)
-        httpClient.addInterceptor(ChuckInterceptor(getContext()))
+        val chuckerInterceptor: ChuckerInterceptor = ChuckerInterceptor.Builder(getContext())
+            .build()
+        httpClient.addInterceptor(chuckerInterceptor)
     }
 
     private fun createAuthorizationInterceptor(token: String): Interceptor {

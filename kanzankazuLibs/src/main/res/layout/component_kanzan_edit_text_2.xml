@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/tv_component_kanzan_edit_text_2_title"
-        style="@style/TvStandartBold"
+        style="@style/TvStandardBold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/tv_component_kanzan_edit_text_2_prefix"
-        style="@style/TvStandartBold"
+        style="@style/TvStandardBold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -104,7 +104,7 @@
 
     <TextView
         android:id="@+id/tv_component_kanzan_edit_text_2_error"
-        style="@style/TvStandart"
+        style="@style/TvStandard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_margin_half"
@@ -122,7 +122,7 @@
 
     <TextView
         android:id="@+id/tv_component_kanzan_edit_text_2_success"
-        style="@style/TvStandart"
+        style="@style/TvStandard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_margin_half"

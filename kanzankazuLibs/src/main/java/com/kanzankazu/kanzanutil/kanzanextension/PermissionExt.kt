@@ -42,19 +42,32 @@ fun FragmentActivity.getDeclaredPermissions(
     val permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
 
     val filtered = permissions.filter { permission ->
-        val isAndroidPermission = !isOnlyAndroidPermission || permission.startsWith("android.permission.")
-
-        val isRuntimePermission = if (isRuntimeOnly) {
-            try {
-                val permInfo = packageManager.getPermissionInfo(permission, 0)
-                permInfo.protectionLevel and PermissionInfo.PROTECTION_DANGEROUS != 0
-            } catch (e: Exception) {
-                e.debugMessageError(" - getDeclaredPermissions - isRuntimePermission")
-                false
+        try {
+            val isAndroidPermission = !isOnlyAndroidPermission || permission.startsWith("android.permission.")
+            
+            // Skip permission yang tidak dikenal
+            if (permission.startsWith("me.everything.badger.permission.")) {
+                return@filter false
             }
-        } else true
 
-        isAndroidPermission && isRuntimePermission
+            val isRuntimePermission = if (isRuntimeOnly) {
+                try {
+                    val permInfo = packageManager.getPermissionInfo(permission, 0)
+                    permInfo.protectionLevel and PermissionInfo.PROTECTION_DANGEROUS != 0
+                } catch (e: PackageManager.NameNotFoundException) {
+                    // Lewati permission yang tidak ditemukan
+                    return@filter false
+                } catch (e: Exception) {
+                    e.debugMessageError(" - getDeclaredPermissions - isRuntimePermission")
+                    false
+                }
+            } else true
+
+            isAndroidPermission && isRuntimePermission
+        } catch (e: Exception) {
+            e.debugMessageError("Error checking permission: $permission")
+            false
+        }
     }
 
     filtered
