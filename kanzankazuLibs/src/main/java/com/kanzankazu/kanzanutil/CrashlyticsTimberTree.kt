@@ -34,11 +34,7 @@ class CrashlyticsTimberTree @Inject constructor(
         val finalTag = tag ?: DEFAULT_TAG
         if (isDebug) {
             logToLogcat(priority, finalTag, message, t)
-            t?.let {
-                chuckerCollector.onError(finalTag, it)
-            } ?: kotlin.run {
-                chuckerCollector.onError(finalTag, Throwable(message))
-            }
+            if (priority >= minLogPriority) chuckerCollector.onError(finalTag, t ?: Throwable(message))
         }
         if (priority < minLogPriority) return
         logToCrashlytics(finalTag, message, t)

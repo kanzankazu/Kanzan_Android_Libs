@@ -98,3 +98,11 @@ fun <T> T.use(listener: T.() -> Unit) = listener.invoke(this)
  * ```
  */
 fun <T, R> T.useReturn(listener: T.() -> R) = listener.invoke(this)
+
+//fun Any?.isDataClass(): Boolean {
+//    return this?.let {
+//        it.javaClass.declaredAnnotations.any { annotation ->
+//            annotation.annotationClass.simpleName == "Data"
+//        } || it.javaClass.kotlin.isData
+//    } ?: false
+//}

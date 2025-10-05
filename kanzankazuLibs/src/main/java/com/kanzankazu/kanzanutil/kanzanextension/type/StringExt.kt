@@ -7,6 +7,7 @@ import android.os.Build
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.kanzankazu.kanzanutil.BaseConst
+import com.kanzankazu.kanzanutil.kanzanextension.fromObjectToJson
 import com.kanzankazu.kanzanutil.kanzanextension.getFullErrorLog
 import com.kanzankazu.kanzanutil.kanzanextension.ifNullOrEmpty
 import com.kanzankazu.kanzanutil.kanzanextension.toDateFormat
@@ -24,6 +25,8 @@ import java.util.Base64
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+
+const val LOG = "Lihat"
 
 /**
  * Represents different levels of debugging messages, providing a way to classify
@@ -129,54 +132,51 @@ enum class DebugType {
 }
 
 /**
- * Logs a debug message to the console or logcat, using a specific logging level (verbose, debug, info, warning, or error).
- * If the input `log` is split into chunks (if longer than 4000 characters), each chunk is logged separately.
- * If debugging is disabled (determined by `isDebugPublic()`), the message is not logged.
- * If the `log` is null, an error message is logged stating that the log is null.
+ * Logs a debug message for the current object, supporting various debug types and large messages.
  *
- * @param log The message or object to be logged. If null, logs an error message indicating the absence of log data.
- * @param location The tag or location from where the debug message is being logged. Defaults to "StringExt - debugMessage".
- * @param debugType The type of debug log (e.g., VERBOSE, DEBUG, INFO, WARNING, or ERROR). Defaults to `DebugType.DEBUG`.
+ * This function converts the current object to a string representation and logs it using the specified
+ * debug type. If the object is an exception or throwable, it logs the full error log. If the object is a data
+ * class, it logs the JSON representation. For large messages, it splits the log into chunks.
  *
- * Example:
- * ```kotlin
- * debugMessage("Debugging message", "MyActivity - onCreate", DebugType.INFO)
- * debugMessage(null, "MyService - onStart")
- * ```
+ * @receiver The object to be logged. Can be any type, including null.
+ * @param location The location in the code where the log is called, used as a tag in the log message.
+ *                 Defaults to "StringExt - debugMessage".
+ * @param debugType The type of debug log to be used. Defaults to `DebugType.DEBUG`.
  */
-@SuppressLint("LogNotTimber")
-fun debugMessage(log: Any?, location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
-    if (log != null) {
+private fun Any?.debugMessage(location: String = "StringExt - debugMessage", debugType: DebugType = DebugType.DEBUG) {
+    if (this != null) {
         val maxLogSize = 4000
-        repeat(log.toString().chunked(maxLogSize).size) { i ->
-            when (log) {
-                is Exception -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
-                is Throwable -> Timber.tag("Lihat").e(log, log.getFullErrorLog())
-                else -> {
-                    val message = if (i == 0) "${location.ifNullOrEmpty { "-" }} >>>>---->> $log" else "$i == ${location.ifNullOrEmpty { "-" }} >>>>---->> $log"
-                    when (debugType) {
-                        DebugType.VERBOSE -> Timber.tag("Lihat").v(message)
-                        DebugType.DEBUG -> Timber.tag("Lihat").d(message)
-                        DebugType.INFO -> Timber.tag("Lihat").i(message)
-                        DebugType.WARNING -> Timber.tag("Lihat").w(message)
-                        DebugType.ERROR -> Timber.tag("Lihat").e(message)
-                    }
-                }
+        val logMessage = when {
+            this is Exception -> this.getFullErrorLog()
+            this is Throwable -> this.getFullErrorLog()
+            //isDataClass() -> "Data Class ${javaClass.simpleName}:\n${this.fromObjectToJson()}"
+            else -> this.toString()
+        }
+
+        repeat(logMessage.chunked(maxLogSize).size) { i ->
+            val message = if (i == 0) "${location.ifNullOrEmpty { "-" }} >>>>---->> $logMessage"
+            else "$i == ${location.ifNullOrEmpty { "-" }} >>>>---->> $logMessage"
+            when (debugType) {
+                DebugType.VERBOSE -> Timber.tag(LOG).v(message)
+                DebugType.DEBUG -> Timber.tag(LOG).d(message)
+                DebugType.INFO -> Timber.tag(LOG).i(message)
+                DebugType.WARNING -> Timber.tag(LOG).w(message)
+                DebugType.ERROR -> Timber.tag(LOG).e(message)
             }
         }
-    } else Timber.tag("Lihat").i("$location >> log is null")
+    } else Timber.tag(LOG).w("$location >> log is null")
 }
 
 fun Any?.debugMessageDebug(location: String = "") {
-    debugMessage(this, location, DebugType.DEBUG)
+    this.debugMessage(location, DebugType.DEBUG)
 }
 
-fun Any?.debugMessageWarning(location: String) {
-    debugMessage(this, location, DebugType.WARNING)
+fun Any?.debugMessageInfo(location: String) {
+    this.debugMessage(location, DebugType.INFO)
 }
 
 fun Any?.debugMessageError(location: String) {
-    debugMessage(this, location, DebugType.ERROR)
+    this.debugMessage(location, DebugType.ERROR)
 }
 
 /**

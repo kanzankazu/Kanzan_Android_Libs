@@ -37,7 +37,7 @@ fun ImageView.qrcodeGenerate(context: Context, data: String) {
 
     val qrgEncoder = QRGEncoder(data, null, QRGContents.Type.TEXT, smallerDimension)
     try {
-        val bitmap = qrgEncoder.encodeAsBitmap()
+        val bitmap = qrgEncoder.getBitmap()
         this.setImageBitmap(bitmap)
     } catch (e: WriterException) {
 

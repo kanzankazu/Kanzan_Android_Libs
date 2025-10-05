@@ -4,13 +4,13 @@ package com.kanzankazu.kanzanwidget.qrcode.widget
 
 import android.app.Activity
 import androidx.fragment.app.FragmentActivity
-import com.budiyev.android.codescanner.CodeScanner
-import com.budiyev.android.codescanner.CodeScannerView
 import com.google.zxing.Result
 import com.kanzankazu.kanzanutil.kanzanextension.PermissionEnumArray
 import com.kanzankazu.kanzanutil.kanzanextension.PermissionState
 import com.kanzankazu.kanzanutil.kanzanextension.getPermissionState
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
+import com.kanzankazu.kanzanwidget.codescanner.CodeScanner
+import com.kanzankazu.kanzanwidget.codescanner.CodeScannerView
 
 /**
  * A wrapper class for the 'com.budiyev.android:code-scanner:2.1.0' library, simplifying QR code scanning.

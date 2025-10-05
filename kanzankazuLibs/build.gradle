@@ -185,7 +185,7 @@ dependencies {
     releaseApi "com.github.chuckerteam.chucker:library:3.5.0"
 
     /*Volley*/
-    api "com.android.volley:volley:1.1.1"
+    api "com.android.volley:volley:1.2.1"
 
     /*Rx*/
     api "io.reactivex.rxjava2:rxandroid:2.1.1"
@@ -224,25 +224,32 @@ dependencies {
 
     /*Other*/
     api "com.airbnb.android:lottie:3.4.0"
-    api "androidmads.library.qrgenearator:QRGenearator:1.0.3"
+    //api "androidmads.library.qrgenearator:QRGenearator:1.0.3"
+    api "com.github.androidmads:QRGenerator:1.0.5"
     api "com.afollestad.material-dialogs:core:3.3.0"
     api "com.github.mreram:showcaseview:1.4.1"
-    api "com.amulyakhare:com.amulyakhare.textdrawable:1.0.1"
+    //api "com.amulyakhare:com.amulyakhare.textdrawable:1.0.1"
     api "com.andkulikov:transitionseverywhere:1.7.6"
-    api "com.budiyev.android:code-scanner:2.1.0"
-    api "com.chaos.view:pinview:1.4.3"
+    //api "com.budiyev.android:code-scanner:2.3.2"
+    //api "com.chaos.view:pinview:1.4.3"
     api "com.github.bumptech.glide:glide:4.10.0"
     api "com.github.cachapa:ExpandableLayout:2.9.2"
     api "com.github.chrisbanes:PhotoView:2.0.0"
     api "com.github.JakeWharton:ViewPagerIndicator:2.4.1"
     api "com.github.siyamed:android-shape-imageview:0.9.3@aar"
-    api "com.google.android.exoplayer:exoplayer:2.7.3"
-    api "com.hbb20:ccp:2.1.2"
-    api "com.mindorks.android:prdownloader:0.4.0"
+    //api "com.google.android.exoplayer:exoplayer:2.7.3"
+    api 'com.google.android.exoplayer:exoplayer-core:2.19.1'
+    api 'com.google.android.exoplayer:exoplayer-ui:2.19.1'
+    api 'com.google.android.exoplayer:extension-okhttp:2.19.1'
+    api 'com.google.android.exoplayer:exoplayer-dash:2.19.1'
+    api 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
+    api 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.19.1'
+    //api "com.hbb20:ccp:2.1.2"
+    //api "com.mindorks.android:prdownloader:0.4.0"
     api "de.hdodenhof:circleimageview:3.0.1"
-    api "id.zelory:compressor:2.1.0"
+    api "id.zelory:compressor:3.0.1"
     //api "io.fotoapparat:fotoapparat:2.7.0"
-    api "it.xabaras.android:recyclerview-swipedecorator:1.2.3"
+    //api "it.xabaras.android:recyclerview-swipedecorator:1.2.3"
     //api "org.greenrobot:eventbus:3.1.1"
     api "org.jsoup:jsoup:1.11.2"
     api "com.jakewharton.timber:timber:5.0.1"

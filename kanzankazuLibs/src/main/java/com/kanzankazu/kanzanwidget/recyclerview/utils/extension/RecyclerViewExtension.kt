@@ -1,7 +1,6 @@
 package com.kanzankazu.kanzanwidget.recyclerview.utils.extension
 
 import android.content.res.Resources
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.annotation.AnimRes
@@ -46,7 +45,7 @@ fun RecyclerView.setRecyclerView(
         RecyclerViewLayoutType.RECYCLER_VIEW_STAG_VERTICAL -> StaggeredGridLayoutManager(spanCountGrid, StaggeredGridLayoutManager.VERTICAL)
         else -> StaggeredGridLayoutManager(spanCountGrid, StaggeredGridLayoutManager.HORIZONTAL)
     }
-    addItemDecoration(
+    if (itemDecorationCount == 0) addItemDecoration(
         when (layoutManagerIndex) {
             RecyclerViewLayoutType.RECYCLER_VIEW_LIN_VERTICAL -> LinearItemDecoration(
                 spacingItemDecoration.dpToPx(),

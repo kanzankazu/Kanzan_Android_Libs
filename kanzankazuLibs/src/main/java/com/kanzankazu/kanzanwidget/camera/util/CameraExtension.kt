@@ -18,6 +18,11 @@ import com.kanzankazu.kanzanwidget.camera.ui.CameraProperty
 import com.kanzankazu.kanzanwidget.camera.ui.MediaView
 import com.kanzankazu.kanzanwidget.camera.util.CameraFetchPath.getFilePathFromUri
 import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.format
+import id.zelory.compressor.constraint.quality
+import id.zelory.compressor.constraint.resolution
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 private val placeholderImage: Int = R.drawable.ic_android
@@ -168,7 +173,7 @@ private fun validationPicUrlIsEmpty(cameraProperty: CameraProperty?, onGetImage:
 
 /**
  * @param arrayListOfExtension example arrayListOf("pdf, jpeg, jpg")*/
-fun Context.isValidFile(
+suspend fun Context.isValidFile(
     filePath: String,
     arrayListOfExtension: ArrayList<String>,
     minLimitInKb: Int = 10,
@@ -212,13 +217,14 @@ fun Context.isValidFile(
     }
 }
 
-fun File.compressImageFile(context: Context): File {
-    return Compressor(context)
-        .setQuality(90)
-        .setMaxWidth(640)
-        .setMaxHeight(480)
-        .setCompressFormat(Bitmap.CompressFormat.JPEG)
-        .compressToFile(this)
+suspend fun File.compressImageFile(context: Context): File {
+    return withContext(Dispatchers.IO) {
+        Compressor.compress(context, this@compressImageFile) {
+            quality(90)
+            resolution(640, 480)  // Mengganti setMaxWidth dan setMaxHeight dengan resolution()
+            format(Bitmap.CompressFormat.JPEG)
+        }
+    }
 }
 
 fun String.isUrl(): Boolean {

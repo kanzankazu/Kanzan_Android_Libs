@@ -355,6 +355,7 @@ abstract class BaseRecyclerViewFilterAdapter<T> : RecyclerView.Adapter<RecyclerV
         }
         return null
     }
+
     open class ListItem<out T> {
         data class DataItem<T>(val data: T) : ListItem<T>()
         object Loading : ListItem<Nothing>()

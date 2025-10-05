@@ -7,6 +7,7 @@ import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.BaseResponse
 import kotlinx.coroutines.flow.Flow
 
 interface RealtimeDatabase {
+
     fun getRootRefKt(tableChildKey: String): DatabaseReference
 
     fun createPrimaryKeyData(tableChildKey: String): String

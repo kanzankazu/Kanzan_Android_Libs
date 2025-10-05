@@ -2,6 +2,7 @@ package com.kanzankazu.kanzanutil.errorHandling
 
 import android.content.Context
 import android.content.Intent
+import com.chuckerteam.chucker.api.ChuckerCollector
 import com.google.gson.Gson
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import kotlin.system.exitProcess
@@ -23,13 +24,15 @@ class GlobalExceptionHandler private constructor(
     private val activityToBeLaunched: Class<*>,
 ) : Thread.UncaughtExceptionHandler {
 
-    override fun uncaughtException(p0: Thread, p1: Throwable) {
+    override fun uncaughtException(thread: Thread, throwable: Throwable) {
         try {
-            launchActivity(applicationContext, activityToBeLaunched, p1)
+            val collector = ChuckerCollector(applicationContext)
+            collector.onError("Error caught on ${thread.name} thread", throwable)
+            launchActivity(applicationContext, activityToBeLaunched, throwable)
             exitProcess(0)
         } catch (e: Exception) {
             e.debugMessageError("GlobalExceptionHandler - uncaughtException")
-            defaultHandler.uncaughtException(p0, p1)
+            defaultHandler.uncaughtException(thread, throwable)
         }
     }
 

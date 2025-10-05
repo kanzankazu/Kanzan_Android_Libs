@@ -16,12 +16,18 @@ import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.format
+import id.zelory.compressor.constraint.quality
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -102,21 +108,36 @@ class PictureUtil {
         else mFragment!!.startActivityForResult(Intent.createChooser(intent, "Pilih foto"), REQUEST_CODE_IMAGE_GALLERY)
     }
 
+    private suspend fun compressImage(file: File): File {
+        return withContext(Dispatchers.IO) {
+            Compressor.compress(mActivity, file) {
+                quality(qualityCompress)
+                format(Bitmap.CompressFormat.JPEG)
+            }
+        }
+    }
+
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): String? {
         if (requestCode == REQUEST_CODE_IMAGE_CAMERA && resultCode == Activity.RESULT_OK && mCurrentPhotoPath != null) { //FROM CAMERA
             try {
                 val galleryPath = mCurrentPhotoPath
                 val file = File(Objects.requireNonNull(Uri.parse(galleryPath).path))
-                try {
-                    val compressedImage = Compressor(mActivity)
-                        .setQuality(qualityCompress)
-                        .setCompressFormat(Bitmap.CompressFormat.JPEG)
-                        .compressToFile(file)
-                    mCurrentPhotoPath = getRealPathFromURIPath(Uri.parse(compressedImage.absolutePath))
-                } catch (e: Exception) {
-                    e.debugMessageError("PictureUtil - onActivityResult1")
+                
+                // Panggil dari coroutine
+                (mActivity as? ComponentActivity)?.lifecycleScope?.launch {
+                    try {
+                        val compressedImage = compressImage(file)
+                        mCurrentPhotoPath = getRealPathFromURIPath(Uri.parse(compressedImage.absolutePath))
+                        imageView?.let { 
+                            Glide.with(mActivity)
+                                .load(mCurrentPhotoPath)
+                                .into(it) 
+                        }
+                    } catch (e: Exception) {
+                        e.debugMessageError("PictureUtil - onActivityResult1")
+                    }
                 }
-                imageView?.let { Glide.with(mActivity).load(mCurrentPhotoPath).into(it) }
+                
                 return mCurrentPhotoPath
             } catch (e: Exception) {
                 Snackbar.make(mActivity.findViewById(android.R.id.content), mActivity.getString(R.string.error_message_picture_failed), Snackbar.LENGTH_LONG).show()
@@ -127,17 +148,23 @@ class PictureUtil {
                 val uri = data.data
                 val galleryPath = getRealPathFromURIPath(uri)
                 val file = File(Objects.requireNonNull(Uri.parse(galleryPath).path))
-                try {
-                    val compressedImage = Compressor(mActivity)
-                        .setQuality(qualityCompress)
-                        .setCompressFormat(Bitmap.CompressFormat.JPEG)
-                        .compressToFile(file)
-                    mCurrentPhotoPath = getRealPathFromURIPath(Uri.parse(compressedImage.absolutePath))
-                    imageView?.let { Glide.with(mActivity).load(mCurrentPhotoPath).into(it) }
-                    return mCurrentPhotoPath
-                } catch (e: Exception) {
-                    e.debugMessageError("PictureUtil - onActivityResult3")
+                
+                // Panggil dari coroutine
+                (mActivity as? ComponentActivity)?.lifecycleScope?.launch {
+                    try {
+                        val compressedImage = compressImage(file)
+                        mCurrentPhotoPath = getRealPathFromURIPath(Uri.parse(compressedImage.absolutePath))
+                        imageView?.let { 
+                            Glide.with(mActivity)
+                                .load(mCurrentPhotoPath)
+                                .into(it)
+                        }
+                    } catch (e: Exception) {
+                        e.debugMessageError("PictureUtil - onActivityResult3")
+                    }
                 }
+                
+                return galleryPath // Kembalikan path asli sementara, nanti akan diupdate setelah kompresi selesai
             } catch (e: Exception) {
                 e.debugMessageError("PictureUtil - onActivityResult4")
             }

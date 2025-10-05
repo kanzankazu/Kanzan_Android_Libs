@@ -30,7 +30,9 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         FirebaseDatabase.getInstance()
     }
 
-    override fun getRootRefKt(tableChildKey: String) = firebaseDatabase.getReference(tableChildKey)
+    override fun getRootRefKt(tableChildKey: String): DatabaseReference {
+        return firebaseDatabase.getReference(tableChildKey)
+    }
 
     override fun createPrimaryKeyData(tableChildKey: String): String =
         getRootRefKt(tableChildKey).push().key ?: ""
@@ -396,6 +398,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         getRootRefKt(tableChildKey).child(tableChildPrimaryKeyId)
             .addListenerForSingleValueEvent(handleTaskListenerIsExist(function))
     }
+
     private fun Task<Void>.handleTask(function: (pair: Pair<Boolean, String>) -> Unit) {
         this.addOnSuccessListener { function.invoke(Pair(true, "")) }
             .addOnCompleteListener { function.invoke(Pair(true, "")) }

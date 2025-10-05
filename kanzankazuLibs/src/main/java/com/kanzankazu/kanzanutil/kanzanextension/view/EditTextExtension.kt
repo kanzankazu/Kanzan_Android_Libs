@@ -311,6 +311,7 @@ fun EditText.setupAutocomplete(
     maxItemsToShow: Int = 5, // Jumlah maksimal item yang ditampilkan
     onItemSelected: ((String) -> Unit)? = null, // Callback jika item dipilih
 ) {
+    var isFromItemSelection = false
     val listPopupWindow = ListPopupWindow(context)
     listPopupWindow.anchorView = this // Set EditText sebagai anchor
 
@@ -352,24 +353,20 @@ fun EditText.setupAutocomplete(
     if (triggerOnClick) {
         // Listener untuk fokus (jika diaktifkan)
         this.makeClickable()
-        this.click { triggerAutocomplete() }
-//        this.setOnFocusChangeListener { _, hasFocus ->
-//            if (hasFocus) {
-//                triggerAutocomplete()
-//            } else {
-//                listPopupWindow.dismiss()
-//            }
-//        }
+        this.setOnClickListener { triggerAutocomplete() }
     } else {
         this.onFocusIn { triggerAutocomplete() }
         // Listener untuk perubahan teks
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if ((s?.length ?: 0) >= thresholdOnChange) {
-                    showPopup(s.toString())
-                } else {
-                    listPopupWindow.dismiss()
+                if (!isFromItemSelection) {
+                    if ((s?.length ?: 0) >= thresholdOnChange) {
+                        showPopup(s.toString())
+                    } else {
+                        listPopupWindow.dismiss()
+                    }
                 }
             }
 
@@ -379,11 +376,13 @@ fun EditText.setupAutocomplete(
 
     // Set behavior ketika item dipilih dari popup
     listPopupWindow.setOnItemClickListener { _, _, position, _ ->
+        isFromItemSelection = true
         val selectedItem = listPopupWindow.listView?.adapter?.getItem(position) as String
         this.setText(selectedItem) // Isi EditText dengan item yang dipilih
         this.setSelection(this.text.length) // Tempatkan kursor di akhir teks
         listPopupWindow.dismiss()
         onItemSelected?.invoke(selectedItem) // Trigger callback
+        isFromItemSelection = false
     }
 
     // Return fungsi triggerAutocomplete agar bisa dipanggil manual
