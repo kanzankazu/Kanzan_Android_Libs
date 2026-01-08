@@ -32,7 +32,7 @@ fun RecyclerView.setRecyclerView(
     isNestedScrollingEnabledParam: Boolean = false,
     isAll: Boolean = true,
     onScrollListener: RecyclerView.OnScrollListener? = null,
-    @AnimRes animRes: Int = R.anim.layout_animation_fall_down,
+    @AnimRes animRes: Int? = R.anim.layout_animation_fall_down,
 ) {
     overScrollMode = View.OVER_SCROLL_NEVER
     adapter = adapterParam
@@ -64,7 +64,7 @@ fun RecyclerView.setRecyclerView(
     )
     isNestedScrollingEnabled = isNestedScrollingEnabledParam
 
-    if (animRes != -1) {
+    if (animRes != null) {
         val layoutAnimationController = AnimationUtils.loadLayoutAnimation(context, animRes)
         this.layoutAnimation = layoutAnimationController
     }

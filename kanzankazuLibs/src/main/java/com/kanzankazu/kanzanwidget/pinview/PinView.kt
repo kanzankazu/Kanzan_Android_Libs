@@ -308,6 +308,8 @@ class PinView @JvmOverloads constructor(
         }
     }
 
+
+
     private fun updateItemRectF(i: Int) {
         val halfLineWidth = lineWidth / 2f
         val startX = paddingLeft + i * (pinItemWidth + pinItemSpacing)

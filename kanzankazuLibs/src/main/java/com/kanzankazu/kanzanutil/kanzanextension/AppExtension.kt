@@ -36,6 +36,7 @@ fun FragmentActivity.getLifeCycleOwner() = this
 
 fun Fragment.getLifeCycleOwner() = viewLifecycleOwner
 
+
 fun FragmentActivity.getFragmentManagers() = supportFragmentManager
 
 fun Fragment.getFragmentManagers() = childFragmentManager

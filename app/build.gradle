@@ -5,22 +5,25 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
 }
 
 android {
     namespace 'com.kanzankazu.app'
-    compileSdkVersion AndroidConfig.compileSdkVersion
+    compileSdk AndroidConfig.compileSdkVersion
     buildToolsVersion AndroidConfig.buildToolsVersion
 
     defaultConfig {
         applicationId AndroidConfig.applicationId
-        minSdkVersion AndroidConfig.minSdkVersion
-        targetSdkVersion AndroidConfig.targetSdkVersion
+        minSdk AndroidConfig.minSdkVersion
+        targetSdk AndroidConfig.targetSdkVersion
 
         versionCode AndroidConfig.versionCode
         versionName AndroidConfig.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
 
     buildTypes {
@@ -29,24 +32,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-    
+
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = '17'
     }
-    
+
     buildFeatures {
-        buildConfig true
         compose true
+        buildConfig true
     }
-    
+
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
+
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -55,8 +59,43 @@ android {
 }
 
 dependencies {
-    implementation project(':kanzankazuLibs')
+    // Compose BOM
+    def composeBom = platform(libs.composeBom)
+    implementation composeBom
+    androidTestImplementation composeBom
 
-    implementation libs.comGoogleDaggerHiltAndroid
-    kapt libs.comGoogleDaggerHiltAndroidCompiler
+    // Compose
+    implementation libs.activityCompose
+    implementation libs.ui
+    implementation libs.uiGraphics
+    implementation libs.uiToolingPreview
+    implementation libs.material3
+    implementation libs.materialIconsExtended
+
+    // Debug
+    debugImplementation libs.uiTooling
+    debugImplementation libs.uiTestManifest
+
+    // Navigation
+    implementation libs.navigationCompose
+    implementation libs.navigationRuntime
+
+    // Hilt
+    implementation libs.hiltAndroid
+    kapt libs.hiltCompiler
+    implementation libs.hiltNavigationCompose
+
+    // Lifecycle
+    implementation libs.lifecycleRuntime
+    implementation libs.lifecycleViewmodel
+    implementation libs.lifecycleRuntimeCompose
+
+    // Gson
+    implementation libs.gson
+
+    // Testing
+    testImplementation libs.junit
+    androidTestImplementation libs.extJunit
+    androidTestImplementation libs.espressoCore
+    androidTestImplementation libs.uiTestManifest
 }

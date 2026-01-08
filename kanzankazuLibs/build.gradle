@@ -80,9 +80,9 @@ tasks.register('makeJar', Copy) {
     include('classes.jar')
     rename('classes.jar', 'myCompiledLibrary.jar')
 }
+
 dependencies {
     api fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-
     /*Core*/
     api "androidx.core:core-ktx:1.6.0"
 
@@ -150,7 +150,7 @@ dependencies {
     api "com.google.firebase:firebase-ads:23.2.0"
     api "com.google.firebase:firebase-analytics-ktx:19.0.0"
     api "com.google.firebase:firebase-appcheck-debug:16.0.0-beta06"
-    api "com.google.firebase:firebase-appdistribution-gradle:4.0.0"
+    //api "com.google.firebase:firebase-appdistribution-gradle:4.0.0"
     api "com.google.firebase:firebase-auth-ktx:21.1.0"
     api "com.google.firebase:firebase-auth:21.1.0"
     api "com.google.firebase:firebase-config-ktx:21.0.0"
@@ -181,8 +181,8 @@ dependencies {
     /*debugApi "com.readystatesoftware.chuck:library:1.1.0"
     releaseApi "com.readystatesoftware.chuck:library:1.1.0"*/
 
-    debugApi "com.github.chuckerteam.chucker:library:3.5.0"
-    releaseApi "com.github.chuckerteam.chucker:library:3.5.0"
+    debugApi "com.github.chuckerteam.chucker:library:3.5.2"
+    releaseApi "com.github.chuckerteam.chucker:library:3.5.2"
 
     /*Volley*/
     api "com.android.volley:volley:1.2.1"

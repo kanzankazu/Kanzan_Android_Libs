@@ -1,11 +1,65 @@
 [versions]
-hiltVersion = "2.47"
+# Compose
+activityComposeVersion = "1.8.2"
+composeVersion = "1.5.4"
+materialIconsVersion = "1.5.4"
+material3Version = "1.1.2"
+
+# Navigation
+navigationComposeVersion = "2.7.5"
+
+# Hilt
+hiltVersion = "2.48"
+
+# Lifecycle
+lifecycleVersion = "2.6.2"
+
+# Google Play
 featureDeliveryKtxVersion = "2.1.0"
 
+# Testing
+espressoCoreVersion = "3.5.1"
+junitVersion = "4.13.2"
+extJunitVersion = "1.1.5"
+
+# Other
+gsonVersion = "2.10.1"
+
 [libraries]
-comGoogleDaggerHiltAndroidCompiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
-comGoogleDaggerHiltAndroid = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
+# Compose
+activityCompose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+composeBom = { module = "androidx.compose:compose-bom", version = "2023.10.01" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+materialIconsCore = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsVersion" }
+materialIconsExtended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsVersion" }
+runtime = { module = "androidx.compose.runtime:runtime", version.ref = "composeVersion" }
+ui = { module = "androidx.compose.ui:ui", version.ref = "composeVersion" }
+uiGraphics = { module = "androidx.compose.ui:ui-graphics", version.ref = "composeVersion" }
+uiTestManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "composeVersion" }
+uiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeVersion" }
+uiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeVersion" }
+
+# Navigation
+navigationCompose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+navigationRuntime = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigationComposeVersion" }
+
+# Hilt
+hiltAndroid = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
+hiltCompiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
+hiltNavigationCompose = { module = "androidx.hilt:hilt-navigation-compose", version = "1.0.0" }
+
+# Lifecycle
+lifecycleRuntime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
+lifecycleViewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
+lifecycleRuntimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleVersion" }
+
+# Google Play
 featureDeliveryKtx = { group = "com.google.android.play", name = "feature-delivery-ktx", version.ref = "featureDeliveryKtxVersion" }
 
-[plugins]
+# Testing
+espressoCore = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+extJunit = { module = "androidx.test.ext:junit", version.ref = "extJunitVersion" }
+junit = { module = "junit:junit", version.ref = "junitVersion" }
 
+# Other
+gson = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }

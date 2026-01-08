@@ -7,6 +7,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
+import com.kanzankazu.kanzandatabase.firebase.FilterCondition
+import com.kanzankazu.kanzandatabase.firebase.FilterOperator
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.BaseResponse
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.handleBaseResponseConvert
 import com.kanzankazu.kanzannetwork.response.kanzanbaseresponse.handleBaseResponseConvertToObject
@@ -17,17 +19,26 @@ import com.kanzankazu.kanzanutil.kanzanextension.toObjectList
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageDebug
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.math.BigInteger
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.properties.Delegates
 
 open class RealtimeDatabaseImpl : RealtimeDatabase {
     private val firebaseDatabase: FirebaseDatabase by lazy {
         FirebaseDatabase.getInstance()
+    }
+
+    var observedValue by Delegates.observable(initialValue = "") { _, old, new ->
+        println("Value berubah dari $old ke $new")
     }
 
     override fun getRootRefKt(tableChildKey: String): DatabaseReference {
@@ -285,6 +296,110 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         else getRootRefKt(tableChildKey).orderByChild(rowChildKey).endAt(d - 1)
     }
 
+    override fun queryWithMultipleConditions(
+        tableChildKey: String,
+        filters: List<FilterCondition>,
+        orderBy: String,
+        isDescending: Boolean,
+        limit: Int,
+    ): Query {
+        var query: Query = getRootRefKt(tableChildKey)
+
+        // Apply filters
+        filters.forEach { filter ->
+            query = when (filter.operator) {
+                FilterOperator.EQUAL -> {
+                    when (val value = filter.value) {
+                        is String -> query.orderByChild(filter.key).equalTo(value)
+                        is Number -> query.orderByChild(filter.key).equalTo(value.toDouble())
+                        is Boolean -> query.orderByChild(filter.key).equalTo(value)
+                        else -> query.orderByChild(filter.key)
+                    }
+                }
+
+                FilterOperator.GREATER_THAN -> {
+                    when (val value = filter.value) {
+                        is Number -> query.orderByChild(filter.key).startAt(value.toDouble() + 0.00001)
+                        is String -> query.orderByChild(filter.key).startAt(value + "\u0000")
+                        else -> query.orderByChild(filter.key)
+                    }
+                }
+
+                FilterOperator.LESS_THAN -> {
+                    when (val value = filter.value) {
+                        is Number -> query.orderByChild(filter.key).endAt(value.toDouble() - 0.00001)
+                        is String -> query.orderByChild(filter.key).endAt(value)
+                        else -> query.orderByChild(filter.key)
+                    }
+                }
+
+                FilterOperator.CONTAINS -> {
+                    when (val value = filter.value) {
+                        is String -> query.orderByChild(filter.key)
+                            .startAt(value)
+                            .endAt(value + "\uf8ff")
+
+                        else -> query.orderByChild(filter.key)
+                    }
+                }
+            }
+        }
+
+        // Apply ordering
+        query = if (orderBy == "key") {
+            if (isDescending) query.orderByKey().limitToLast(limit)
+            else query.orderByKey().limitToFirst(limit)
+        } else {
+            if (isDescending) query.orderByChild(orderBy).limitToLast(limit)
+            else query.orderByChild(orderBy).limitToFirst(limit)
+        }
+
+        return query
+    }
+
+    override fun queryWithPagination(
+        tableChildKey: String,
+        orderBy: String,
+        lastValue: Any?,
+        limit: Int,
+        isDescending: Boolean,
+    ): Query {
+        // Inisialisasi query dasar
+        var query: Query = getRootRefKt(tableChildKey)
+
+        // Atur pengurutan
+        query = if (orderBy == "key") {
+            query.orderByKey()
+        } else {
+            query.orderByChild(orderBy)
+        }
+
+        // Terapkan paginasi jika ada lastValue
+        if (lastValue != null) {
+            query = if (isDescending) {
+                when (lastValue) {
+                    is String -> query.endBefore(lastValue)
+                    is Number -> query.endBefore(lastValue.toDouble())
+                    is Boolean -> query.endBefore(lastValue)
+                    else -> throw IllegalArgumentException("Tipe data lastValue tidak didukung. Gunakan String, Number, atau Boolean.")
+                }
+            } else {
+                when (lastValue) {
+                    is String -> query.startAfter(lastValue)
+                    is Number -> query.startAfter(lastValue.toDouble())
+                    is Boolean -> query.startAfter(lastValue)
+                    else -> throw IllegalArgumentException("Tipe data lastValue tidak didukung. Gunakan String, Number, atau Boolean.")
+                }
+            }
+        }
+
+        // Terapkan limit
+        return if (isDescending) {
+            query.limitToLast(limit)  // Ambil 'limit' data terakhir untuk urutan menurun
+        } else {
+            query.limitToFirst(limit) // Ambil 'limit' data pertama untuk urutan menaik
+        }
+    }
     override fun getDataByQuery(
         query: Query,
         onDataChangedListener: (dataSnapshot: DataSnapshot) -> Unit,
@@ -316,29 +431,43 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
 
     override suspend fun getDataByQueryKanzanBaseResponse(
         query: Query,
-        isSingleCall: Boolean,
-    ): BaseResponse<DataSnapshot> {
-        return suspendCancellableCoroutine { continuation ->
-            if (isSingleCall) query.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    continuation.resume(BaseResponse.Success(dataSnapshot))
+    ): BaseResponse<DataSnapshot> = try {
+        val snapshot = suspendCancellableCoroutine { cont ->
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (cont.isActive) cont.resume(snapshot)
                 }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    "getDataByQueryKanzanBaseResponse - addListenerForSingleValueEvent - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
-                    continuation.resume(BaseResponse.Error(databaseError.message))
+                override fun onCancelled(error: DatabaseError) {
+                    if (cont.isActive) cont.resumeWithException(error.toException())
                 }
-            }) else query.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    continuation.resume(BaseResponse.Success(dataSnapshot))
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    "getDataByQueryKanzanBaseResponse - addListenerForSingleValueEvent - ${databaseError.message}|${databaseError.details}|${databaseError.code}".debugMessageError("RealtimeDatabaseImpl - onCancelled")
-                    continuation.resume(BaseResponse.Error(databaseError.message))
-                }
-            })
+            }
+            query.addListenerForSingleValueEvent(listener)
+            cont.invokeOnCancellation { query.removeEventListener(listener) }
         }
+        BaseResponse.Success(snapshot)
+    } catch (e: Exception) {
+        BaseResponse.Error(e.message.toString())
+    }
+
+    override suspend fun getDataByQueryKanzanBaseResponseFlow(
+        query: Query,
+    ): Flow<BaseResponse<DataSnapshot>> {
+        return callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    trySend(BaseResponse.Success(snapshot)).isSuccess
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(BaseResponse.Error(error.message))
+                    close(error.toException())
+                }
+            }
+
+            query.addValueEventListener(listener)
+            awaitClose { query.removeEventListener(listener) }
+        }.onStart { emit(BaseResponse.Loading) }
     }
 
     override suspend fun isExistData(
