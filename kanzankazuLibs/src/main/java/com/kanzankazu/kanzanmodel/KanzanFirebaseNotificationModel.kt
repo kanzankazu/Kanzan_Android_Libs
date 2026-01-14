@@ -1,5 +1,3 @@
-@file:Suppress("PackageName")
-
 package com.kanzankazu.kanzanmodel
 
 import android.os.Parcelable
