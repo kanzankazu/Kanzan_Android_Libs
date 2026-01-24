@@ -13,6 +13,7 @@ import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 fun <T> Observable<T>.addDispose(mCompositeDisposable: CompositeDisposable, onSuccess: (T) -> Unit, onThrowable: (throwable: Throwable) -> Unit = { _ -> }, schedulerSubscribeOn: Scheduler = Schedulers.io(), schedulerObserveOn: Scheduler = AndroidSchedulers.mainThread()) {
@@ -60,3 +61,7 @@ fun Completable.addDispose(mCompositeDisposable: CompositeDisposable, onSuccess:
 }
 
 fun Completable.addDispose(schedulerSubscribeOn: Scheduler, schedulerObserveOn: Scheduler): Completable = this.subscribeOn(schedulerSubscribeOn).observeOn(schedulerObserveOn)
+
+fun Disposable.disposedBy(compositeDisposable: CompositeDisposable) {
+    compositeDisposable.add(this)
+}
