@@ -10,10 +10,12 @@ import com.kanzankazu.kanzanutil.kanzanextension.type.json2Object
 import org.json.JSONObject
 
 abstract class BaseMessagingService : FirebaseMessagingService() {
-    val allUserTopic = NotifTopics.ALL_USER_APP.topic
-    val adminChannelId = "admin_channel"
+
+    companion object {
+        const val ADMIN_CHANNEL_ID = "admin_channel"
+    }
+
     private lateinit var notif: KanzanFirebaseNotificationModel
-        private set
 
     abstract fun onMessageReceivedListener(
         notif: KanzanFirebaseNotificationModel,

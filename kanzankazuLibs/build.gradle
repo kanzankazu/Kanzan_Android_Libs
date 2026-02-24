@@ -83,21 +83,22 @@ tasks.register('makeJar', Copy) {
 
 dependencies {
     api fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-    /*Core*/
-    api "androidx.core:core-ktx:1.6.0"
 
-    /*Android_X*/
-    /*Ui*/
+    /* Core Android */
+    api "androidx.core:core-ktx:1.6.0"
+    api "androidx.multidex:multidex:2.0.1"
+
+    /* AndroidX UI */
     api "androidx.activity:activity-ktx:1.3.0-rc02"
     api "androidx.appcompat:appcompat:1.3.1"
     api "androidx.cardview:cardview:1.0.0"
     api "androidx.constraintlayout:constraintlayout:2.0.4"
     api "androidx.fragment:fragment-ktx:1.4.0-alpha04"
-    api "androidx.multidex:multidex:2.0.1"
     api "androidx.recyclerview:recyclerview:1.2.1"
     api "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     api "androidx.security:security-crypto:1.0.0"
-    /*Lifecycle_Mvvm*/
+
+    /* AndroidX Lifecycle & MVVM */
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.4.1'
     api "androidx.lifecycle:lifecycle-common-java8:2.4.1"
     api "androidx.lifecycle:lifecycle-extensions:2.2.0"
@@ -109,10 +110,9 @@ dependencies {
     api "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
     api "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
     api "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.4.1"
-    // required to avoid crash on Android 12 API 31
     api "androidx.work:work-runtime-ktx:2.7.1"
 
-    /*Room*/
+    /* AndroidX Room */
     annotationProcessor 'androidx.room:room-compiler:2.3.0'
     api "androidx.room:room-guava:2.3.0"
     api "androidx.room:room-ktx:2.3.0"
@@ -120,37 +120,38 @@ dependencies {
     api "androidx.room:room-rxjava2:2.3.0"
     kapt "androidx.room:room-compiler:2.3.0"
     testImplementation "androidx.room:room-testing:2.3.0"
-    /*Navigation_Component*/
+
+    /* AndroidX Navigation */
     api "androidx.navigation:navigation-fragment-ktx:2.3.5"
     api "androidx.navigation:navigation-ui-ktx:2.3.5"
     api "androidx.navigation:navigation-compose:2.6.0"
 
-    /*Jetbrain*/
-    /*Kotlin*/
+    /* Kotlin & Coroutines */
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.10"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1"
 
-    /*Com_Google*/
+    /* Material Design */
     api "com.google.android.material:material:1.4.0"
 
-    /*Play*/
-    //api "com.google.android.play:core:1.10.3"
-    //api "com.google.android.play:core-ktx:1.9.0"
-    api"com.google.android.play:app-update:2.1.0"
-    api"com.google.android.play:app-update-ktx:2.1.0"
+    /* Google Play */
+    api "com.google.android.play:app-update:2.1.0"
+    api "com.google.android.play:app-update-ktx:2.1.0"
+    api "com.google.android.play:feature-delivery-ktx:2.1.0"
 
-    /*Play_Service*/
+    /* Google Play Services */
     api "com.google.android.gms:play-services-ads:23.2.0"
     api "com.google.android.gms:play-services-auth:20.4.1"
     api "com.google.android.gms:play-services-maps:17.0.0"
 
-    /*Firebase*/
+    /* Firebase */
     api "com.google.auth:google-auth-library-oauth2-http:1.16.0"
     api "com.google.firebase:firebase-ads:23.2.0"
     api "com.google.firebase:firebase-analytics-ktx:19.0.0"
     api "com.google.firebase:firebase-appcheck-debug:16.0.0-beta06"
-    //api "com.google.firebase:firebase-appdistribution-gradle:4.0.0"
     api "com.google.firebase:firebase-auth-ktx:21.1.0"
     api "com.google.firebase:firebase-auth:21.1.0"
     api "com.google.firebase:firebase-config-ktx:21.0.0"
@@ -161,101 +162,64 @@ dependencies {
     api "com.google.firebase:firebase-database-ktx:20.1.0"
     api "com.google.firebase:firebase-database:20.1.0"
     api "com.google.firebase:firebase-dynamic-links:19.1.0"
-    api "com.google.android.play:feature-delivery-ktx:2.1.0"
     api "com.google.firebase:firebase-firestore-ktx:21.7.0"
     api "com.google.firebase:firebase-invites:17.0.0"
-    //api "com.google.firebase:firebase-messaging:20.2.4"
     api "com.google.firebase:firebase-iid:21.1.0"
     api "com.google.firebase:firebase-perf-ktx:20.0.6"
     api "com.google.firebase:firebase-storage:19.2.0"
 
-    /*Retrofit*/
+    /* Networking */
     api "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
     api "com.squareup.retrofit2:adapter-rxjava2:2.9.0"
     api "com.squareup.retrofit2:converter-gson:2.9.0"
     api "com.squareup.retrofit2:converter-jackson:2.3.0"
     api "com.squareup.retrofit2:converter-scalars:2.5.0"
     api "com.squareup.retrofit2:retrofit:2.9.0"
+    api "com.android.volley:volley:1.2.1"
 
-    /*Retrofit_Chuck*/
-    /*debugApi "com.readystatesoftware.chuck:library:1.1.0"
-    releaseApi "com.readystatesoftware.chuck:library:1.1.0"*/
-
+    /* Debug Tools */
     debugApi "com.github.chuckerteam.chucker:library:3.5.2"
     releaseApi "com.github.chuckerteam.chucker:library:3.5.2"
 
-    /*Volley*/
-    api "com.android.volley:volley:1.2.1"
-
-    /*Rx*/
+    /* Reactive Programming */
     api "io.reactivex.rxjava2:rxandroid:2.1.1"
     api "io.reactivex.rxjava2:rxkotlin:2.2.0"
 
-    /*Facebook_Login*/
+    /* Social Login */
     api "com.facebook.android:facebook-android-sdk:5.4.0"
 
-    /*Unit_Test*/
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-
-    /*Dagger*/
-//    api "com.google.dagger:dagger-andjunit:junitroid:2.12"
-//    api "com.google.dagger:dagger-android-support:2.12"
-//    api "com.google.dagger:dagger-android:2.37"
-//    api "com.google.dagger:dagger:2.35"
-//    kapt 'com.google.dagger:dagger-android-processor:2.12'
-//    kapt 'com.google.dagger:dagger-compiler:2.35'
-
-    /*Hilt*/
-//    api "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
-//    api "com.google.dagger:hilt-android:2.35"
-//    kapt "com.google.dagger:hilt-android-compiler:2.35"
-//    kapt 'androidx.hilt:hilt-compiler:1.0.0'
-
-    // coroutines
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1"
-
-    // Deeplink
+    /* Deep Link */
     api "com.airbnb:deeplinkdispatch:5.4.3"
     kapt "com.airbnb:deeplinkdispatch-processor:5.4.3"
 
-    /*Other*/
+    /* UI Components */
     api "com.airbnb.android:lottie:3.4.0"
-    //api "androidmads.library.qrgenearator:QRGenearator:1.0.3"
     api "com.github.androidmads:QRGenerator:1.0.5"
     api "com.afollestad.material-dialogs:core:3.3.0"
     api "com.github.mreram:showcaseview:1.4.1"
-    //api "com.amulyakhare:com.amulyakhare.textdrawable:1.0.1"
     api "com.andkulikov:transitionseverywhere:1.7.6"
-    //api "com.budiyev.android:code-scanner:2.3.2"
-    //api "com.chaos.view:pinview:1.4.3"
     api "com.github.bumptech.glide:glide:4.10.0"
     api "com.github.cachapa:ExpandableLayout:2.9.2"
     api "com.github.chrisbanes:PhotoView:2.0.0"
     api "com.github.JakeWharton:ViewPagerIndicator:2.4.1"
     api "com.github.siyamed:android-shape-imageview:0.9.3@aar"
-    //api "com.google.android.exoplayer:exoplayer:2.7.3"
+    api "de.hdodenhof:circleimageview:3.0.1"
+
+    /* Media */
     api 'com.google.android.exoplayer:exoplayer-core:2.19.1'
     api 'com.google.android.exoplayer:exoplayer-ui:2.19.1'
     api 'com.google.android.exoplayer:extension-okhttp:2.19.1'
     api 'com.google.android.exoplayer:exoplayer-dash:2.19.1'
     api 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
     api 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.19.1'
-    //api "com.hbb20:ccp:2.1.2"
-    //api "com.mindorks.android:prdownloader:0.4.0"
-    api "de.hdodenhof:circleimageview:3.0.1"
+
+    /* Utilities */
     api "id.zelory:compressor:3.0.1"
-    //api "io.fotoapparat:fotoapparat:2.7.0"
-    //api "it.xabaras.android:recyclerview-swipedecorator:1.2.3"
-    //api "org.greenrobot:eventbus:3.1.1"
     api "org.jsoup:jsoup:1.11.2"
     api "com.jakewharton.timber:timber:5.0.1"
     api "com.onesignal:OneSignal:[4.0.0, 4.99.99]"
 
-    /*compose*/
+    /* Compose */
     api "androidx.activity:activity-compose:1.1.1"
     api "androidx.compose.animation:animation:1.1.1"
     api "androidx.compose.compiler:compiler:1.1.1"
@@ -269,25 +233,11 @@ dependencies {
     api "androidx.compose.ui:ui-tooling-preview:1.1.1"
     api "androidx.compose.ui:ui-tooling:1.1.1"
     api "androidx.compose.ui:ui:1.1.1"
-    api "androidx.navigation:navigation-compose:1.1.1"
-    //api "androidx.window:window:1.1.1"
 
-    /*
-        api "androidx.compose.compiler:compiler:1.1.1"
-    api "androidx.compose.runtime:runtime:1.1.1"
-    api "androidx.compose.ui:ui:1.1.1"
-
-    api "androidx.compose.ui:ui:1.2.0"
-    api "androidx.compose.ui:ui-tooling:1.2.0"
-    api "androidx.compose.ui:ui-tooling-preview:1.2.0"
-    api "androidx.compose.foundation:foundation:1.2.0"
-    api "androidx.compose.foundation:foundation-layout:1.2.0"
-    api "androidx.compose.animation:animation:1.2.0"
-    api "androidx.activity:activity-compose:1.2.0"
-    api "androidx.compose.material:material:1.2.0"
-    api "androidx.compose.material3:material3:1.1.1"
-    api "androidx.compose.material3:material3-window-size-class:1.1.1"
-    */
+    /* Testing */
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
 makeJar.dependsOn(clearJar, build)
