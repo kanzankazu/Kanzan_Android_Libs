@@ -129,7 +129,6 @@ dependencies {
     /* Kotlin & Coroutines */
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.10"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1"
@@ -148,25 +147,25 @@ dependencies {
     api "com.google.android.gms:play-services-maps:17.0.0"
 
     /* Firebase */
-    api "com.google.auth:google-auth-library-oauth2-http:1.16.0"
-    api "com.google.firebase:firebase-ads:23.2.0"
-    api "com.google.firebase:firebase-analytics-ktx:19.0.0"
-    api "com.google.firebase:firebase-appcheck-debug:16.0.0-beta06"
-    api "com.google.firebase:firebase-auth-ktx:21.1.0"
-    api "com.google.firebase:firebase-auth:21.1.0"
-    api "com.google.firebase:firebase-config-ktx:21.0.0"
-    api "com.google.firebase:firebase-core:17.5.0"
-    api "com.google.firebase:firebase-crash:16.2.1"
-    api "com.google.firebase:firebase-crashlytics:17.2.1"
-    api "com.google.firebase:firebase-crashlytics-ktx:18.6.1"
-    api "com.google.firebase:firebase-database-ktx:20.1.0"
-    api "com.google.firebase:firebase-database:20.1.0"
-    api "com.google.firebase:firebase-dynamic-links:19.1.0"
-    api "com.google.firebase:firebase-firestore-ktx:21.7.0"
-    api "com.google.firebase:firebase-invites:17.0.0"
-    api "com.google.firebase:firebase-iid:21.1.0"
-    api "com.google.firebase:firebase-perf-ktx:20.0.6"
-    api "com.google.firebase:firebase-storage:19.2.0"
+    api "com.google.auth:google-auth-library-oauth2-http:1.16.0" // Google Auth Library untuk OAuth2 HTTP authentication
+    api "com.google.firebase:firebase-ads:23.2.0" // Google AdMob - Monetasi app dengan iklan in-app dari Google advertisers
+    api "com.google.firebase:firebase-analytics-ktx:19.0.0" // Google Analytics - Analisis penggunaan app dan user engagement gratis
+    api "com.google.firebase:firebase-appcheck-debug:16.0.0-beta06" // App Check - Proteksi backend API dari unauthorized clients (debug version)
+    api "com.google.firebase:firebase-auth-ktx:21.1.0" // Firebase Authentication - Multi-platform sign-in dengan ready-made UI libraries
+    api "com.google.firebase:firebase-auth:21.1.0" // Firebase Authentication - Backend services untuk user authentication
+    api "com.google.firebase:firebase-config-ktx:21.0.0" // Remote Config - Personalisasi app dengan feature flags tanpa update
+    api "com.google.firebase:firebase-core:17.5.0" // Firebase Core - Core library untuk Firebase services
+//    api "com.google.firebase:firebase-crash:16.2.1" // DEPRECATED: Firebase Crash - Digantikan oleh Crashlytics
+    api "com.google.firebase:firebase-crashlytics:17.2.1" // Firebase Crashlytics - Realtime crash reporting dan analysis
+    api "com.google.firebase:firebase-crashlytics-ktx:18.6.1" // Firebase Crashlytics - Kotlin extensions untuk crash reporting
+    api "com.google.firebase:firebase-database-ktx:20.1.0" // Realtime Database - JSON data sync realtime dengan offline support
+    api "com.google.firebase:firebase-database:20.1.0" // Realtime Database - Backend services untuk real-time data synchronization
+//    api "com.google.firebase:firebase-dynamic-links:19.1.0" // DEPRECATED: Dynamic Links - Akan shutdown 25 Agustus 2025
+    api "com.google.firebase:firebase-firestore-ktx:21.7.0" // Cloud Firestore - NoSQL document database untuk global scale apps
+//    api "com.google.firebase:firebase-invites:17.0.0" // DEPRECATED: Firebase Invites - Service sudah shutdown
+//    api "com.google.firebase:firebase-iid:21.1.0" // DEPRECATED: Firebase Instance ID - Digantikan oleh Firebase Messaging
+    api "com.google.firebase:firebase-perf-ktx:20.0.6" // Performance Monitoring - Monitor network requests, screen rendering, dan custom traces
+    api "com.google.firebase:firebase-storage:19.2.0" // Cloud Storage - Object storage untuk images, audio, video, dan user-generated content
 
     /* Networking */
     api "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
@@ -189,15 +188,15 @@ dependencies {
     api "com.facebook.android:facebook-android-sdk:5.4.0"
 
     /* Deep Link */
-    api "com.airbnb:deeplinkdispatch:5.4.3"
-    kapt "com.airbnb:deeplinkdispatch-processor:5.4.3"
+//    api "com.airbnb:deeplinkdispatch:5.4.3"
+//    kapt "com.airbnb:deeplinkdispatch-processor:5.4.3"
 
     /* UI Components */
     api "com.airbnb.android:lottie:3.4.0"
     api "com.github.androidmads:QRGenerator:1.0.5"
     api "com.afollestad.material-dialogs:core:3.3.0"
-    api "com.github.mreram:showcaseview:1.4.1"
-    api "com.andkulikov:transitionseverywhere:1.7.6"
+//    api "com.github.mreram:showcaseview:1.4.1"
+//    api "com.andkulikov:transitionseverywhere:1.7.6"
     api "com.github.bumptech.glide:glide:4.10.0"
     api "com.github.cachapa:ExpandableLayout:2.9.2"
     api "com.github.chrisbanes:PhotoView:2.0.0"
@@ -215,24 +214,24 @@ dependencies {
 
     /* Utilities */
     api "id.zelory:compressor:3.0.1"
-    api "org.jsoup:jsoup:1.11.2"
+//    api "org.jsoup:jsoup:1.11.2"
     api "com.jakewharton.timber:timber:5.0.1"
     api "com.onesignal:OneSignal:[4.0.0, 4.99.99]"
 
     /* Compose */
-    api "androidx.activity:activity-compose:1.1.1"
-    api "androidx.compose.animation:animation:1.1.1"
-    api "androidx.compose.compiler:compiler:1.1.1"
-    api "androidx.compose.foundation:foundation-layout:1.1.1"
-    api "androidx.compose.foundation:foundation:1.1.1"
-    api "androidx.compose.material3:material3-window-size-class:1.1.1"
-    api "androidx.compose.material3:material3:1.1.1"
-    api "androidx.compose.material:material:1.1.1"
-    api "androidx.compose.runtime:runtime-livedata:1.1.1"
-    api "androidx.compose.runtime:runtime:1.1.1"
-    api "androidx.compose.ui:ui-tooling-preview:1.1.1"
-    api "androidx.compose.ui:ui-tooling:1.1.1"
-    api "androidx.compose.ui:ui:1.1.1"
+    implementation "androidx.activity:activity-compose:1.1.1"
+    implementation "androidx.compose.animation:animation:1.1.1"
+    implementation "androidx.compose.compiler:compiler:1.1.1"
+    implementation "androidx.compose.foundation:foundation-layout:1.1.1"
+    implementation "androidx.compose.foundation:foundation:1.1.1"
+    implementation "androidx.compose.material3:material3-window-size-class:1.1.1"
+    implementation "androidx.compose.material3:material3:1.1.1"
+    implementation "androidx.compose.material:material:1.1.1"
+    implementation "androidx.compose.runtime:runtime-livedata:1.1.1"
+    implementation "androidx.compose.runtime:runtime:1.1.1"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.1.1"
+    implementation "androidx.compose.ui:ui-tooling:1.1.1"
+    implementation "androidx.compose.ui:ui:1.1.1"
 
     /* Testing */
     testImplementation 'junit:junit:4.+'
