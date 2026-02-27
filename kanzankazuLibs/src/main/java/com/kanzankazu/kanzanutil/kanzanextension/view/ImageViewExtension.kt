@@ -4,6 +4,7 @@ package com.kanzankazu.kanzanutil.kanzanextension.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.transition.AutoTransition
 import android.transition.TransitionManager
@@ -12,13 +13,24 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.HttpException
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.kanzankazu.R
 import com.kanzankazu.kanzanutil.RoundedCornersTransformation
 import com.kanzankazu.kanzanutil.kanzanextension.type.debugMessageError
+import com.kanzankazu.kanzanwidget.camera.util.requestOptionStandard
+import com.kanzankazu.kanzanwidget.camera.util.requestOptionStandardNoSaveCache
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.cachapa.expandablelayout.ExpandableLayout
+import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 /**
  * A constant representing the resource ID of a placeholder image used in the application.
@@ -87,6 +99,127 @@ fun requestOptionStandartNoSaveCache(placeholder: Int = placeholderImage): Reque
 }
 
 /**
+ * Method untuk mendapatakan id resource image dengan memasukkan string nama image.
+ *
+ * @param context
+ * @param image
+ * @return
+ */
+fun getImageId(context: Context, image: String?): Int = try {
+    context.resources.getIdentifier(image, "drawable", context.packageName)
+} catch (_: java.lang.Exception) {
+    0
+}
+
+
+/**
+ * Load local image from resources or placeholder image if local image is null
+ * @param localName Name of local image resource
+ * @param placeholder Resource ID of placeholder image
+ */
+private fun ImageView.loadLocalOrPlaceholder(localName: String?, placeholder: Int) {
+    val resId = localName?.let { getImageId(context, it) } ?: 0
+    setImageResource(if (resId != 0) resId else placeholder)
+}
+
+/**
+ * Clears Glide's memory and disk cache if it has been more than a day since the last clear.
+ * @param context The context to use for clearing the cache.
+ */
+private fun clearGlideCacheIfNeeded(context: Context) {
+    val prefs = context.getSharedPreferences("glide_cache_prefs", Context.MODE_PRIVATE)
+    val lastClear = prefs.getLong("last_clear_date", 0)
+    val currentTime = System.currentTimeMillis()
+
+    if (TimeUnit.MILLISECONDS.toDays(currentTime - lastClear) >= 1) {
+        Glide.get(context).clearMemory()
+        CoroutineScope(Dispatchers.IO).launch { Glide.get(context).clearDiskCache() }
+        prefs.edit().putLong("last_clear_date", currentTime).apply()
+    }
+}
+
+/**
+ * Load image from url or local file. If url is null, load image from local file.
+ *
+ * @param url The url of the image to be loaded.
+ * @param localName The name of the local file to be loaded if url is null.
+ * @param isSaveCache Whether to save the image in cache or not.
+ * @param placeholder The resource id of the placeholder image.
+ * @param otherErrorHandle A callback to handle other errors.
+ */
+fun ImageView.loadImage(
+    url: String?,
+    localName: String? = null,
+    isSaveCache: Boolean = false,
+    placeholder: Int = placeholderImage,
+    otherErrorHandle: (() -> Unit)? = null,
+) {
+    if (url.isNullOrEmpty()) {
+        loadLocalOrPlaceholder(localName, placeholder)
+        return
+    }
+
+    clearGlideCacheIfNeeded(context)
+
+    try {
+        val errorRequest = localName?.let {
+            val resId = getImageId(context, it)
+            if (resId != 0)
+                Glide.with(context).load(resId).apply(requestOptionStandard(placeholder))
+            else null
+        }
+
+        val requestOptions = if (isSaveCache)
+            requestOptionStandard(placeholder)
+        else
+            requestOptionStandardNoSaveCache(placeholder)
+
+        Glide.with(context)
+            .load(url)
+            .apply(requestOptions)
+            .placeholder(placeholder)
+            .dontAnimate()
+            .error(errorRequest)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    val errorMsg = when {
+                        e?.rootCauses?.any { it is HttpException && it.statusCode == 403 } == true ->
+                            "Akses ditolak (403). Mohon periksa kredensial atau izin akses."
+
+                        e?.rootCauses?.any { it is UnknownHostException } == true ->
+                            "Tidak dapat terhubung ke server. Periksa koneksi internet Anda."
+
+                        else -> "Gagal memuat gambar: ${e?.message}"
+                    }
+
+                    errorMsg.debugMessageError("ImageExt - onLoadFailed")
+                    otherErrorHandle?.invoke()
+                    loadLocalOrPlaceholder(localName, placeholder)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean,
+                ) = false
+            })
+            .into(this)
+
+    } catch (e: Exception) {
+        e.debugMessageError("ImageExt - loadImage")
+        loadLocalOrPlaceholder(localName, placeholder)
+    }
+}
+
+/**
  * Loads an image from a given URL into an ImageView using the Glide library, with options for caching and placeholder.
  *
  * @param url The URL of the image to be loaded.
@@ -103,6 +236,7 @@ fun requestOptionStandartNoSaveCache(placeholder: Int = placeholderImage): Reque
  * ```
  */
 fun ImageView.loadImage(url: String, isSaveCache: Boolean = true, placeholder: Int = placeholderImage) {
+    clearGlideCacheIfNeeded(context)
     try {
         Glide.with(context)
             .load(url)
@@ -127,6 +261,7 @@ fun ImageView.loadImage(url: String, isSaveCache: Boolean = true, placeholder: I
  * ```
  */
 fun ImageView.loadImage(@DrawableRes url: Int, isSaveCache: Boolean = true, placeholder: Int = placeholderImage) {
+    clearGlideCacheIfNeeded(context)
     try {
         Glide.with(context)
             .load(url)
