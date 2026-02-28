@@ -48,33 +48,13 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
     override fun createPrimaryKeyData(tableChildKey: String): String =
         getRootRefKt(tableChildKey).push().key ?: ""
 
-    override fun <T> setDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        value: T,
-        function: (BaseResponse<String>) -> Unit,
-    ) {
+    override fun <T> setDataBaseResponse(tableChildKey: String, tableChildKeyId: String, value: T, function: (BaseResponse<String>) -> Unit) {
         "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - setDataBaseResponse")
         getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
             .handleTaskBaseResponse(RealtimeDatabaseImplType.SAVE, function)
     }
 
-    override suspend fun <T> setDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        value: T,
-    ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - setDataBaseResponse")
-        return getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
-            .handleTaskBaseResponse(RealtimeDatabaseImplType.SAVE)
-    }
-
-    override fun <T> updateDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        value: T,
-        function: (BaseResponse<String>) -> Unit,
-    ) {
+    override fun <T> updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, value: T, function: (BaseResponse<String>) -> Unit) {
         "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
         getRootRefKt(tableChildKey)
             .child(tableChildKeyId)
@@ -82,86 +62,25 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE, function)
     }
 
-    override suspend fun <T> updateDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        value: T,
-    ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
-        return getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
-            .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE)
-    }
-
-    override fun updateDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        rowChildKey: String,
-        rowChildValue: String,
-        function: (BaseResponse<String>) -> Unit,
-    ) {
+    override fun updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, rowChildKey: String, rowChildValue: String, function: (BaseResponse<String>) -> Unit) {
         "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
         getRootRefKt(tableChildKey).child(tableChildKeyId).child(rowChildKey)
             .setValue(rowChildValue)
             .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE, function)
     }
 
-    override suspend fun updateDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        rowChildKey: String,
-        rowChildValue: String,
-    ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
-        return getRootRefKt(tableChildKey)
-            .child(tableChildKeyId)
-            .child(rowChildKey)
-            .setValue(rowChildValue)
-            .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE)
-    }
-
-    override fun removeDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        function: (BaseResponse<String>) -> Unit,
-    ) {
+    override fun removeDataBaseResponse(tableChildKey: String, tableChildKeyId: String, function: (BaseResponse<String>) -> Unit) {
         "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - removeDataBaseResponse")
         getRootRefKt(tableChildKey).child(tableChildKeyId).removeValue()
             .handleTaskBaseResponse(RealtimeDatabaseImplType.REMOVE, function)
     }
 
-    override suspend fun removeDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-    ): BaseResponse<String> {
-        "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - removeDataBaseResponse")
-        return getRootRefKt(tableChildKey).child(tableChildKeyId).removeValue()
-            .handleTaskBaseResponse(RealtimeDatabaseImplType.REMOVE)
-    }
-
-    override fun getDataAllBaseResponse(
-        tableChildKey: String,
-        isSingleCall: Boolean,
-        function: (BaseResponse<DataSnapshot>) -> Unit,
-    ) {
+    override fun getDataAllBaseResponse(tableChildKey: String, isSingleCall: Boolean, function: (BaseResponse<DataSnapshot>) -> Unit) {
         "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataAllBaseResponse")
         getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall, function)
     }
 
-    override suspend fun getDataAllBaseResponse(
-        tableChildKey: String,
-        isSingleCall: Boolean,
-    ): BaseResponse<DataSnapshot> {
-        "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataAllBaseResponse")
-        return getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall)
-    }
-
-    override fun <T> getDataByIdBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        targetClass: Class<T>,
-        isSingleCall: Boolean,
-        function: (BaseResponse<T>) -> Unit,
-    ) {
+    override fun <T> getDataByIdBaseResponse(tableChildKey: String, tableChildKeyId: String, targetClass: Class<T>, isSingleCall: Boolean, function: (BaseResponse<T>) -> Unit) {
         "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - getDataByIdBaseResponse")
         val reference = getRootRefKt(tableChildKey).child(tableChildKeyId)
         reference.handleTaskBaseResponse(isSingleCall) { dataSnapshotKanzanBaseResponse ->
@@ -175,12 +94,39 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    override suspend fun <T> getDataByIdBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        targetClass: Class<T>,
-        isSingleCall: Boolean,
-    ): BaseResponse<T> {
+    override suspend fun <T> setDataBaseResponse(tableChildKey: String, tableChildKeyId: String, value: T): BaseResponse<String> {
+        "RealtimeDatabaseImpl - setDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - setDataBaseResponse")
+        return getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
+            .handleTaskBaseResponse(RealtimeDatabaseImplType.SAVE)
+    }
+
+    override suspend fun <T> updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, value: T): BaseResponse<String> {
+        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
+        return getRootRefKt(tableChildKey).child(tableChildKeyId).setValue(value)
+            .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE)
+    }
+
+    override suspend fun updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, rowChildKey: String, rowChildValue: String): BaseResponse<String> {
+        "RealtimeDatabaseImpl - updateDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - updateDataBaseResponse")
+        return getRootRefKt(tableChildKey)
+            .child(tableChildKeyId)
+            .child(rowChildKey)
+            .setValue(rowChildValue)
+            .handleTaskBaseResponse(RealtimeDatabaseImplType.UPDATE)
+    }
+
+    override suspend fun removeDataBaseResponse(tableChildKey: String, tableChildKeyId: String): BaseResponse<String> {
+        "RealtimeDatabaseImpl - removeDataKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - removeDataBaseResponse")
+        return getRootRefKt(tableChildKey).child(tableChildKeyId).removeValue()
+            .handleTaskBaseResponse(RealtimeDatabaseImplType.REMOVE)
+    }
+
+    override suspend fun getDataAllBaseResponse(tableChildKey: String, isSingleCall: Boolean): BaseResponse<DataSnapshot> {
+        "RealtimeDatabaseImpl - getDataAllKanzanBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataAllBaseResponse")
+        return getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall)
+    }
+
+    override suspend fun <T> getDataByIdBaseResponse(tableChildKey: String, tableChildKeyId: String, targetClass: Class<T>, isSingleCall: Boolean): BaseResponse<T> {
         "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponse - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - getDataByIdBaseResponse")
         return querySelectTableDataByPrimaryKey(
             tableChildKey,
@@ -189,12 +135,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             .handleBaseResponseConvertToObject(targetClass)
     }
 
-    override suspend fun <T> getDataByIdBaseResponseFlow(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        targetClass: Class<T>,
-        isSingleCall: Boolean,
-    ): Flow<BaseResponse<T>> {
+    override suspend fun <T> getDataByIdBaseResponseFlow(tableChildKey: String, tableChildKeyId: String, targetClass: Class<T>, isSingleCall: Boolean): Flow<BaseResponse<T>> {
         "RealtimeDatabaseImpl - getDataByIdKanzanBaseResponseFlow - $tableChildKey - $tableChildKeyId".debugMessageDebug("RealtimeDatabaseImpl - getDataByIdBaseResponseFlow")
         return flow {
             val response = querySelectTableDataByPrimaryKey(
@@ -209,54 +150,32 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    override fun querySelectTableDataByPrimaryKey(
-        tableChildKey: String,
-        tableChildPrimaryKeyId: String,
-    ): Query {
+    override fun querySelectTableDataByPrimaryKey(tableChildKey: String, tableChildPrimaryKeyId: String): Query {
         "RealtimeDatabaseImpl - querySelectTableDataByPrimaryKey - $tableChildKey - $tableChildPrimaryKeyId".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByPrimaryKey")
         return getRootRefKt(tableChildKey).child(tableChildPrimaryKeyId)
     }
 
-    override fun querySelectTableDataByKeyValue(
-        tableChildKey: String,
-        rowChildKey: String,
-        rowChildValue: String,
-    ): Query {
+    override fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKey: String, rowChildValue: String): Query {
         "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue)
     }
 
-    override fun querySelectTableDataByKeyValue(
-        tableChildKey: String,
-        rowChildKey: String,
-        rowChildValue: Int,
-    ): Query {
+    override fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKey: String, rowChildValue: Int): Query {
         "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue.toDouble())
     }
 
-    override fun querySelectTableDataByKeyValue(
-        tableChildKey: String,
-        rowChildKey: String,
-        rowChildValue: Double,
-    ): Query {
+    override fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKey: String, rowChildValue: Double): Query {
         "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue)
     }
 
-    override fun querySelectTableDataByKeyValue(
-        tableChildKey: String,
-        rowChildKey: String,
-        rowChildValue: Boolean,
-    ): Query {
+    override fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKey: String, rowChildValue: Boolean): Query {
         "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).equalTo(rowChildValue)
     }
 
-    override fun querySelectTableDataByKeyValue(
-        tableChildKey: String,
-        rowChildKeySlashValue: String,
-    ): Query {
+    override fun querySelectTableDataByKeyValue(tableChildKey: String, rowChildKeySlashValue: String): Query {
         "RealtimeDatabaseImpl - querySelectTableDataByKeyValue - $tableChildKey - $rowChildKeySlashValue".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableDataByKeyValue")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKeySlashValue)
     }
@@ -266,22 +185,13 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         return getRootRefKt(tableChildKey).orderByKey().limitToFirst(limit)
     }
 
-    override fun querySelectTableValueWithStart(
-        tableChildKey: String,
-        rowChildKey: String,
-        string: String,
-    ): Query {
+    override fun querySelectTableValueWithStart(tableChildKey: String, rowChildKey: String, string: String): Query {
         "RealtimeDatabaseImpl - querySelectTableValueWithStart - $tableChildKey - $rowChildKey - $string".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableValueWithStart")
         return getRootRefKt(tableChildKey).orderByChild(rowChildKey).startAt(string)
             .endAt("${string}\uf8ff")
     }
 
-    override fun querySelectTableValueWithMoreLessDigits(
-        tableChildKey: String,
-        rowChildKey: String,
-        digits: Any,
-        isMore: Boolean,
-    ): Query {
+    override fun querySelectTableValueWithMoreLessDigits(tableChildKey: String, rowChildKey: String, digits: Any, isMore: Boolean): Query {
         "RealtimeDatabaseImpl - querySelectTableValueWithMoreLessDigits - $tableChildKey - $rowChildKey - $digits".debugMessageDebug("RealtimeDatabaseImpl - querySelectTableValueWithMoreLessDigits")
         val d = when (digits) {
             is Int -> digits.toDouble()
@@ -296,13 +206,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         else getRootRefKt(tableChildKey).orderByChild(rowChildKey).endAt(d - 1)
     }
 
-    override fun queryWithMultipleConditions(
-        tableChildKey: String,
-        filters: List<FilterCondition>,
-        orderBy: String,
-        isDescending: Boolean,
-        limit: Int,
-    ): Query {
+    override fun queryWithMultipleConditions(tableChildKey: String, filters: List<FilterCondition>, orderBy: String, isDescending: Boolean, limit: Int): Query {
         var query: Query = getRootRefKt(tableChildKey)
 
         // Apply filters
@@ -357,13 +261,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         return query
     }
 
-    override fun queryWithPagination(
-        tableChildKey: String,
-        orderBy: String,
-        lastValue: Any?,
-        limit: Int,
-        isDescending: Boolean,
-    ): Query {
+    override fun queryWithPagination(tableChildKey: String, orderBy: String, lastValue: Any?, limit: Int, isDescending: Boolean): Query {
         // Inisialisasi query dasar
         var query: Query = getRootRefKt(tableChildKey)
 
@@ -400,12 +298,8 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             query.limitToFirst(limit) // Ambil 'limit' data pertama untuk urutan menaik
         }
     }
-    override fun getDataByQuery(
-        query: Query,
-        onDataChangedListener: (dataSnapshot: DataSnapshot) -> Unit,
-        onCancelledListener: (String) -> Unit,
-        isSingleCall: Boolean,
-    ) {
+
+    override fun getDataByQuery(query: Query, onDataChangedListener: (dataSnapshot: DataSnapshot) -> Unit, onCancelledListener: (String) -> Unit, isSingleCall: Boolean) {
         if (isSingleCall) query.addListenerForSingleValueEvent(
             handleTaskListenerDataSnapshot({ onDataChangedListener.invoke(it) }, {
                 onCancelledListener.invoke("${it.message}|| ${it.details}||${it.code}")
@@ -417,11 +311,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         )
     }
 
-    override fun getDataByQueryKanzanBaseResponse(
-        query: Query,
-        isSingleCall: Boolean,
-        function: (BaseResponse<DataSnapshot>) -> Unit,
-    ) {
+    override fun getDataByQueryKanzanBaseResponse(query: Query, isSingleCall: Boolean, function: (BaseResponse<DataSnapshot>) -> Unit) {
         if (isSingleCall) query.addListenerForSingleValueEvent(
             handleTaskListenerDataSnapshotBaseResponse(function)
         ) else query.addValueEventListener(
@@ -450,9 +340,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         BaseResponse.Error(e.message.toString())
     }
 
-    override suspend fun getDataByQueryKanzanBaseResponseFlow(
-        query: Query,
-    ): Flow<BaseResponse<DataSnapshot>> {
+    override suspend fun getDataByQueryKanzanBaseResponseFlow(query: Query): Flow<BaseResponse<DataSnapshot>> {
         return callbackFlow {
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -470,11 +358,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }.onStart { emit(BaseResponse.Loading) }
     }
 
-    override suspend fun isExistData(
-        tableChildKey: String,
-        rowChildKey: String,
-        rowChildValue: String,
-    ): Pair<Boolean, String> {
+    override suspend fun isExistData(tableChildKey: String, rowChildKey: String, rowChildValue: String): Pair<Boolean, String> {
         "RealtimeDatabaseImpl - isExistData - $tableChildKey - $rowChildKey - $rowChildValue".debugMessageDebug("RealtimeDatabaseImpl - isExistData")
         return suspendCancellableCoroutine {
             querySelectTableDataByKeyValue(
@@ -518,11 +402,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
      * }
      * ```
      */
-    override fun isExistData(
-        tableChildKey: String,
-        tableChildPrimaryKeyId: String,
-        function: (pair: Pair<Boolean, String>) -> Unit,
-    ) {
+    override fun isExistData(tableChildKey: String, tableChildPrimaryKeyId: String, function: (pair: Pair<Boolean, String>) -> Unit) {
         "RealtimeDatabaseImpl - isExistData - $tableChildKey - $tableChildPrimaryKeyId".debugMessageDebug("RealtimeDatabaseImpl - isExistData")
         getRootRefKt(tableChildKey).child(tableChildPrimaryKeyId)
             .addListenerForSingleValueEvent(handleTaskListenerIsExist(function))
@@ -535,10 +415,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
             .addOnCanceledListener { function.invoke(Pair(false, "Task Canceled")) }
     }
 
-    private fun Task<Void>.handleTaskBaseResponse(
-        realtimeDatabaseImplType: RealtimeDatabaseImplType,
-        function: (BaseResponse<String>) -> Unit,
-    ) {
+    private fun Task<Void>.handleTaskBaseResponse(realtimeDatabaseImplType: RealtimeDatabaseImplType, function: (BaseResponse<String>) -> Unit) {
         this.addOnSuccessListener {
             function.invoke(
                 BaseResponse.Success(
@@ -577,9 +454,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    private suspend fun Task<Void>.handleTaskBaseResponse(
-        realtimeDatabaseImplType: RealtimeDatabaseImplType,
-    ): BaseResponse<String> {
+    private suspend fun Task<Void>.handleTaskBaseResponse(realtimeDatabaseImplType: RealtimeDatabaseImplType): BaseResponse<String> {
         return suspendCancellableCoroutine { continuation ->
             addOnSuccessListener {
                 continuation.resume(
@@ -637,10 +512,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    private fun handleTaskKanzanBaseResponseMessageError(
-        realtimeDatabaseImplType: RealtimeDatabaseImplType,
-        otherMessage: String = "",
-    ): String {
+    private fun handleTaskKanzanBaseResponseMessageError(realtimeDatabaseImplType: RealtimeDatabaseImplType, otherMessage: String = ""): String {
         return otherMessage.ifEmpty {
             when (realtimeDatabaseImplType) {
                 RealtimeDatabaseImplType.SAVE -> "Data Gagal Di Simpan"
@@ -650,27 +522,17 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    private fun <T> DatabaseReference.handleTask(
-        targetClass: Class<T>,
-        isList: Boolean,
-        isSingleCall: Boolean,
-        function: (Triple<ArrayList<T>?, T?, String>) -> Unit,
-    ) {
+    private fun <T> DatabaseReference.handleTask(targetClass: Class<T>, isList: Boolean, isSingleCall: Boolean, function: (Triple<ArrayList<T>?, T?, String>) -> Unit) {
         if (isSingleCall) this.addListenerForSingleValueEvent(handleTaskListener(targetClass, isList, function))
         else addValueEventListener(handleTaskListener(targetClass, isList, function))
     }
 
-    private fun DatabaseReference.handleTaskBaseResponse(
-        isSingleCall: Boolean,
-        function: (BaseResponse<DataSnapshot>) -> Unit,
-    ) {
+    private fun DatabaseReference.handleTaskBaseResponse(isSingleCall: Boolean, function: (BaseResponse<DataSnapshot>) -> Unit) {
         if (isSingleCall) this.addListenerForSingleValueEvent(handleTaskListenerBaseResponse(function))
         else addValueEventListener(handleTaskListenerBaseResponse(function))
     }
 
-    private suspend fun DatabaseReference.handleTaskBaseResponse(
-        isSingleCall: Boolean,
-    ): BaseResponse<DataSnapshot> {
+    private suspend fun DatabaseReference.handleTaskBaseResponse(isSingleCall: Boolean): BaseResponse<DataSnapshot> {
         "handleTaskKanzanBaseResponse".debugMessageDebug("RealtimeDatabaseImpl - handleTaskBaseResponse")
         return suspendCancellableCoroutine { continuation ->
             if (isSingleCall) this.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -696,9 +558,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    private suspend fun Query.handleTaskBaseResponse(
-        isSingleCall: Boolean,
-    ): BaseResponse<DataSnapshot> {
+    private suspend fun Query.handleTaskBaseResponse(isSingleCall: Boolean): BaseResponse<DataSnapshot> {
         return suspendCancellableCoroutine { continuation ->
             if (isSingleCall) this.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -723,12 +583,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         }
     }
 
-    private fun <T> Query.handleTask(
-        targetClass: Class<T>,
-        isList: Boolean,
-        isSingleCall: Boolean,
-        function: (Triple<ArrayList<T>?, T?, String>) -> Unit,
-    ) {
+    private fun <T> Query.handleTask(targetClass: Class<T>, isList: Boolean, isSingleCall: Boolean, function: (Triple<ArrayList<T>?, T?, String>) -> Unit) {
         if (isSingleCall) this.addListenerForSingleValueEvent(
             handleTaskListener(
                 targetClass, isList, function
@@ -737,11 +592,7 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         else addValueEventListener(handleTaskListener(targetClass, isList, function))
     }
 
-    private fun <T> handleTaskListener(
-        targetClass: Class<T>,
-        isList: Boolean,
-        function: (Triple<ArrayList<T>?, T?, String>) -> Unit,
-    ): ValueEventListener {
+    private fun <T> handleTaskListener(targetClass: Class<T>, isList: Boolean, function: (Triple<ArrayList<T>?, T?, String>) -> Unit): ValueEventListener {
         return object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (isList) function.invoke(
@@ -813,5 +664,113 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
         override fun onCancelled(databaseError: DatabaseError) {
             function.invoke(BaseResponse.Error(databaseError.message))
         }
+    }
+
+    override fun <T> getDataByTableBaseResponse(tableChildKey: String, targetClass: Class<T>, isSingleCall: Boolean, function: (BaseResponse<List<T>>) -> Unit) {
+        "RealtimeDatabaseImpl - getDataByTableBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataByTableBaseResponse")
+        getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall) { dataSnapshotResponse ->
+            function.invoke(dataSnapshotResponse.handleBaseResponseConvert {
+                val list = it.toObjectList(targetClass)
+                BaseResponse.Success(list)
+            })
+        }
+    }
+
+    override suspend fun <T> getDataByTableBaseResponse(tableChildKey: String, targetClass: Class<T>, isSingleCall: Boolean): BaseResponse<List<T>> {
+        "RealtimeDatabaseImpl - getDataByTableBaseResponse - $tableChildKey".debugMessageDebug("RealtimeDatabaseImpl - getDataByTableBaseResponse")
+        return try {
+            val dataSnapshot = getRootRefKt(tableChildKey).handleTaskBaseResponse(isSingleCall)
+            dataSnapshot.handleBaseResponseConvert { snapshot ->
+                val list = snapshot.toObjectList(targetClass)
+                BaseResponse.Success(list)
+            }
+        } catch (e: Exception) {
+            BaseResponse.Error(e.message ?: "Failed to get data")
+        }
+    }
+
+    override suspend fun <T> getDataByQuerySuspend(query: Query, targetClass: Class<T>): BaseResponse<List<T>> {
+        return try {
+            val snapshot = suspendCancellableCoroutine { cont ->
+                val listener = object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (cont.isActive) cont.resume(snapshot)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        if (cont.isActive) cont.resumeWithException(error.toException())
+                    }
+                }
+                query.addListenerForSingleValueEvent(listener)
+                cont.invokeOnCancellation { query.removeEventListener(listener) }
+            }
+            val list = snapshot.toObjectList(targetClass)
+            BaseResponse.Success(list)
+        } catch (e: Exception) {
+            BaseResponse.Error(e.message ?: "Failed to get data")
+        }
+    }
+
+    override fun <T> observeDataByPathFlow(path: String, targetClass: Class<T>): Flow<BaseResponse<List<T>>> {
+        return callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = snapshot.toObjectList(targetClass)
+                    trySend(BaseResponse.Success(list)).isSuccess
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(BaseResponse.Error(error.message))
+                    close(error.toException())
+                }
+            }
+
+            val reference = getRootRefKt(path)
+            reference.addValueEventListener(listener)
+            awaitClose { reference.removeEventListener(listener) }
+        }.onStart { emit(BaseResponse.Loading) }
+    }
+
+    override fun <T> observeDataByPathSingleFlow(path: String, targetClass: Class<T>): Flow<BaseResponse<T>> {
+        return callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val obj = snapshot.toObject(targetClass)
+                    if (obj != null) {
+                        trySend(BaseResponse.Success(obj)).isSuccess
+                    } else {
+                        trySend(BaseResponse.Error("Data not found"))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(BaseResponse.Error(error.message))
+                    close(error.toException())
+                }
+            }
+
+            val reference = getRootRefKt(path)
+            reference.addValueEventListener(listener)
+            awaitClose { reference.removeEventListener(listener) }
+        }.onStart { emit(BaseResponse.Loading) }
+    }
+
+    override fun <T> observeDataByQueryFlow(query: Query, targetClass: Class<T>): Flow<BaseResponse<List<T>>> {
+        return callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = snapshot.toObjectList(targetClass)
+                    trySend(BaseResponse.Success(list)).isSuccess
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(BaseResponse.Error(error.message))
+                    close(error.toException())
+                }
+            }
+
+            query.addValueEventListener(listener)
+            awaitClose { query.removeEventListener(listener) }
+        }.onStart { emit(BaseResponse.Loading) }
     }
 }

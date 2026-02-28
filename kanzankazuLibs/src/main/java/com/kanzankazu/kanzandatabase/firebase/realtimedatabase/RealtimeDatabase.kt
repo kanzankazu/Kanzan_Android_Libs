@@ -13,52 +13,19 @@ interface RealtimeDatabase {
 
     fun createPrimaryKeyData(tableChildKey: String): String
 
-    fun <T> getDataByIdBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        targetClass: Class<T>,
-        isSingleCall: Boolean,
-        function: (BaseResponse<T>) -> Unit,
-    )
+    fun <T> getDataByIdBaseResponse(tableChildKey: String, tableChildKeyId: String, targetClass: Class<T>, isSingleCall: Boolean, function: (BaseResponse<T>) -> Unit)
 
-    fun <T> setDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        value: T,
-        function: (BaseResponse<String>) -> Unit,
-    )
+    fun <T> setDataBaseResponse(tableChildKey: String, tableChildKeyId: String, value: T, function: (BaseResponse<String>) -> Unit)
 
-    fun <T> updateDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        value: T,
-        function: (BaseResponse<String>) -> Unit,
-    )
+    fun <T> updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, value: T, function: (BaseResponse<String>) -> Unit)
 
-    fun getDataAllBaseResponse(
-        tableChildKey: String,
-        isSingleCall: Boolean,
-        function: (BaseResponse<DataSnapshot>) -> Unit,
-    )
+    fun getDataAllBaseResponse(tableChildKey: String, isSingleCall: Boolean, function: (BaseResponse<DataSnapshot>) -> Unit)
 
-    fun getDataByQuery(
-        query: Query,
-        onDataChangedListener: (dataSnapshot: DataSnapshot) -> Unit = {},
-        onCancelledListener: (String) -> Unit = {},
-        isSingleCall: Boolean,
-    )
+    fun getDataByQuery(query: Query, onDataChangedListener: (dataSnapshot: DataSnapshot) -> Unit = {}, onCancelledListener: (String) -> Unit = {}, isSingleCall: Boolean)
 
-    fun getDataByQueryKanzanBaseResponse(
-        query: Query,
-        isSingleCall: Boolean,
-        function: (BaseResponse<DataSnapshot>) -> Unit,
-    )
+    fun getDataByQueryKanzanBaseResponse(query: Query, isSingleCall: Boolean, function: (BaseResponse<DataSnapshot>) -> Unit)
 
-    fun isExistData(
-        tableChildKey: String,
-        tableChildPrimaryKeyId: String,
-        function: (pair: Pair<Boolean, String>) -> Unit,
-    )
+    fun isExistData(tableChildKey: String, tableChildPrimaryKeyId: String, function: (pair: Pair<Boolean, String>) -> Unit)
 
     /**
      * Query to select data from a table by its primary key.
@@ -146,12 +113,7 @@ interface RealtimeDatabase {
      * @param isMore If true, find values greater than digits; if false, find values less than digits
      * @return Query object that can be used to fetch the filtered data
      */
-    fun querySelectTableValueWithMoreLessDigits(
-        tableChildKey: String,
-        rowChildKey: String,
-        digits: Any,
-        isMore: Boolean = true,
-    ): Query
+    fun querySelectTableValueWithMoreLessDigits(tableChildKey: String, rowChildKey: String, digits: Any, isMore: Boolean = true): Query
 
     /**
      * Query to select data where a specific column starts with the given string.
@@ -162,11 +124,7 @@ interface RealtimeDatabase {
      * @param string The prefix string to search for
      * @return Query object that can be used to fetch the matching data
      */
-    fun querySelectTableValueWithStart(
-        tableChildKey: String,
-        rowChildKey: String,
-        string: String,
-    ): Query
+    fun querySelectTableValueWithStart(tableChildKey: String, rowChildKey: String, string: String): Query
 
     /**
      * Query to perform complex filtering with multiple conditions.
@@ -203,26 +161,11 @@ interface RealtimeDatabase {
      */
     fun queryWithPagination(tableChildKey: String, orderBy: String = "createdAt", lastValue: Any? = null, limit: Int = 20, isDescending: Boolean = false): Query
 
-    fun removeDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        function: (BaseResponse<String>) -> Unit,
-    )
+    fun removeDataBaseResponse(tableChildKey: String, tableChildKeyId: String, function: (BaseResponse<String>) -> Unit)
 
-    fun updateDataBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        rowChildKey: String,
-        rowChildValue: String,
-        function: (BaseResponse<String>) -> Unit,
-    )
+    fun updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, rowChildKey: String, rowChildValue: String, function: (BaseResponse<String>) -> Unit)
 
-    suspend fun <T> getDataByIdBaseResponse(
-        tableChildKey: String,
-        tableChildKeyId: String,
-        targetClass: Class<T>,
-        isSingleCall: Boolean,
-    ): BaseResponse<T>
+    suspend fun <T> getDataByIdBaseResponse(tableChildKey: String, tableChildKeyId: String, targetClass: Class<T>, isSingleCall: Boolean): BaseResponse<T>
 
     suspend fun <T> getDataByIdBaseResponseFlow(tableChildKey: String, tableChildKeyId: String, targetClass: Class<T>, isSingleCall: Boolean): Flow<BaseResponse<T>>
 
@@ -241,4 +184,34 @@ interface RealtimeDatabase {
     suspend fun removeDataBaseResponse(tableChildKey: String, tableChildKeyId: String): BaseResponse<String>
 
     suspend fun updateDataBaseResponse(tableChildKey: String, tableChildKeyId: String, rowChildKey: String, rowChildValue: String): BaseResponse<String>
+
+    /**
+     * Observe data changes by path and return as Flow
+     */
+    fun <T> observeDataByPathFlow(path: String, targetClass: Class<T>): Flow<BaseResponse<List<T>>>
+
+    /**
+     * Observe data changes by path for single object and return as Flow
+     */
+    fun <T> observeDataByPathSingleFlow(path: String, targetClass: Class<T>): Flow<BaseResponse<T>>
+
+    /**
+     * Observe data changes by query and return as Flow
+     */
+    fun <T> observeDataByQueryFlow(query: Query, targetClass: Class<T>): Flow<BaseResponse<List<T>>>
+
+    /**
+     * Get data by query with suspend function
+     */
+    suspend fun <T> getDataByQuerySuspend(query: Query, targetClass: Class<T>): BaseResponse<List<T>>
+
+    /**
+     * Callback version of getDataByTableBaseResponse
+     */
+    fun <T> getDataByTableBaseResponse(tableChildKey: String, targetClass: Class<T>, isSingleCall: Boolean, function: (BaseResponse<List<T>>) -> Unit)
+
+    /**
+     * Get all data from a table and convert to list of objects
+     */
+    suspend fun <T> getDataByTableBaseResponse(tableChildKey: String, targetClass: Class<T>, isSingleCall: Boolean): BaseResponse<List<T>>
 }
