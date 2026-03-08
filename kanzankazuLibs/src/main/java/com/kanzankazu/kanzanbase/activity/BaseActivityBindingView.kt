@@ -14,7 +14,7 @@ import com.kanzankazu.kanzannetwork.InternetConnection
 abstract class BaseActivityBindingView<VB : ViewBinding> : BaseActivitySuper() {
 
     private var isNetworkAvailable: InternetConnection = InternetConnection.CONNECTED
-    private var _binding: ViewBinding? = null
+    protected var _binding: ViewBinding? = null
     abstract val bindingInflater: (LayoutInflater) -> VB
     val bindActivity: VB
         get() = _binding as VB
