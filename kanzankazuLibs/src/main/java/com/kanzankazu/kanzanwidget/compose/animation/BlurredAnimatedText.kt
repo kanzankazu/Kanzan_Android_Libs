@@ -12,6 +12,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +27,9 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.kanzankazu.kanzanwidget.compose.ui.BaseTheme
 import kotlin.math.roundToInt
 
 /**
@@ -163,6 +168,19 @@ private fun Modifier.fullContentBlur(
 
                 canvas.restore()
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BlurredAnimatedTextPreview() {
+    BaseTheme {
+        Surface(color = Color.Black) {
+            BlurredAnimatedText(
+                text = "Blurred Animated Text LooooooooooooooooooooooNG",
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 }

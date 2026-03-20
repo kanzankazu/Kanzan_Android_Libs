@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.kanzankazu.R
 import com.kanzankazu.kanzanwidget.compose.extension.initMod
+import com.kanzankazu.kanzanwidget.compose.ui.AppTextStyle
 import com.kanzankazu.kanzanwidget.compose.ui.PrimaryDarkItungItungan
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +28,12 @@ fun KanzanStandardToolbar(
     navigateUp: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text(title, initMod().fillMaxWidth(), color = Color.Black) },
+        title = { Text(
+            text = title,
+            modifier = initMod().fillMaxWidth(),
+            color = Color.Black,
+            style = AppTextStyle.nunito_medium_16
+        ) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = containerColor
         ),
