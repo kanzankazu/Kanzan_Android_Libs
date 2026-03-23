@@ -118,6 +118,11 @@ object AppTextStyle {
         fontSize = dp100.toSp()
     )
 
+    val nunito_regular_10 = TextStyle(
+        fontFamily = Nunito,
+        fontWeight = FontWeight.Normal,
+        fontSize = dp10.toSp()
+    )
     val nunito_regular_12 = TextStyle(
         fontFamily = Nunito,
         fontWeight = FontWeight.Normal,

@@ -27,6 +27,7 @@ val dp1 = 1.dp
 val dp2 = 2.dp
 val dp4 = 4.dp
 val dp8 = 8.dp
+val dp10 = 10.dp
 val dp12 = 12.dp
 val dp14 = 14.dp
 val dp16 = 16.dp
