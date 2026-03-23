@@ -316,7 +316,7 @@ private fun PreviewBadge() {
     KanzanTopAppBar(
         title = "Inbox",
         menuIcons = {
-            KanzanBadgeIcon(count = 5) {
+            KanzanIconBadge(count = 5) {
                 IconButton(onClick = {}) { Text(text = "🔔", style = AppTextStyle.nunito_regular_16) }
             }
             IconButton(onClick = {}) { Text(text = "⋮", style = AppTextStyle.nunito_regular_16) }
@@ -327,11 +327,11 @@ private fun PreviewBadge() {
 
 @Preview(showBackground = true, name = "14. Badge 99+")
 @Composable
-private fun PreviewBadge99() {
+private fun Preview99Badge() {
     KanzanTopAppBar(
         title = "Notifikasi",
         menuIcons = {
-            KanzanBadgeIcon(count = 150) {
+            KanzanIconBadge(count = 150) {
                 IconButton(onClick = {}) { Text(text = "🔔", style = AppTextStyle.nunito_regular_16) }
             }
         },
@@ -438,7 +438,7 @@ private fun PreviewFullCombo() {
         shadowElevation = 4.dp,
         search = "Cari transaksi..." to {},
         menuIcons = {
-            KanzanBadgeIcon(count = 3) {
+            KanzanIconBadge(count = 3) {
                 IconButton(onClick = {}) { Text(text = "🔔", style = AppTextStyle.nunito_regular_16) }
             }
             IconButton(onClick = {}) { Text(text = "⋮", style = AppTextStyle.nunito_regular_16) }

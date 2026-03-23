@@ -60,7 +60,7 @@ fun BottomBarWithFabDem() {
             RoundedBottomAppBar(navController)
         },
         floatingActionButtonPosition = FabPosition.Center,
-        isFloatingActionButtonDocked = true,
+        isFloatingActionButtonDocked = false,
         floatingActionButton = {
             SimpleFloatingActionButton(
                 navHostControllerRoute = Pair(navController, Screen.Camera.route),
