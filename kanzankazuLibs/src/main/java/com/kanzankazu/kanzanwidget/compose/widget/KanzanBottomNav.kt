@@ -25,6 +25,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.kanzankazu.kanzanwidget.compose.ui.dp0
+import com.kanzankazu.kanzanwidget.compose.ui.dp12
+import com.kanzankazu.kanzanwidget.compose.ui.dp15
+import com.kanzankazu.kanzanwidget.compose.ui.dp22
+import com.kanzankazu.kanzanwidget.compose.ui.dp35
+import com.kanzankazu.kanzanwidget.compose.ui.dp65
+import com.kanzankazu.kanzanwidget.compose.ui.dp100
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -76,11 +83,11 @@ fun BottomBarWithFabDem() {
 fun RoundedBottomAppBar(navController: NavController) {
     BottomAppBar(
         modifier = Modifier
-            .height(65.dp)
-            .clip(RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
+            .height(dp65)
+            .clip(RoundedCornerShape(dp15, dp15, dp0, dp0)),
         cutoutShape = CircleShape,
         //backgroundColor = Color.White,
-        elevation = 22.dp
+        elevation = dp22
     ) {
         BottomNav(navController = navController, screens = items)
     }
@@ -92,10 +99,10 @@ fun BottomNav(navController: NavController, screens: List<Screen>) {
     val currentRoute = navBackStackEntry?.destination
     BottomNavigation(
         modifier = Modifier
-            .padding(12.dp, 0.dp, 12.dp, 0.dp)
-            .height(100.dp),
+            .padding(dp12, dp0, dp12, dp0)
+            .height(dp100),
         //backgroundColor = Color.White,
-        elevation = 0.dp
+        elevation = dp0
     ) {
         screens.forEach { screen ->
             BottomNavigationItem(
@@ -104,7 +111,7 @@ fun BottomNav(navController: NavController, screens: List<Screen>) {
                         Icon(
                             imageVector = it,
                             contentDescription = "",
-                            modifier = Modifier.size(35.dp),
+                            modifier = Modifier.size(dp35),
                             //tint = Color.Gray
                         )
                     }

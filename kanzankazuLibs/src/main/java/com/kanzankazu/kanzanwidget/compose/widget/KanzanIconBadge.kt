@@ -20,6 +20,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kanzankazu.kanzanwidget.compose.ui.AppTextStyle
+import com.kanzankazu.kanzanwidget.compose.ui.dp1
+import com.kanzankazu.kanzanwidget.compose.ui.dp2
+import com.kanzankazu.kanzanwidget.compose.ui.dp4
+import com.kanzankazu.kanzanwidget.compose.ui.dp10
+import com.kanzankazu.kanzanwidget.compose.ui.dp16
+import com.kanzankazu.kanzanwidget.compose.ui.dp24
 
 /**
  * Badge wrapper — wraps a composable (typically an IconButton) with a badge count.
@@ -34,19 +40,19 @@ fun KanzanIconBadge(
         if (count > 0) {
             val label = if (count > 99) "99+" else count.toString()
             val isChip = label.length >= 3
-            val badgeHeight = 16.dp
+            val badgeHeight = dp16
             Text(
                 text = label,
                 style = AppTextStyle.nunito_regular_10,
                 color = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = if (isChip) (-2).dp else (-10).dp, y = 2.dp)
+                    .offset(x = if (isChip) (-dp2) else (-dp10), y = dp2)
                     .then(
                         if (isChip) {
                             Modifier
                                 .height(badgeHeight)
-                                .widthIn(min = 24.dp)
+                                .widthIn(min = dp24)
                                 .clip(RoundedCornerShape(badgeHeight / 2))
                         } else {
                             Modifier
@@ -55,7 +61,7 @@ fun KanzanIconBadge(
                         }
                     )
                     .background(Color.Red)
-                    .padding(horizontal = if (isChip) 4.dp else 1.dp, vertical = 1.dp),
+                    .padding(horizontal = if (isChip) dp4 else dp1, vertical = dp1),
                 textAlign = TextAlign.Center,
                 maxLines = 1
             )

@@ -30,8 +30,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kanzankazu.kanzanwidget.compose.ui.AppTextStyle
 import com.kanzankazu.kanzanwidget.compose.ui.PrimaryDarkItungItungan
+import com.kanzankazu.kanzanwidget.compose.ui.dp0
+import com.kanzankazu.kanzanwidget.compose.ui.dp2
+import com.kanzankazu.kanzanwidget.compose.ui.dp6
+import com.kanzankazu.kanzanwidget.compose.ui.dp8
+import com.kanzankazu.kanzanwidget.compose.ui.dp12
+import com.kanzankazu.kanzanwidget.compose.ui.dp14
+import com.kanzankazu.kanzanwidget.compose.ui.dp16
+import com.kanzankazu.kanzanwidget.compose.ui.dp40
+import com.kanzankazu.kanzanwidget.compose.ui.dp56
 
-private val BarHeight = 56.dp
+private val BarHeight = dp56
 
 /** Layout alignment for [KanzanTabBar] and [KanzanChipBar]. */
 enum class KanzanBarAlignment {
@@ -101,7 +110,7 @@ fun KanzanTabBar(
             Column(
                 modifier = itemModifier
                     .clickable { onTabSelected(index) }
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = dp16),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -109,12 +118,12 @@ fun KanzanTabBar(
                     text = label,
                     style = if (isSelected) AppTextStyle.nunito_medium_14 else AppTextStyle.nunito_regular_14,
                     color = if (isSelected) selectedColor else unselectedColor,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = dp8)
                 )
                 Box(
                     modifier = Modifier
-                        .width(40.dp)
-                        .height(2.dp)
+                        .width(dp40)
+                        .height(dp2)
                         .background(if (isSelected) selectedColor else Color.Transparent)
                 )
             }
@@ -154,7 +163,7 @@ fun KanzanChipBar(
     val chipContent: @Composable (Int, String) -> Unit = { index, label ->
         val isSelected = index == selectedIndex
         Surface(
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(dp16),
             color = if (isSelected) selectedChipColor else unselectedChipColor,
             modifier = Modifier
                 .wrapContentWidth()
@@ -162,7 +171,7 @@ fun KanzanChipBar(
         ) {
             Text(
                 text = label,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                modifier = Modifier.padding(horizontal = dp14, vertical = dp6),
                 style = if (isSelected) AppTextStyle.nunito_medium_12 else AppTextStyle.nunito_regular_12,
                 color = if (isSelected) selectedTextColor else unselectedTextColor
             )
@@ -174,18 +183,18 @@ fun KanzanChipBar(
             modifier = modifier
                 .fillMaxWidth()
                 .background(containerColor)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalSpacing = 8.dp,
-            verticalSpacing = 8.dp,
+                .padding(horizontal = dp12, vertical = dp8),
+            horizontalSpacing = dp8,
+            verticalSpacing = dp8,
             centerRows = alignment == KanzanBarAlignment.WRAP_CENTER
         ) {
             items.forEachIndexed { index, label -> chipContent(index, label) }
         }
     } else {
         val horizontalArrangement = when (alignment) {
-            KanzanBarAlignment.START -> Arrangement.spacedBy(8.dp, Alignment.Start)
-            KanzanBarAlignment.CENTER -> Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-            else -> Arrangement.spacedBy(8.dp)
+            KanzanBarAlignment.START -> Arrangement.spacedBy(dp8, Alignment.Start)
+            KanzanBarAlignment.CENTER -> Arrangement.spacedBy(dp8, Alignment.CenterHorizontally)
+            else -> Arrangement.spacedBy(dp8)
         }
 
         val baseModifier = modifier
@@ -194,9 +203,9 @@ fun KanzanChipBar(
             .background(containerColor)
 
         val finalModifier = if (alignment == KanzanBarAlignment.SCROLL) {
-            baseModifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp)
+            baseModifier.horizontalScroll(rememberScrollState()).padding(horizontal = dp12)
         } else {
-            baseModifier.padding(horizontal = 12.dp)
+            baseModifier.padding(horizontal = dp12)
         }
 
         Row(
@@ -219,8 +228,8 @@ fun KanzanChipBar(
 @Composable
 private fun SimpleFlowRow(
     modifier: Modifier = Modifier,
-    horizontalSpacing: Dp = 0.dp,
-    verticalSpacing: Dp = 0.dp,
+    horizontalSpacing: Dp = dp0,
+    verticalSpacing: Dp = dp0,
     centerRows: Boolean = false,
     content: @Composable () -> Unit,
 ) {
