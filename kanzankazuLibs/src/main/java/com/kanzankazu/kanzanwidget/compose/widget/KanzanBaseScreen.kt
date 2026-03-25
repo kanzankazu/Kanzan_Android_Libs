@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.IconButton
@@ -55,6 +57,7 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp16
  * @param scrollBehaviorType Enum to create scroll behavior internally. Default [KanzanScrollBehaviorType.NONE].
  * @param scrollBehavior Pre-created scroll behavior. When provided, takes precedence over [scrollBehaviorType].
  * @param containerColor Scaffold background color
+ * @param scrollable When true, wraps content in a vertical scroll. Default false. Jangan aktifkan jika content sudah pakai LazyColumn/LazyRow.
  * @param content Main screen content receiving PaddingValues from Scaffold
  */
 @Composable
@@ -71,6 +74,7 @@ fun KanzanBaseScreen(
     scrollBehaviorType: KanzanScrollBehaviorType = KanzanScrollBehaviorType.NONE,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     containerColor: Color = MaterialTheme.colorScheme.background,
+    scrollable: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val resolvedScrollBehavior = scrollBehavior ?: rememberKanzanScrollBehavior(scrollBehaviorType)
@@ -99,7 +103,14 @@ fun KanzanBaseScreen(
             if (emptyContent != null) {
                 emptyContent()
             } else {
-                content(paddingValues)
+                val contentModifier = if (scrollable) {
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                } else {
+                    Modifier.fillMaxSize()
+                }
+                Box(modifier = contentModifier) {
+                    content(paddingValues)
+                }
             }
 
             // Loading overlay
