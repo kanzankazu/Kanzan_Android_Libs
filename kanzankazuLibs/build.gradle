@@ -178,6 +178,9 @@ dependencies {
     /* Ktor HTTP engine for Supabase */
     api "io.ktor:ktor-client-android:2.3.12"
 
+    /* Appwrite Android SDK */
+    api "io.appwrite:sdk-for-android:8.1.0"
+
     /* Networking */
     api "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
     api "com.squareup.retrofit2:adapter-rxjava2:2.9.0"
