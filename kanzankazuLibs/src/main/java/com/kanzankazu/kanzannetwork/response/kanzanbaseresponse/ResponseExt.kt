@@ -99,7 +99,8 @@ fun <T> BaseResponse<T>.handleBaseResponse(
             onLoading?.invoke(false)
             val error = when (this) {
                 is HttpError -> message
-                is NoInternetError, is TimeOutError -> "Koneksi terputus. Cek sinyal kamu dan coba lagi, ya."
+                is NoInternetError, is TimeOutError, is SSLError -> "Koneksi terputus. Cek sinyal kamu dan coba lagi, ya."
+                is ParseError -> "Data dari server tidak bisa diproses. Coba beberapa saat lagi, ya."
                 else -> message.ifEmpty { "Terjadi kesalahan server. Coba beberapa saat lagi, ya." }
             }
             onError?.invoke(error)
