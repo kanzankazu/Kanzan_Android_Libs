@@ -110,15 +110,16 @@ fun KanzanTabBar(
             Column(
                 modifier = itemModifier
                     .clickable { onTabSelected(index) }
-                    .padding(horizontal = dp16),
+                    .padding(horizontal = dp6),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = label,
-                    style = if (isSelected) AppTextStyle.nunito_medium_14 else AppTextStyle.nunito_regular_14,
+                    style = if (isSelected) AppTextStyle.nunito_bold_14 else AppTextStyle.nunito_regular_14,
                     color = if (isSelected) selectedColor else unselectedColor,
-                    modifier = Modifier.padding(vertical = dp8)
+                    modifier = Modifier
+                        .padding(vertical = dp16)
                 )
                 Box(
                     modifier = Modifier
@@ -286,7 +287,7 @@ private fun SimpleFlowRow(
 
 
 // region ==================== Preview: KanzanTabBar ====================
-private val sampleTabs = listOf("Harian", "Mingguan", "Bulanan", "Total")
+private val sampleTabs = listOf("DAILY", "CALENDAR", "MONTHLY", "TOTAL")
 
 @Preview(showBackground = true, name = "TabBar 1. SCROLL (default)")
 @Composable

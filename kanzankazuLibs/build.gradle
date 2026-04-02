@@ -113,13 +113,13 @@ dependencies {
     api "androidx.work:work-runtime-ktx:2.7.1"
 
     /* AndroidX Room */
-    annotationProcessor 'androidx.room:room-compiler:2.3.0'
-    api "androidx.room:room-guava:2.3.0"
-    api "androidx.room:room-ktx:2.3.0"
-    api "androidx.room:room-runtime:2.3.0"
-    api "androidx.room:room-rxjava2:2.3.0"
-    kapt "androidx.room:room-compiler:2.3.0"
-    testImplementation "androidx.room:room-testing:2.3.0"
+    annotationProcessor 'androidx.room:room-compiler:2.5.2'
+    api "androidx.room:room-guava:2.5.2"
+    api "androidx.room:room-ktx:2.5.2"
+    api "androidx.room:room-runtime:2.5.2"
+    api "androidx.room:room-rxjava2:2.5.2"
+    kapt "androidx.room:room-compiler:2.5.2"
+    testImplementation "androidx.room:room-testing:2.5.2"
 
     /* AndroidX Navigation */
     api "androidx.navigation:navigation-fragment-ktx:2.3.5"
@@ -166,20 +166,6 @@ dependencies {
 //    api "com.google.firebase:firebase-iid:21.1.0" // DEPRECATED: Firebase Instance ID - Digantikan oleh Firebase Messaging
     api "com.google.firebase:firebase-perf-ktx:20.0.6" // Performance Monitoring - Monitor network requests, screen rendering, dan custom traces
     api "com.google.firebase:firebase-storage:19.2.0" // Cloud Storage - Object storage untuk images, audio, video, dan user-generated content
-
-    /* Supabase Kotlin SDK */
-    api platform("io.github.jan-tennert.supabase:bom:2.6.1")
-    api "io.github.jan-tennert.supabase:postgrest-kt"
-    api "io.github.jan-tennert.supabase:auth-kt"
-    api "io.github.jan-tennert.supabase:storage-kt"
-    api "io.github.jan-tennert.supabase:realtime-kt"
-    api "io.github.jan-tennert.supabase:functions-kt"
-
-    /* Ktor HTTP engine for Supabase */
-    api "io.ktor:ktor-client-android:2.3.12"
-
-    /* Appwrite Android SDK */
-    api "io.appwrite:sdk-for-android:8.1.0"
 
     /* Networking */
     api "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"

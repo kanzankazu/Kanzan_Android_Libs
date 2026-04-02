@@ -70,7 +70,7 @@ import timber.log.Timber
 object BaseRoomDatabase {
 
     @Volatile
-    private val instances = mutableMapOf<String, RoomDatabase>()
+    private var instances = mutableMapOf<String, RoomDatabase>()
 
     /**
      * Build atau get existing instance dari [RoomDatabase].
