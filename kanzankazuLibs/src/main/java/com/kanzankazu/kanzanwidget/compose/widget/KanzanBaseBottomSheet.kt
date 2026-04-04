@@ -4,6 +4,7 @@ package com.kanzankazu.kanzanwidget.compose.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -22,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -55,44 +55,140 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp40
 import com.kanzankazu.kanzanwidget.compose.ui.dp100
 import kotlinx.coroutines.launch
 
-// region ==================== KanzanBaseBottomSheet ====================
+// region ==================== Sealed Class: KanzanSheetType ====================
 
 /**
- * Reusable Modal Bottom Sheet with configurable header (title, subtitle, close button),
- * drag handle, shape, colors, and scrollable content.
+ * Sealed class yang mendefinisikan tipe konten bottom sheet.
+ * Setiap subclass membawa parameter spesifik untuk tipe tersebut.
  *
- * Wraps [ModalBottomSheet] with a consistent header pattern used across the app.
+ * Usage:
+ * ```
+ * KanzanBottomSheet(
+ *     isVisible = true,
+ *     onDismiss = { },
+ *     title = "Judul",
+ *     sheetType = KanzanSheetType.Content { Text("Hello") },
+ * )
  *
- * @param isVisible Controls visibility of the bottom sheet
- * @param onDismiss Called when the sheet is dismissed (back press, scrim tap, or close button)
- * @param modifier Modifier for the ModalBottomSheet
- * @param title Optional header title
- * @param subtitle Optional header subtitle
- * @param showCloseButton Show close (✕) button in the header
- * @param showDragHandle Show drag handle indicator at the top
- * @param showDivider Show divider between header and content
- * @param fullScreen When true, sheet uses [RectangleShape] and fills the entire screen height
- * @param skipPartiallyExpanded When true, sheet skips half-expanded state and opens fully expanded
- * @param dismissOnOutsideClick When false, tapping scrim or back press won't dismiss the sheet
- * @param sheetState SheetState for controlling expand/collapse programmatically
- * @param shape Bottom sheet shape (default: top rounded 16dp; ignored when [fullScreen] is true)
- * @param containerColor Background color of the sheet
- * @param scrimColor Scrim (overlay) color behind the sheet
- * @param tonalElevation Tonal elevation for the sheet surface
- * @param headerContent Custom header composable (replaces default title/subtitle/close)
- * @param scrollable Whether the content area is vertically scrollable
- * @param content Sheet body content
+ * KanzanBottomSheet(
+ *     isVisible = true,
+ *     onDismiss = { },
+ *     title = "Pilih Item",
+ *     sheetType = KanzanSheetType.ItemList(
+ *         items = listOf("A", "B", "C"),
+ *         onItemSelected = { index -> },
+ *     ),
+ * )
+ *
+ * KanzanBottomSheet(
+ *     isVisible = true,
+ *     onDismiss = { },
+ *     title = "Hapus?",
+ *     sheetType = KanzanSheetType.Confirm(
+ *         message = "Yakin hapus data ini?",
+ *         onConfirm = { },
+ *     ),
+ * )
+ * ```
+ */
+sealed class KanzanSheetType {
+
+    /**
+     * Free-form content — paling fleksibel, kamu tentukan sendiri isi body-nya.
+     *
+     * @param scrollable Apakah konten bisa di-scroll (default true)
+     * @param body Composable content lambda
+     */
+    data class Content(
+        val scrollable: Boolean = true,
+        val body: @Composable ColumnScope.() -> Unit,
+    ) : KanzanSheetType()
+
+    /**
+     * Selectable list dengan opsional search/filter.
+     *
+     * @param items Daftar label yang ditampilkan
+     * @param selectedIndex Index item yang sedang terpilih (-1 = tidak ada)
+     * @param onItemSelected Callback saat item dipilih (index asli dari [items])
+     * @param selectedColor Warna background item terpilih
+     * @param searchable Tampilkan field pencarian
+     * @param searchPlaceholder Placeholder text untuk field pencarian
+     * @param emptyText Text yang ditampilkan saat hasil pencarian kosong
+     */
+    data class ItemList(
+        val items: List<String>,
+        val selectedIndex: Int = -1,
+        val onItemSelected: (Int) -> Unit,
+        val selectedColor: Color = PrimaryDarkItungItungan.copy(alpha = 0.15f),
+        val searchable: Boolean = false,
+        val searchPlaceholder: String = "Cari...",
+        val emptyText: String = "Tidak ditemukan",
+    ) : KanzanSheetType()
+
+    /**
+     * Confirmation dialog dengan message dan dua tombol aksi.
+     *
+     * @param message Pesan konfirmasi
+     * @param confirmText Label tombol konfirmasi
+     * @param cancelText Label tombol batal
+     * @param onConfirm Callback saat tombol konfirmasi ditekan
+     * @param onCancel Callback saat tombol batal ditekan (null = pakai onDismiss)
+     * @param confirmColor Warna text tombol konfirmasi
+     */
+    data class Confirm(
+        val message: String,
+        val confirmText: String = "Ya",
+        val cancelText: String = "Batal",
+        val onConfirm: () -> Unit,
+        val onCancel: (() -> Unit)? = null,
+        val confirmColor: Color = Color.Red,
+    ) : KanzanSheetType()
+}
+
+// endregion
+
+// region ==================== KanzanBottomSheet (Unified) ====================
+
+/**
+ * Unified Modal Bottom Sheet — satu composable untuk semua kebutuhan bottom sheet.
+ *
+ * Tipe konten ditentukan oleh [sheetType] sealed class:
+ * - [KanzanSheetType.Content] → free-form composable body
+ * - [KanzanSheetType.ItemList] → selectable list dengan opsional search
+ * - [KanzanSheetType.Confirm] → confirmation dialog dengan 2 tombol
+ *
+ * Parameter shared berlaku untuk semua tipe.
+ *
+ * @param isVisible Kontrol visibilitas bottom sheet
+ * @param onDismiss Dipanggil saat sheet ditutup (back press, scrim tap, atau close button)
+ * @param sheetType Tipe konten bottom sheet (sealed class)
+ * @param modifier Modifier untuk ModalBottomSheet
+ * @param title Judul header (opsional)
+ * @param subtitle Sub-judul header (opsional)
+ * @param showCloseButton Tampilkan tombol close (✕) di header
+ * @param showDragHandle Tampilkan drag handle indicator di atas
+ * @param showDivider Tampilkan divider antara header dan konten
+ * @param fullScreen Sheet mengisi seluruh layar (shape jadi RectangleShape)
+ * @param skipPartiallyExpanded Sheet langsung fully expanded (skip half-expanded)
+ * @param dismissOnOutsideClick Tap di luar bisa menutup sheet
+ * @param sheetState SheetState untuk kontrol expand/collapse programmatically
+ * @param shape Bentuk bottom sheet (default: top rounded 16dp; diabaikan saat [fullScreen])
+ * @param containerColor Warna background sheet
+ * @param scrimColor Warna scrim (overlay) di belakang sheet
+ * @param tonalElevation Tonal elevation untuk surface sheet
+ * @param headerContent Custom header composable (menggantikan default title/subtitle/close)
  */
 @Composable
-fun KanzanBaseBottomSheet(
+fun KanzanBottomSheet(
     isVisible: Boolean,
     onDismiss: () -> Unit,
+    sheetType: KanzanSheetType,
     modifier: Modifier = Modifier,
     title: String? = null,
     subtitle: String? = null,
     showCloseButton: Boolean = true,
     showDragHandle: Boolean = true,
-    showDivider: Boolean = false,
+    showDivider: Boolean = sheetType !is KanzanSheetType.Content,
     fullScreen: Boolean = false,
     skipPartiallyExpanded: Boolean = false,
     dismissOnOutsideClick: Boolean = true,
@@ -104,12 +200,13 @@ fun KanzanBaseBottomSheet(
     scrimColor: Color = Color.Black.copy(alpha = 0.32f),
     tonalElevation: Dp = dp0,
     headerContent: @Composable (() -> Unit)? = null,
-    scrollable: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
     if (!isVisible) return
+
+    val scope = rememberCoroutineScope()
+    val hideAndDismiss: () -> Unit = {
+        scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
+    }
 
     ModalBottomSheet(
         onDismissRequest = { if (dismissOnOutsideClick) onDismiss() },
@@ -122,39 +219,167 @@ fun KanzanBaseBottomSheet(
         dragHandle = if (showDragHandle && !fullScreen) {
             { KanzanDragHandle() }
         } else null,
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            // Header
-            if (headerContent != null) {
-                headerContent()
-            } else if (title != null) {
-                KanzanSheetHeader(
-                    title = title,
-                    subtitle = subtitle,
-                    showCloseButton = showCloseButton,
-                    onClose = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
-                    }
-                )
-            }
+    ) { ModalBottomSheetContent(headerContent, title, subtitle, showCloseButton, hideAndDismiss, showDivider, sheetType, onDismiss) }
+}
 
-            // Divider
-            if (showDivider && (title != null || headerContent != null)) {
-                Divider(color = Color.LightGray.copy(alpha = 0.5f))
-            }
+@Composable
+private fun ModalBottomSheetContent(headerContent: @Composable (() -> Unit)?, title: String?, subtitle: String?, showCloseButton: Boolean, hideAndDismiss: () -> Unit, showDivider: Boolean, sheetType: KanzanSheetType, onDismiss: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // ── Header ──
+        if (headerContent != null) {
+            headerContent()
+        } else if (title != null) {
+            KanzanSheetHeader(
+                title = title,
+                subtitle = subtitle,
+                showCloseButton = showCloseButton,
+                onClose = hideAndDismiss,
+            )
+        }
 
-            // Content
-            val contentModifier = if (scrollable) {
-                Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
-            } else {
-                Modifier.fillMaxWidth()
-            }
-            Column(modifier = contentModifier) {
-                content()
-            }
+        // ── Divider ──
+        if (showDivider && (title != null || headerContent != null)) {
+            Divider(color = Color.LightGray.copy(alpha = 0.5f))
+        }
+
+        // ── Body berdasarkan sheetType ──
+        when (sheetType) {
+            is KanzanSheetType.Content -> ContentBody(sheetType)
+            is KanzanSheetType.ItemList -> ItemListBody(sheetType, onDismiss)
+            is KanzanSheetType.Confirm -> ConfirmBody(sheetType, onDismiss)
         }
     }
 }
+
+// endregion
+
+// region ==================== Internal Body Composables ====================
+
+@Composable
+private fun ColumnScope.ContentBody(type: KanzanSheetType.Content) {
+    val contentModifier = if (type.scrollable) {
+        Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
+    } else {
+        Modifier.fillMaxWidth()
+    }
+    Column(modifier = contentModifier) {
+        type.body(this)
+    }
+}
+
+@Composable
+private fun ColumnScope.ItemListBody(
+    type: KanzanSheetType.ItemList,
+    onDismiss: () -> Unit,
+) {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredItems by remember(type.items, searchQuery) {
+        derivedStateOf {
+            val indexed = type.items.mapIndexed { index, label -> index to label }
+            if (searchQuery.isBlank()) indexed
+            else indexed.filter { it.second.contains(searchQuery, ignoreCase = true) }
+        }
+    }
+
+    if (type.searchable) {
+        KanzanTextField(
+            label = "",
+            value = searchQuery,
+            onValueChanged = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp16, vertical = dp8),
+            placeholder = type.searchPlaceholder,
+            kanzanInputType = KanzanInputType.SEARCH,
+            imeAction = ImeAction.Done,
+            singleLine = true,
+        )
+    }
+
+    val scrollModifier = if (type.searchable) {
+        Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
+    } else {
+        Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
+    }
+
+    Column(modifier = scrollModifier) {
+        filteredItems.forEach { (originalIndex, label) ->
+            val isSelected = originalIndex == type.selectedIndex
+            val bgColor = if (isSelected) type.selectedColor else Color.Transparent
+            Text(
+                text = label,
+                style = if (isSelected) AppTextStyle.nunito_medium_14 else AppTextStyle.nunito_regular_14,
+                color = Color.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(bgColor)
+                    .clickable {
+                        type.onItemSelected(originalIndex)
+                        searchQuery = ""
+                        onDismiss()
+                    }
+                    .padding(horizontal = dp16, vertical = dp14),
+            )
+        }
+        if (type.searchable && filteredItems.isEmpty()) {
+            Text(
+                text = type.emptyText,
+                style = AppTextStyle.nunito_regular_14,
+                color = Color.Gray,
+                modifier = Modifier.padding(horizontal = dp16, vertical = dp14),
+            )
+        }
+    }
+    Spacer(modifier = Modifier.height(dp16))
+}
+
+@Composable
+private fun ConfirmBody(
+    type: KanzanSheetType.Confirm,
+    onDismiss: () -> Unit,
+) {
+    Text(
+        text = type.message,
+        style = AppTextStyle.nunito_regular_14,
+        color = Color.DarkGray,
+        modifier = Modifier.padding(horizontal = dp16, vertical = dp12),
+    )
+    Spacer(modifier = Modifier.height(dp8))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dp16, vertical = dp8),
+        horizontalArrangement = Arrangement.spacedBy(dp8),
+    ) {
+        KanzanBaseButton(
+            title = type.cancelText,
+            onClick = { (type.onCancel ?: onDismiss).invoke() },
+            modifier = Modifier.weight(1f),
+            buttonType = KanzanButtonType.OUTLINED,
+            buttonSize = KanzanButtonSize.MEDIUM,
+            containerColor = Color.Gray,
+            borderColor = Color.Gray,
+            contentColor = Color.Gray,
+        )
+        KanzanBaseButton(
+            title = type.confirmText,
+            onClick = {
+                type.onConfirm()
+                onDismiss()
+            },
+            modifier = Modifier.weight(1f),
+            buttonType = KanzanButtonType.FILLED,
+            buttonSize = KanzanButtonSize.MEDIUM,
+            containerColor = type.confirmColor,
+            contentColor = Color.White,
+        )
+    }
+    Spacer(modifier = Modifier.height(dp8))
+}
+
+// endregion
+
+// region ==================== Internal UI Components ====================
 
 /** Default drag handle indicator. */
 @Composable
@@ -166,13 +391,13 @@ private fun KanzanDragHandle(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = dp8),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
                 .width(dp40)
                 .height(dp4)
-                .background(color, RoundedCornerShape(dp2))
+                .background(color, RoundedCornerShape(dp2)),
         )
     }
 }
@@ -189,7 +414,7 @@ private fun KanzanSheetHeader(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dp16, vertical = dp8),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -212,492 +437,200 @@ private fun KanzanSheetHeader(
         }
     }
 }
+
 // endregion
 
-// region ==================== KanzanListBottomSheet ====================
 
-/**
- * Convenience bottom sheet for displaying a selectable list of items.
- * Wraps [KanzanBaseBottomSheet] with a list of clickable rows.
- *
- * @param isVisible Controls visibility
- * @param onDismiss Called when dismissed
- * @param title Header title
- * @param items List of display labels
- * @param selectedIndex Currently selected index (highlighted, based on original items index)
- * @param onItemSelected Called with the selected index (original items index)
- * @param selectedColor Background color for selected item
- * @param subtitle Optional header subtitle
- * @param searchable When true, shows a search/filter field above the list
- * @param searchPlaceholder Placeholder text for the search field
- * @param fullScreen When true, sheet fills the entire screen
- * @param skipPartiallyExpanded When true, sheet opens fully expanded
- * @param dismissOnOutsideClick When false, tapping outside won't dismiss
- */
+// region ==================== Previews ====================
+
+@Preview(showBackground = true)
 @Composable
-fun KanzanListBottomSheet(
-    isVisible: Boolean,
-    onDismiss: () -> Unit,
-    title: String,
-    items: List<String>,
-    selectedIndex: Int = -1,
-    onItemSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    selectedColor: Color = PrimaryDarkItungItungan.copy(alpha = 0.15f),
-    subtitle: String? = null,
-    searchable: Boolean = false,
-    searchPlaceholder: String = "Cari...",
-    fullScreen: Boolean = false,
-    skipPartiallyExpanded: Boolean = false,
-    dismissOnOutsideClick: Boolean = true,
-) {
-    var searchQuery by remember { mutableStateOf("") }
-    // Pair(originalIndex, label) filtered by query
-    val filteredItems by remember(items, searchQuery) {
-        derivedStateOf {
-            if (searchQuery.isBlank()) {
-                items.mapIndexed { index, label -> index to label }
-            } else {
-                items.mapIndexed { index, label -> index to label }
-                    .filter { it.second.contains(searchQuery, ignoreCase = true) }
-            }
-        }
-    }
-
-    KanzanBaseBottomSheet(
-        isVisible = isVisible,
-        onDismiss = {
-            searchQuery = ""
-            onDismiss()
+private fun PreviewContentBody() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "Content Sheet",
+        subtitle = "Subtitle opsional",
+        showCloseButton = true,
+        hideAndDismiss = {},
+        showDivider = false,
+        sheetType = KanzanSheetType.Content {
+            Text(
+                text = "Ini adalah free-form content body.\nBisa diisi composable apapun.",
+                modifier = Modifier.padding(dp16),
+            )
         },
-        modifier = modifier,
-        title = title,
-        subtitle = subtitle,
-        showDivider = true,
-        scrollable = !searchable, // when searchable, we handle scroll ourselves below the search field
-        fullScreen = fullScreen,
-        skipPartiallyExpanded = skipPartiallyExpanded,
-        dismissOnOutsideClick = dismissOnOutsideClick,
-    ) {
-        if (searchable) {
-            KanzanTextField(
-                label = "",
-                value = searchQuery,
-                onValueChanged = { searchQuery = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dp16, vertical = dp8),
-                placeholder = searchPlaceholder,
-                kanzanInputType = KanzanInputType.SEARCH,
-                imeAction = ImeAction.Done,
-                singleLine = true,
-            )
-        }
-
-        val scrollModifier = if (searchable) {
-            Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
-        } else {
-            Modifier.fillMaxWidth()
-        }
-
-        Column(modifier = scrollModifier) {
-            filteredItems.forEach { (originalIndex, label) ->
-                val isSelected = originalIndex == selectedIndex
-                val bgColor = if (isSelected) selectedColor else Color.Transparent
-                Text(
-                    text = label,
-                    style = if (isSelected) AppTextStyle.nunito_medium_14 else AppTextStyle.nunito_regular_14,
-                    color = Color.Black,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(bgColor)
-                        .clickable {
-                            onItemSelected(originalIndex)
-                            searchQuery = ""
-                            onDismiss()
-                        }
-                        .padding(horizontal = dp16, vertical = dp14)
-                )
-            }
-            if (searchable && filteredItems.isEmpty()) {
-                Text(
-                    text = "Tidak ditemukan",
-                    style = AppTextStyle.nunito_regular_14,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(horizontal = dp16, vertical = dp14)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(dp16))
-    }
+        onDismiss = {},
+    )
 }
-// endregion
 
-// region ==================== KanzanConfirmBottomSheet ====================
-
-/**
- * Convenience bottom sheet for confirmation dialogs with message and action buttons.
- *
- * @param isVisible Controls visibility
- * @param onDismiss Called when dismissed
- * @param title Header title
- * @param message Confirmation message body
- * @param confirmText Confirm button label
- * @param cancelText Cancel button label
- * @param onConfirm Called when confirm is tapped
- * @param onCancel Called when cancel is tapped (defaults to onDismiss)
- * @param confirmColor Confirm button text color
- * @param dismissOnOutsideClick When false, tapping outside won't dismiss (force user to choose)
- */
+@Preview(showBackground = true)
 @Composable
-fun KanzanConfirmBottomSheet(
-    isVisible: Boolean,
-    onDismiss: () -> Unit,
-    title: String,
-    message: String,
-    confirmText: String = "Ya",
-    cancelText: String = "Batal",
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit = onDismiss,
-    modifier: Modifier = Modifier,
-    confirmColor: Color = Color.Red,
-    dismissOnOutsideClick: Boolean = true,
-) {
-    KanzanBaseBottomSheet(
-        isVisible = isVisible,
-        onDismiss = onDismiss,
-        modifier = modifier,
-        title = title,
-        showDivider = true,
-        scrollable = false,
-        dismissOnOutsideClick = dismissOnOutsideClick,
-    ) {
-        Text(
-            text = message,
-            style = AppTextStyle.nunito_regular_14,
-            color = Color.DarkGray,
-            modifier = Modifier.padding(horizontal = dp16, vertical = dp12)
-        )
-        Spacer(modifier = Modifier.height(dp8))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = dp16, vertical = dp8)
-        ) {
+private fun PreviewContentBodyNoHeader() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = null,
+        subtitle = null,
+        showCloseButton = false,
+        hideAndDismiss = {},
+        showDivider = false,
+        sheetType = KanzanSheetType.Content {
             Text(
-                text = cancelText,
-                style = AppTextStyle.nunito_medium_14,
-                color = Color.Gray,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { onCancel() }
-                    .padding(vertical = dp12),
+                text = "Content tanpa header dan tanpa close button.",
+                modifier = Modifier.padding(dp16),
             )
-            Text(
-                text = confirmText,
-                style = AppTextStyle.nunito_medium_14,
-                color = confirmColor,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        onConfirm()
-                        onDismiss()
-                    }
-                    .padding(vertical = dp12),
-            )
-        }
-        Spacer(modifier = Modifier.height(dp8))
-    }
-}
-// endregion
-
-// region ==================== Preview ====================
-
-/**
- * Helper yang merender konten sheet secara langsung (tanpa ModalBottomSheet)
- * supaya bisa tampil di static Compose Preview.
- * ModalBottomSheet pakai Dialog window internal yang tidak bisa render di preview.
- */
-@Composable
-private fun PreviewSheetSurface(
-    title: String? = null,
-    subtitle: String? = null,
-    showCloseButton: Boolean = true,
-    showDragHandle: Boolean = true,
-    showDivider: Boolean = false,
-    containerColor: Color = Color.White,
-    headerContent: @Composable (() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(containerColor, CustomShapes.bottomSheetShape)
-    ) {
-        if (showDragHandle) KanzanDragHandle()
-        if (headerContent != null) {
-            headerContent()
-        } else if (title != null) {
-            KanzanSheetHeader(title = title, subtitle = subtitle, showCloseButton = showCloseButton)
-        }
-        if (showDivider && (title != null || headerContent != null)) {
-            Divider(color = Color.LightGray.copy(alpha = 0.5f))
-        }
-        content()
-    }
+        },
+        onDismiss = {},
+    )
 }
 
-// region ── 1. KanzanBaseBottomSheet variants ──
-
-@Preview(showBackground = true, name = "BS 1. Title only")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewBsTitle() {
-    PreviewSheetSurface(title = "Pilih Opsi") {
-        Text(text = "Konten bottom sheet", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 2. Title + subtitle")
-@Composable
-private fun PreviewBsSubtitle() {
-    PreviewSheetSurface(title = "Detail Hutang", subtitle = "Rp 500.000") {
-        Text(text = "Informasi detail hutang", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 3. No close button")
-@Composable
-private fun PreviewBsNoClose() {
-    PreviewSheetSurface(title = "Informasi", showCloseButton = false) {
-        Text(text = "Tanpa tombol close", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 4. No drag handle")
-@Composable
-private fun PreviewBsNoDrag() {
-    PreviewSheetSurface(title = "Tanpa Drag Handle", showDragHandle = false) {
-        Text(text = "Konten tanpa drag handle", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 5. With divider")
-@Composable
-private fun PreviewBsDivider() {
-    PreviewSheetSurface(title = "Filter", subtitle = "Pilih filter", showDivider = true) {
-        listOf("Semua", "Belum Lunas", "Lunas", "Jatuh Tempo").forEach { label ->
-            Text(text = label, modifier = Modifier.fillMaxWidth().padding(horizontal = dp16, vertical = dp14), style = AppTextStyle.nunito_regular_14)
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "BS 6. Custom header")
-@Composable
-private fun PreviewBsCustomHeader() {
-    PreviewSheetSurface(
+private fun PreviewContentBodyCustomHeader() {
+    ModalBottomSheetContent(
         headerContent = {
-            Box(modifier = Modifier.fillMaxWidth().background(PrimaryDarkItungItungan).padding(dp16), contentAlignment = Alignment.Center) {
-                Text(text = "Header Kustom", style = AppTextStyle.nunito_medium_16)
-            }
-        }
-    ) {
-        Text(text = "Konten dengan header kustom", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 7. Dark color")
-@Composable
-private fun PreviewBsDark() {
-    PreviewSheetSurface(title = "Tema Gelap", containerColor = Color.DarkGray) {
-        Text(text = "Konten dengan background gelap", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14, color = Color.White)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 8. Primary color")
-@Composable
-private fun PreviewBsPrimary() {
-    PreviewSheetSurface(title = "Aksi", containerColor = PrimaryDarkItungItungan.copy(alpha = 0.1f), showDivider = true) {
-        Text(text = "Konten dengan warna primer", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 9. Full screen (no drag, rectangle)")
-@Composable
-private fun PreviewBsFullScreen() {
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        KanzanSheetHeader(title = "Full Screen", showCloseButton = true)
-        Divider(color = Color.LightGray.copy(alpha = 0.5f))
-        Text(text = "Bottom sheet full screen — tanpa rounded corner, tanpa drag handle", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 10. Skip collapse (langsung expand)")
-@Composable
-private fun PreviewBsSkipCollapse() {
-    PreviewSheetSurface(title = "Langsung Expand") {
-        Text(text = "Sheet ini langsung expand penuh, skip half-expanded state", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-        Spacer(modifier = Modifier.height(dp100))
-        Text(text = "Konten panjang...", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-
-@Preview(showBackground = true, name = "BS 11. No dismiss outside")
-@Composable
-private fun PreviewBsNoDismiss() {
-    PreviewSheetSurface(title = "Tidak bisa dismiss dari luar", showCloseButton = true) {
-        Text(text = "Tap di luar tidak akan menutup sheet ini.\nGunakan tombol ✕ untuk menutup.", modifier = Modifier.padding(dp16), style = AppTextStyle.nunito_regular_14)
-    }
-}
-// endregion
-
-// region ── 2. KanzanListBottomSheet variants ──
-
-@Composable
-private fun PreviewListContent(
-    title: String,
-    items: List<String>,
-    selectedIndex: Int = -1,
-    subtitle: String? = null,
-    selectedColor: Color = PrimaryDarkItungItungan.copy(alpha = 0.15f),
-    searchable: Boolean = false,
-    searchPlaceholder: String = "Cari...",
-) {
-    PreviewSheetSurface(title = title, subtitle = subtitle, showDivider = true) {
-        if (searchable) {
-            KanzanTextField(
-                label = "",
-                value = "",
-                onValueChanged = {},
-                modifier = Modifier.fillMaxWidth().padding(horizontal = dp16, vertical = dp8),
-                placeholder = searchPlaceholder,
-                kanzanInputType = KanzanInputType.SEARCH,
-                imeAction = ImeAction.Done,
-                singleLine = true,
-            )
-        }
-        items.forEachIndexed { index, label ->
-            val isSelected = index == selectedIndex
-            Text(
-                text = label,
-                style = if (isSelected) AppTextStyle.nunito_medium_14 else AppTextStyle.nunito_regular_14,
-                color = Color.Black,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(if (isSelected) selectedColor else Color.Transparent)
-                    .padding(horizontal = dp16, vertical = dp14)
-            )
-        }
-        Spacer(modifier = Modifier.height(dp16))
-    }
-}
-
-@Preview(showBackground = true, name = "List 1. Basic")
-@Composable
-private fun PreviewListBasic() {
-    PreviewListContent(title = "Pilih Kategori", items = listOf("Makanan", "Transportasi", "Hiburan", "Belanja", "Tagihan"), selectedIndex = 1)
-}
-
-@Preview(showBackground = true, name = "List 2. Subtitle")
-@Composable
-private fun PreviewListSubtitle() {
-    PreviewListContent(title = "Pilih Dompet", subtitle = "3 dompet tersedia", items = listOf("Tunai", "BCA", "Mandiri"), selectedIndex = 0)
-}
-
-@Preview(showBackground = true, name = "List 3. No selection")
-@Composable
-private fun PreviewListNoSelection() {
-    PreviewListContent(title = "Urutkan", items = listOf("Terbaru", "Terlama", "Nominal Terbesar", "Nominal Terkecil"))
-}
-
-@Preview(showBackground = true, name = "List 4. Many items")
-@Composable
-private fun PreviewListMany() {
-    PreviewListContent(
-        title = "Pilih Bulan",
-        items = listOf("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"),
-        selectedIndex = 2
+                    .background(Color.Cyan.copy(alpha = 0.2f))
+                    .padding(dp16),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = "Custom Header", style = AppTextStyle.nunito_medium_16)
+            }
+        },
+        title = null,
+        subtitle = null,
+        showCloseButton = false,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.Content {
+            Text(text = "Body dengan custom header di atas.", modifier = Modifier.padding(dp16))
+        },
+        onDismiss = {},
     )
 }
 
-@Preview(showBackground = true, name = "List 5. Searchable")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewListSearchable() {
-    PreviewListContent(
-        title = "Pilih Kategori",
-        items = listOf("Makanan", "Minuman", "Transportasi", "Hiburan", "Belanja", "Tagihan", "Pendidikan", "Kesehatan", "Olahraga", "Lainnya"),
-        selectedIndex = 3,
-        searchable = true,
-        searchPlaceholder = "Cari kategori..."
+private fun PreviewItemList() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "Pilih Item",
+        subtitle = null,
+        showCloseButton = true,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.ItemList(
+            items = listOf("Apel", "Jeruk", "Mangga", "Durian", "Rambutan"),
+            selectedIndex = 2,
+            onItemSelected = {},
+        ),
+        onDismiss = {},
     )
 }
 
-@Preview(showBackground = true, name = "List 6. Fullscreen + search")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewListFullscreenSearch() {
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        KanzanSheetHeader(title = "Pilih Kota", showCloseButton = true)
-        Divider(color = Color.LightGray.copy(alpha = 0.5f))
-        KanzanTextField(
-            label = "",
-            value = "",
-            onValueChanged = {},
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp16, vertical = dp8),
-            placeholder = "Cari kota...",
-            kanzanInputType = KanzanInputType.SEARCH,
-            imeAction = ImeAction.Done,
-            singleLine = true,
-        )
-        listOf("Jakarta", "Surabaya", "Bandung", "Medan", "Semarang", "Makassar", "Palembang", "Tangerang").forEach { city ->
-            Text(text = city, style = AppTextStyle.nunito_regular_14, modifier = Modifier.fillMaxWidth().padding(horizontal = dp16, vertical = dp14))
-        }
-    }
-}
-// endregion
-
-// region ── 3. KanzanConfirmBottomSheet variants ──
-
-@Composable
-private fun PreviewConfirmContent(
-    title: String,
-    message: String,
-    confirmText: String = "Ya",
-    cancelText: String = "Batal",
-    confirmColor: Color = Color.Red,
-) {
-    PreviewSheetSurface(title = title, showDivider = true) {
-        Text(text = message, style = AppTextStyle.nunito_regular_14, color = Color.DarkGray, modifier = Modifier.padding(horizontal = dp16, vertical = dp12))
-        Spacer(modifier = Modifier.height(dp8))
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = dp16, vertical = dp8)) {
-            Text(text = cancelText, style = AppTextStyle.nunito_medium_14, color = Color.Gray, modifier = Modifier.weight(1f).padding(vertical = dp12))
-            Text(text = confirmText, style = AppTextStyle.nunito_medium_14, color = confirmColor, modifier = Modifier.weight(1f).padding(vertical = dp12))
-        }
-        Spacer(modifier = Modifier.height(dp8))
-    }
+private fun PreviewItemListNoSelection() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "Pilih Kota",
+        subtitle = "Belum ada yang dipilih",
+        showCloseButton = true,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.ItemList(
+            items = listOf("Jakarta", "Bandung", "Surabaya", "Yogyakarta"),
+            selectedIndex = -1,
+            onItemSelected = {},
+        ),
+        onDismiss = {},
+    )
 }
 
-@Preview(showBackground = true, name = "Confirm 1. Hapus")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewConfirmDelete() {
-    PreviewConfirmContent(title = "Hapus Hutang", message = "Apakah Anda yakin ingin menghapus hutang ini? Tindakan ini tidak dapat dibatalkan.")
+private fun PreviewItemListSearchable() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "Cari & Pilih",
+        subtitle = null,
+        showCloseButton = true,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.ItemList(
+            items = listOf("Kucing", "Anjing", "Kelinci", "Hamster", "Burung"),
+            selectedIndex = 1,
+            onItemSelected = {},
+            searchable = true,
+            searchPlaceholder = "Cari hewan...",
+            emptyText = "Hewan tidak ditemukan",
+        ),
+        onDismiss = {},
+    )
 }
 
-@Preview(showBackground = true, name = "Confirm 2. Custom labels")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewConfirmCustom() {
-    PreviewConfirmContent(title = "Keluar Arisan", message = "Anda akan keluar dari grup arisan ini. Lanjutkan?", confirmText = "Keluar", cancelText = "Tetap di Grup")
+private fun PreviewItemListEmpty() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "List Kosong",
+        subtitle = null,
+        showCloseButton = true,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.ItemList(
+            items = emptyList(),
+            onItemSelected = {},
+            searchable = true,
+            emptyText = "Data kosong",
+        ),
+        onDismiss = {},
+    )
 }
 
-@Preview(showBackground = true, name = "Confirm 3. Positive")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewConfirmPositive() {
-    PreviewConfirmContent(title = "Tandai Lunas", message = "Hutang sebesar Rp 500.000 akan ditandai sebagai lunas.", confirmText = "Tandai Lunas", confirmColor = Color(0xFF4CAF50))
+private fun PreviewConfirm() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "Konfirmasi Hapus",
+        subtitle = null,
+        showCloseButton = true,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.Confirm(
+            message = "Apakah kamu yakin ingin menghapus data ini? Tindakan ini tidak bisa dibatalkan.",
+            confirmText = "Hapus",
+            cancelText = "Batal",
+            onConfirm = {},
+            confirmColor = Color.Red,
+        ),
+        onDismiss = {},
+    )
 }
 
-@Preview(showBackground = true, name = "Confirm 4. No dismiss outside")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewConfirmNoDismiss() {
-    PreviewConfirmContent(title = "Konfirmasi Wajib", message = "Anda harus memilih salah satu opsi.\nTap di luar tidak akan menutup dialog ini.", confirmText = "Setuju", cancelText = "Tolak")
+private fun PreviewConfirmCustomText() {
+    ModalBottomSheetContent(
+        headerContent = null,
+        title = "Logout",
+        subtitle = "Sesi akan berakhir",
+        showCloseButton = false,
+        hideAndDismiss = {},
+        showDivider = true,
+        sheetType = KanzanSheetType.Confirm(
+            message = "Kamu akan keluar dari akun. Lanjutkan?",
+            confirmText = "Ya, Keluar",
+            cancelText = "Tidak",
+            onConfirm = {},
+            onCancel = {},
+            confirmColor = Color(0xFFFF6600),
+        ),
+        onDismiss = {},
+    )
 }
-// endregion
 
 // endregion

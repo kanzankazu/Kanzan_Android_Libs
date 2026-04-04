@@ -18,12 +18,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -32,9 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,16 +46,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kanzankazu.kanzanwidget.compose.ui.AppTextStyle
-import com.kanzankazu.kanzanwidget.compose.ui.PrimaryDarkItungItungan
 import com.kanzankazu.kanzanwidget.compose.ui.Shapes
-import com.kanzankazu.kanzanwidget.compose.ui.dp2
-import com.kanzankazu.kanzanwidget.compose.ui.dp4
-import com.kanzankazu.kanzanwidget.compose.ui.dp8
 import com.kanzankazu.kanzanwidget.compose.ui.dp12
 import com.kanzankazu.kanzanwidget.compose.ui.dp16
+import com.kanzankazu.kanzanwidget.compose.ui.dp2
 import com.kanzankazu.kanzanwidget.compose.ui.dp20
 import com.kanzankazu.kanzanwidget.compose.ui.dp24
+import com.kanzankazu.kanzanwidget.compose.ui.dp4
 import com.kanzankazu.kanzanwidget.compose.ui.dp48
+import com.kanzankazu.kanzanwidget.compose.ui.dp8
 
 // region ==================== Enums & Models ====================
 
@@ -161,7 +157,9 @@ fun KanzanBaseButton(
     }
 
     val finalEnabled = enabled && !isLoading
-    val finalModifier = if (fullWidth) modifier.fillMaxWidth().height(resolvedHeight) else modifier.height(resolvedHeight)
+    val hasMultiLine = subtitle != null
+    val heightModifier = if (hasMultiLine) Modifier.heightIn(min = resolvedHeight) else Modifier.height(resolvedHeight)
+    val finalModifier = if (fullWidth) modifier.fillMaxWidth().then(heightModifier) else modifier.then(heightModifier)
 
     val colors = ButtonDefaults.buttonColors(
         containerColor = containerColor,
@@ -256,7 +254,11 @@ private fun KanzanButtonContent(
         }
 
         // Title + subtitle
-        Column(modifier = if (nominal != null) Modifier.weight(1f) else Modifier) {
+        Column(
+            modifier =
+                if (nominal != null) Modifier.weight(1f)
+                else Modifier
+        ) {
             Text(text = title, style = titleStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (subtitle != null) {
                 Text(text = subtitle, style = subtitleStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -426,8 +428,20 @@ private fun PreviewButtonDisabled() {
 @Composable
 private fun PreviewButtonCustomColors() {
     Column(modifier = Modifier.padding(dp16), verticalArrangement = Arrangement.spacedBy(dp8)) {
-        KanzanBaseButton(title = "Hapus", onClick = {}, containerColor = Color.Red, fullWidth = true)
-        KanzanBaseButton(title = "Sukses", onClick = {}, containerColor = Color(0xFF4CAF50), fullWidth = true)
+        KanzanBaseButton(
+            title = "Hapus",
+            onClick = {},
+            buttonType = KanzanButtonType.OUTLINED,
+            borderColor = Color.Red,
+            contentColor = Color.Red,
+            fullWidth = true
+        )
+        KanzanBaseButton(
+            title = "Sukses",
+            onClick = {},
+            containerColor = Color(0xFF4CAF50),
+            fullWidth = true
+        )
     }
 }
 
@@ -440,7 +454,9 @@ private fun PreviewButtonBadge() {
         leadingIcon = { Text(text = "🔔", style = AppTextStyle.nunito_regular_14) },
         badge = {
             Box(
-                modifier = Modifier.size(dp20).background(Color.Red, RoundedCornerShape(dp4)),
+                modifier = Modifier
+                    .size(dp20)
+                    .background(Color.Red, RoundedCornerShape(dp4)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "5", style = AppTextStyle.nunito_bold_12, color = Color.White)
