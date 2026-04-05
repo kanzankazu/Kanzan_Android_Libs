@@ -35,22 +35,24 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp16
  * Data class untuk item dropdown menu.
  *
  * @param T tipe data yang dibawa item.
- * @param label teks yang ditampilkan.
+ * @param label teks yang ditampilkan (diabaikan jika [customContent] diset).
  * @param data data yang dibawa item.
  * @param enabled item bisa diklik atau tidak.
  * @param leadingIcon icon di kiri item.
  * @param trailingIcon icon di kanan item.
  * @param showDividerAfter tampilkan divider setelah item ini.
  * @param tint warna teks item (null = default).
+ * @param customContent composable kustom per item — jika diset, menggantikan default label/icon rendering.
  */
 data class KanzanDropdownItem<T>(
-    val label: String,
+    val label: String = "",
     val data: T,
     val enabled: Boolean = true,
     val leadingIcon: @Composable (() -> Unit)? = null,
     val trailingIcon: @Composable (() -> Unit)? = null,
     val showDividerAfter: Boolean = false,
     val tint: Color? = null,
+    val customContent: @Composable (() -> Unit)? = null,
 )
 
 /**
@@ -95,27 +97,43 @@ fun <T> KanzanBaseDropdownMenu(
         header?.invoke()
 
         items.forEach { item ->
-            if (itemContent != null) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    itemContent(item)
+            when {
+                // Prioritas 1: per-item customContent
+                item.customContent != null -> {
+                    DropdownMenuItem(
+                        text = { item.customContent.invoke() },
+                        onClick = {
+                            onItemSelected(item)
+                            onDismiss()
+                        },
+                        enabled = item.enabled,
+                    )
                 }
-            } else {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = item.label,
-                            style = textStyle,
-                            color = item.tint ?: Color.Black
-                        )
-                    },
-                    onClick = {
-                        onItemSelected(item)
-                        onDismiss()
-                    },
-                    enabled = item.enabled,
-                    leadingIcon = item.leadingIcon,
-                    trailingIcon = item.trailingIcon,
-                )
+                // Prioritas 2: global itemContent override
+                itemContent != null -> {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        itemContent(item)
+                    }
+                }
+                // Default: label + icon
+                else -> {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = item.label,
+                                style = textStyle,
+                                color = item.tint ?: Color.Black
+                            )
+                        },
+                        onClick = {
+                            onItemSelected(item)
+                            onDismiss()
+                        },
+                        enabled = item.enabled,
+                        leadingIcon = item.leadingIcon,
+                        trailingIcon = item.trailingIcon,
+                    )
+                }
             }
             if (item.showDividerAfter) {
                 Divider(color = Color.LightGray.copy(alpha = 0.5f))
@@ -210,6 +228,49 @@ private fun PreviewDropdownHeader() {
         Divider(modifier = Modifier.padding(vertical = dp4))
         listOf("Profil", "Pengaturan", "Keluar").forEach {
             Text(text = it, style = AppTextStyle.nunito_regular_14, modifier = Modifier.padding(vertical = dp4))
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Dropdown 3. Custom content per item")
+@Composable
+private fun PreviewDropdownCustomContent() {
+    Column(modifier = Modifier.padding(dp16)) {
+        Text(text = "Mixed items (label + custom):", style = AppTextStyle.nunito_medium_14)
+        // Item biasa
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = dp4),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("✏️")
+            Text(text = "Edit (label biasa)", style = AppTextStyle.nunito_regular_14, modifier = Modifier.padding(start = dp8))
+        }
+        // Item dengan customContent
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFFFF3E0))
+                .padding(dp8)
+        ) {
+            Column {
+                Text(text = "🎨 Custom Widget", style = AppTextStyle.nunito_medium_14, color = Color(0xFFE65100))
+                Text(text = "Ini composable bebas di dalam item", style = AppTextStyle.nunito_regular_12, color = Color.Gray)
+            }
+        }
+        // Item dengan customContent lagi
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFE8F5E9))
+                .padding(dp8)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("✅")
+                Column(modifier = Modifier.padding(start = dp8)) {
+                    Text(text = "Selesai", style = AppTextStyle.nunito_medium_14, color = Color(0xFF2E7D32))
+                    Text(text = "Tandai sebagai selesai", style = AppTextStyle.nunito_regular_12, color = Color.Gray)
+                }
+            }
         }
     }
 }
