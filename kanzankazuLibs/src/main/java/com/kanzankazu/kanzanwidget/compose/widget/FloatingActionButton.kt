@@ -5,6 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -15,6 +16,7 @@ import com.kanzankazu.R
 
 @Composable
 fun SimpleFloatingActionButton(
+    modifier: Modifier = Modifier,
     navHostControllerRoute: Pair<NavHostController, String>? = null,
     painterResourceId: Int? = null,
     imageVectorIcon: ImageVector? = null,
@@ -22,6 +24,7 @@ fun SimpleFloatingActionButton(
     onclick: () -> Unit = {},
 ) {
     FloatingActionButton(
+        modifier = modifier,
         shape = CircleShape,
         onClick = {
             onclick.invoke()

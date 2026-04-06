@@ -66,6 +66,7 @@ enum class KanzanDialogType { ALERT, CONFIRM, CUSTOM }
 fun KanzanDialog(
     isVisible: Boolean,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
     dialogType: KanzanDialogType = KanzanDialogType.ALERT,
     title: String? = null,
     message: String? = null,
@@ -93,6 +94,7 @@ fun KanzanDialog(
         ),
     ) {
         Surface(
+            modifier = modifier,
             shape = RoundedCornerShape(cornerRadius),
             color = Color.White,
             tonalElevation = dp8,

@@ -33,9 +33,10 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp24
 @Composable
 fun KanzanIconBadge(
     count: Int,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Box {
+    Box(modifier = modifier) {
         content()
         if (count > 0) {
             val label = if (count > 99) "99+" else count.toString()

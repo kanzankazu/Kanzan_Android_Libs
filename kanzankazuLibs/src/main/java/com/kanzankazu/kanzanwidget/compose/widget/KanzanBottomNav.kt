@@ -80,9 +80,9 @@ fun BottomBarWithFabDem() {
 }
 
 @Composable
-fun RoundedBottomAppBar(navController: NavController) {
+fun RoundedBottomAppBar(navController: NavController, modifier: Modifier = Modifier) {
     BottomAppBar(
-        modifier = Modifier
+        modifier = modifier
             .height(dp65)
             .clip(RoundedCornerShape(dp15, dp15, dp0, dp0)),
         cutoutShape = CircleShape,
@@ -94,11 +94,11 @@ fun RoundedBottomAppBar(navController: NavController) {
 }
 
 @Composable
-fun BottomNav(navController: NavController, screens: List<Screen>) {
+fun BottomNav(navController: NavController, screens: List<Screen>, modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
     BottomNavigation(
-        modifier = Modifier
+        modifier = modifier
             .padding(dp12, dp0, dp12, dp0)
             .height(dp100),
         //backgroundColor = Color.White,

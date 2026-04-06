@@ -32,6 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.kanzankazu.kanzanwidget.compose.ui.AppTextStyle
 import com.kanzankazu.kanzanwidget.compose.ui.Shapes
 import com.kanzankazu.kanzanwidget.compose.ui.dp12
+import com.kanzankazu.kanzanwidget.compose.ui.dp0
 import com.kanzankazu.kanzanwidget.compose.ui.dp16
 import com.kanzankazu.kanzanwidget.compose.ui.dp2
 import com.kanzankazu.kanzanwidget.compose.ui.dp20
@@ -60,6 +64,15 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp8
 
 enum class KanzanButtonType { FILLED, OUTLINED, TEXT, ELEVATED }
 enum class KanzanButtonSize { SMALL, MEDIUM, LARGE }
+
+enum class KanzanButtonGroupType {
+    /** Segmented toggle — satu yang aktif */
+    SINGLE_SELECT,
+    /** Multi toggle — bisa lebih dari satu aktif */
+    MULTI_SELECT,
+    /** Row of action buttons — tidak ada state aktif */
+    ACTION_ROW,
+}
 
 // endregion
 
@@ -462,6 +475,210 @@ private fun PreviewButtonBadge() {
                 Text(text = "5", style = AppTextStyle.nunito_bold_12, color = Color.White)
             }
         }
+    )
+}
+
+// endregion
+
+// region ==================== KanzanButtonGroup ====================
+
+/**
+ * Group of buttons dalam satu baris.
+ * Support: segmented control (single/multi select), action row.
+ *
+ * @param items daftar label button.
+ * @param modifier Modifier.
+ * @param groupType tipe group (SINGLE_SELECT, MULTI_SELECT, ACTION_ROW).
+ * @param selectedIndices set index yang aktif (untuk SINGLE/MULTI_SELECT).
+ * @param onSelectionChanged callback saat seleksi berubah.
+ * @param onItemClick callback per item click (untuk ACTION_ROW).
+ * @param selectedColor warna background button aktif.
+ * @param unselectedColor warna background button tidak aktif.
+ * @param selectedContentColor warna teks button aktif.
+ * @param unselectedContentColor warna teks button tidak aktif.
+ * @param borderColor warna border.
+ * @param borderWidth lebar border.
+ * @param shape bentuk group (default: rounded).
+ * @param textStyle style teks.
+ * @param spacing jarak antar button (0 = merged/segmented look).
+ * @param fullWidth button mengisi lebar penuh (equal weight).
+ * @param enabled aktif/nonaktif seluruh group.
+ * @param itemIcons composable icon per item (opsional).
+ */
+@Composable
+fun KanzanButtonGroup(
+    items: List<String>,
+    modifier: Modifier = Modifier,
+    groupType: KanzanButtonGroupType = KanzanButtonGroupType.SINGLE_SELECT,
+    selectedIndices: Set<Int> = emptySet(),
+    onSelectionChanged: ((Set<Int>) -> Unit)? = null,
+    onItemClick: ((Int) -> Unit)? = null,
+    selectedColor: Color = Color.Black,
+    unselectedColor: Color = Color.Transparent,
+    selectedContentColor: Color = Color.White,
+    unselectedContentColor: Color = Color.Black,
+    borderColor: Color = Color.Black,
+    borderWidth: Dp = 1.dp,
+    shape: Shape = RoundedCornerShape(dp8),
+    textStyle: TextStyle = AppTextStyle.nunito_medium_14,
+    spacing: Dp = dp0,
+    fullWidth: Boolean = true,
+    enabled: Boolean = true,
+    itemIcons: @Composable ((index: Int) -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier.then(if (fullWidth) Modifier.fillMaxWidth() else Modifier),
+        horizontalArrangement = if (spacing > dp0) Arrangement.spacedBy(spacing) else Arrangement.Center,
+    ) {
+        items.forEachIndexed { index, label ->
+            val isSelected = index in selectedIndices
+
+            val buttonShape = if (spacing == dp0) {
+                when {
+                    items.size == 1 -> shape
+                    index == 0 -> RoundedCornerShape(topStart = dp8, bottomStart = dp8, topEnd = dp0, bottomEnd = dp0)
+                    index == items.lastIndex -> RoundedCornerShape(topStart = dp0, bottomStart = dp0, topEnd = dp8, bottomEnd = dp8)
+                    else -> RoundedCornerShape(dp0)
+                }
+            } else shape
+
+            val containerColor = if (isSelected) selectedColor else unselectedColor
+            val contentColor = if (isSelected) selectedContentColor else unselectedContentColor
+
+            OutlinedButton(
+                onClick = {
+                    when (groupType) {
+                        KanzanButtonGroupType.SINGLE_SELECT -> {
+                            onSelectionChanged?.invoke(setOf(index))
+                        }
+                        KanzanButtonGroupType.MULTI_SELECT -> {
+                            val newSet = selectedIndices.toMutableSet()
+                            if (isSelected) newSet.remove(index) else newSet.add(index)
+                            onSelectionChanged?.invoke(newSet)
+                        }
+                        KanzanButtonGroupType.ACTION_ROW -> {
+                            onItemClick?.invoke(index)
+                        }
+                    }
+                },
+                modifier = if (fullWidth) Modifier.weight(1f) else Modifier,
+                enabled = enabled,
+                shape = buttonShape,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                ),
+                border = BorderStroke(borderWidth, borderColor),
+            ) {
+                itemIcons?.invoke(index)
+                Text(text = label, style = textStyle, color = contentColor)
+            }
+        }
+    }
+}
+
+// endregion
+
+// region ==================== ButtonGroup Preview ====================
+
+@Preview(showBackground = true, name = "ButtonGroup 1. Single select (segmented)")
+@Composable
+private fun PreviewSingleSelect() {
+    var selected by remember { mutableStateOf(setOf(0)) }
+    KanzanButtonGroup(
+        items = listOf("Harian", "Bulanan", "Tahunan"),
+        modifier = Modifier.padding(dp16),
+        selectedIndices = selected,
+        onSelectionChanged = { selected = it },
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 2. Multi select")
+@Composable
+private fun PreviewMultiSelect() {
+    var selected by remember { mutableStateOf(setOf(0, 2)) }
+    KanzanButtonGroup(
+        items = listOf("Hutang", "Piutang", "Cicilan", "Tabungan"),
+        modifier = Modifier.padding(dp16),
+        groupType = KanzanButtonGroupType.MULTI_SELECT,
+        selectedIndices = selected,
+        onSelectionChanged = { selected = it },
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 3. Action row")
+@Composable
+private fun PreviewActionRow() {
+    KanzanButtonGroup(
+        items = listOf("Edit", "Hapus", "Bagikan"),
+        modifier = Modifier.padding(dp16),
+        groupType = KanzanButtonGroupType.ACTION_ROW,
+        onItemClick = {},
+        selectedColor = Color.Transparent,
+        unselectedColor = Color.Transparent,
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 4. With spacing")
+@Composable
+private fun PreviewWithSpacing() {
+    var selected by remember { mutableStateOf(setOf(1)) }
+    KanzanButtonGroup(
+        items = listOf("Ya", "Tidak", "Mungkin"),
+        modifier = Modifier.padding(dp16),
+        selectedIndices = selected,
+        onSelectionChanged = { selected = it },
+        spacing = dp8,
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 5. Custom colors")
+@Composable
+private fun PreviewButtonGroupCustomColors() {
+    var selected by remember { mutableStateOf(setOf(0)) }
+    KanzanButtonGroup(
+        items = listOf("Lunas", "Belum Lunas"),
+        modifier = Modifier.padding(dp16),
+        selectedIndices = selected,
+        onSelectionChanged = { selected = it },
+        selectedColor = Color(0xFF4CAF50),
+        borderColor = Color(0xFF4CAF50),
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 6. Two buttons")
+@Composable
+private fun PreviewTwoButtons() {
+    var selected by remember { mutableStateOf(setOf(0)) }
+    KanzanButtonGroup(
+        items = listOf("Pemasukan", "Pengeluaran"),
+        modifier = Modifier.padding(dp16),
+        selectedIndices = selected,
+        onSelectionChanged = { selected = it },
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 7. Disabled")
+@Composable
+private fun PreviewButtonGroupDisabled() {
+    KanzanButtonGroup(
+        items = listOf("A", "B", "C"),
+        modifier = Modifier.padding(dp16),
+        selectedIndices = setOf(1),
+        enabled = false,
+    )
+}
+
+@Preview(showBackground = true, name = "ButtonGroup 8. Not full width")
+@Composable
+private fun PreviewNotFullWidth() {
+    var selected by remember { mutableStateOf(setOf(0)) }
+    KanzanButtonGroup(
+        items = listOf("S", "M", "L", "XL"),
+        modifier = Modifier.padding(dp16),
+        selectedIndices = selected,
+        onSelectionChanged = { selected = it },
+        fullWidth = false,
     )
 }
 
