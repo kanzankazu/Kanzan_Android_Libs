@@ -37,7 +37,7 @@ fun KanzanSpacerVertical(height: Dp = dp16) {
 /** Spacer horizontal (lebar). */
 @Composable
 fun KanzanSpacerHorizontal(width: Dp = dp16) {
-    Spacer(modifier = Modifier.width(width))
+    KanzanSpacerHorizontal(width = width)
 }
 
 // endregion

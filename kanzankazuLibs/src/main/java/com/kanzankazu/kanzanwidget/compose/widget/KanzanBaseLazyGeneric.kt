@@ -657,7 +657,7 @@ fun KanzanSkeletonItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.height(dp48).width(dp48).clip(RoundedCornerShape(dp8)).background(brush))
-        Spacer(modifier = Modifier.width(dp12))
+        KanzanSpacerHorizontal(width = dp12)
         Column(modifier = Modifier.weight(1f)) {
             Box(modifier = Modifier.fillMaxWidth(0.7f).height(dp16).clip(RoundedCornerShape(dp4)).background(brush))
             Spacer(modifier = Modifier.height(dp8))
@@ -835,7 +835,7 @@ private fun PreviewLazySwipeBoth() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "💰", style = AppTextStyle.nunito_regular_16)
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
                 Text(text = item, style = AppTextStyle.nunito_regular_14)
             }
         },

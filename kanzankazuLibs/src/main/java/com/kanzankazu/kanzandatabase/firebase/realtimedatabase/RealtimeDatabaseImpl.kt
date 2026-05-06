@@ -461,38 +461,33 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
     private suspend fun Task<Void>.handleTaskBaseResponse(realtimeDatabaseImplType: RealtimeDatabaseImplType): BaseResponse<String> {
         return suspendCancellableCoroutine { continuation ->
             addOnSuccessListener {
-                continuation.resume(
-                    BaseResponse.Success(
-                        handleTaskKanzanBaseResponseMessageSuccess(realtimeDatabaseImplType)
-                    )
-                )
-            }
-            addOnCompleteListener {
-                continuation.resume(
-                    handleTaskKanzanBaseResponseMessageSuccess(realtimeDatabaseImplType).toBaseResponseSuccess()
-                )
-            }
-            addOnCanceledListener {
-                continuation.resume(
-                    BaseResponse.Error(
-                        handleTaskKanzanBaseResponseMessageError(realtimeDatabaseImplType)
-                    )
-                )
-            }
-            addOnFailureListener { exception ->
-                exception.message?.let {
-                    exception.message.toString().debugMessageDebug("RealtimeDatabaseImpl - handleTaskBaseResponse")
+                if (continuation.isActive) {
                     continuation.resume(
-                        BaseResponse.Error(
-                            handleTaskKanzanBaseResponseMessageError(
-                                realtimeDatabaseImplType, exception.message.toString()
-                            )
+                        BaseResponse.Success(
+                            handleTaskKanzanBaseResponseMessageSuccess(realtimeDatabaseImplType)
                         )
                     )
-                } ?: kotlin.run {
+                }
+            }
+            addOnCanceledListener {
+                if (continuation.isActive) {
                     continuation.resume(
                         BaseResponse.Error(
                             handleTaskKanzanBaseResponseMessageError(realtimeDatabaseImplType)
+                        )
+                    )
+                }
+            }
+            addOnFailureListener { exception ->
+                if (continuation.isActive) {
+                    val errorMessage = exception.message?.also {
+                        it.debugMessageDebug("RealtimeDatabaseImpl - handleTaskBaseResponse")
+                    }
+                    continuation.resume(
+                        BaseResponse.Error(
+                            handleTaskKanzanBaseResponseMessageError(
+                                realtimeDatabaseImplType, errorMessage ?: ""
+                            )
                         )
                     )
                 }

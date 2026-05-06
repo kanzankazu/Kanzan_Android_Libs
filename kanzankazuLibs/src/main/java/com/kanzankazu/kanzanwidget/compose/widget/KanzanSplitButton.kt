@@ -97,7 +97,7 @@ fun KanzanSplitButton(
                     contentPadding = PaddingValues(horizontal = dp16, vertical = dp8),
                 ) {
                     leadingIcon?.invoke()
-                    if (leadingIcon != null) Spacer(modifier = Modifier.width(dp8))
+                    if (leadingIcon != null) KanzanSpacerHorizontal(width = dp8)
                     Text(text = title, style = textStyle)
                 }
                 // Dropdown trigger
@@ -123,7 +123,7 @@ fun KanzanSplitButton(
                     contentPadding = PaddingValues(horizontal = dp16, vertical = dp8),
                 ) {
                     leadingIcon?.invoke()
-                    if (leadingIcon != null) Spacer(modifier = Modifier.width(dp8))
+                    if (leadingIcon != null) KanzanSpacerHorizontal(width = dp8)
                     Text(text = title, style = textStyle)
                 }
                 OutlinedButton(

@@ -195,7 +195,7 @@ fun KanzanPinView(
                     if (chunkSize > 0 && i > 0 && i % chunkSize == 0) {
                         chunkSeparator?.invoke() ?: DefaultChunkSeparator()
                     } else if (i > 0) {
-                        Spacer(modifier = Modifier.width(cellSpacing))
+                        KanzanSpacerHorizontal(width = cellSpacing)
                     }
 
                     val char = value.getOrNull(i)

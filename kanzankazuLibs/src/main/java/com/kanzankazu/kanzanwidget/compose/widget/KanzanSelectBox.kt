@@ -103,7 +103,7 @@ fun KanzanSelectBox(
                     },
                     enabled = enabled,
                 )
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
                 Text(
                     text = selectAllLabel,
                     style = AppTextStyle.nunito_medium_14,
@@ -154,7 +154,7 @@ fun KanzanSelectBox(
                             enabled = enabled,
                         )
                     }
-                    Spacer(modifier = Modifier.width(dp8))
+                    KanzanSpacerHorizontal(width = dp8)
                     Text(
                         text = label,
                         style = itemTextStyle,

@@ -106,7 +106,7 @@ fun KanzanShimmerListItem(
                 height = dp48,
                 shape = CircleShape,
             )
-            Spacer(modifier = Modifier.width(dp12))
+            KanzanSpacerHorizontal(width = dp12)
         }
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(dp8)) {
             repeat(lineCount) { index ->

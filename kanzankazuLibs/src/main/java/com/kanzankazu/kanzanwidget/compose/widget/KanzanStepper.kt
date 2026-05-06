@@ -255,7 +255,7 @@ fun KanzanVerticalStepper(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
 
                 // Right: label + description + custom content
                 Column(modifier = Modifier.weight(1f).padding(top = dp4)) {

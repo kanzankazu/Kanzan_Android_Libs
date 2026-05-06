@@ -132,9 +132,9 @@ fun KanzanOnboardingShowCase(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         step.leadingIcon?.invoke()
-                        if (step.leadingIcon != null) Spacer(modifier = Modifier.width(dp8))
+                        if (step.leadingIcon != null) KanzanSpacerHorizontal(width = dp8)
                         Text(text = step.title, style = titleStyle, color = bubbleTextColor)
-                        if (step.trailingIcon != null) Spacer(modifier = Modifier.width(dp8))
+                        if (step.trailingIcon != null) KanzanSpacerHorizontal(width = dp8)
                         step.trailingIcon?.invoke()
                     }
                     Spacer(modifier = Modifier.height(dp8))
@@ -176,7 +176,7 @@ fun KanzanOnboardingShowCase(
                                 buttonSize = KanzanButtonSize.SMALL,
                             )
                         } else {
-                            Spacer(modifier = Modifier.width(dp4))
+                            KanzanSpacerHorizontal(width = dp4)
                         }
 
                         // Next / Done

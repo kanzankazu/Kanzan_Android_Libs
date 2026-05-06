@@ -169,7 +169,7 @@ fun KanzanCustomToast(
             verticalAlignment = Alignment.CenterVertically
         ) {
             resolvedIcon()
-            Spacer(modifier = Modifier.width(dp12))
+            KanzanSpacerHorizontal(width = dp12)
             Text(
                 text = message,
                 style = textStyle,
@@ -177,7 +177,7 @@ fun KanzanCustomToast(
                 modifier = Modifier.weight(1f)
             )
             if (actionLabel != null && onAction != null) {
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
                 Text(
                     text = actionLabel,
                     style = AppTextStyle.nunito_bold_14,

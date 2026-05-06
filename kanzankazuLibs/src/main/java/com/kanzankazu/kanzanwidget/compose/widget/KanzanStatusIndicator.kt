@@ -72,15 +72,15 @@ fun KanzanStatusIndicator(
         ) {
             leadingIcon?.let {
                 it()
-                Spacer(modifier = Modifier.width(dp6))
+                KanzanSpacerHorizontal(width = dp6)
             }
             if (showDot) {
                 Box(modifier = Modifier.size(dotSize).background(color, CircleShape))
-                Spacer(modifier = Modifier.width(dp6))
+                KanzanSpacerHorizontal(width = dp6)
             }
             Text(text = label, style = textStyle, color = resolvedTextColor)
             trailingIcon?.let {
-                Spacer(modifier = Modifier.width(dp6))
+                KanzanSpacerHorizontal(width = dp6)
                 it()
             }
         }
@@ -88,15 +88,15 @@ fun KanzanStatusIndicator(
         Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
             leadingIcon?.let {
                 it()
-                Spacer(modifier = Modifier.width(dp6))
+                KanzanSpacerHorizontal(width = dp6)
             }
             if (showDot) {
                 Box(modifier = Modifier.size(dotSize).background(color, CircleShape))
-                Spacer(modifier = Modifier.width(dp6))
+                KanzanSpacerHorizontal(width = dp6)
             }
             Text(text = label, style = textStyle, color = resolvedTextColor)
             trailingIcon?.let {
-                Spacer(modifier = Modifier.width(dp6))
+                KanzanSpacerHorizontal(width = dp6)
                 it()
             }
         }

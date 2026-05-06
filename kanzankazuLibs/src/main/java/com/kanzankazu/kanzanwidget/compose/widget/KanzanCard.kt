@@ -265,7 +265,7 @@ private fun KanzanCardContent(
                 ) {
                     leadingIcon?.let {
                         it()
-                        Spacer(modifier = Modifier.width(dp12))
+                        KanzanSpacerHorizontal(width = dp12)
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         KanzanCardTextBlock(
@@ -284,7 +284,7 @@ private fun KanzanCardContent(
                         )
                     }
                     trailingContent?.let {
-                        Spacer(modifier = Modifier.width(dp12))
+                        KanzanSpacerHorizontal(width = dp12)
                         it()
                     }
                 }
@@ -327,7 +327,7 @@ private fun KanzanCardTextBlock(
                 modifier = Modifier.weight(1f, fill = false),
             )
             badge?.let {
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
                 it()
             }
         }
@@ -455,7 +455,7 @@ private fun PreviewCardActions() {
                     buttonSize = KanzanButtonSize.SMALL,
                     buttonType = KanzanButtonType.TEXT,
                 )
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
                 KanzanBaseButton(
                     title = "Detail",
                     onClick = {},

@@ -178,7 +178,7 @@ fun KanzanPieChart(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(modifier = Modifier.size(dp12).background(item.color, CircleShape))
-                    Spacer(modifier = Modifier.width(dp8))
+                    KanzanSpacerHorizontal(width = dp8)
                     Text(text = item.label, style = legendStyle, color = Color.DarkGray, modifier = Modifier.weight(1f))
                     Text(text = item.value.toLong().toString(), style = legendStyle, color = Color.Black)
                 }

@@ -114,7 +114,7 @@ fun KanzanSearchBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()
-            if (leadingIcon != null) Spacer(modifier = Modifier.width(dp8))
+            if (leadingIcon != null) KanzanSpacerHorizontal(width = dp8)
 
             Box(modifier = Modifier.weight(1f)) {
                 if (query.isEmpty()) {

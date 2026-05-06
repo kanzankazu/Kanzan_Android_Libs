@@ -254,7 +254,7 @@ private fun KanzanButtonContent(
         AnimatedVisibility(visible = isLoading, enter = fadeIn(), exit = fadeOut()) {
             Row {
                 CircularProgressIndicator(modifier = Modifier.size(loadingSize), color = loadingColor, strokeWidth = dp2)
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
             }
         }
 
@@ -262,7 +262,7 @@ private fun KanzanButtonContent(
         if (!isLoading) {
             leadingIcon?.let {
                 it()
-                Spacer(modifier = Modifier.width(dp8))
+                KanzanSpacerHorizontal(width = dp8)
             }
         }
 
@@ -280,19 +280,19 @@ private fun KanzanButtonContent(
 
         // Nominal
         if (nominal != null) {
-            Spacer(modifier = Modifier.width(dp8))
+            KanzanSpacerHorizontal(width = dp8)
             Text(text = nominal, style = nominalStyle, textAlign = TextAlign.End)
         }
 
         // Trailing icon
         trailingIcon?.let {
-            Spacer(modifier = Modifier.width(dp8))
+            KanzanSpacerHorizontal(width = dp8)
             it()
         }
 
         // Badge
         badge?.let {
-            Spacer(modifier = Modifier.width(dp4))
+            KanzanSpacerHorizontal(width = dp4)
             it()
         }
     }
