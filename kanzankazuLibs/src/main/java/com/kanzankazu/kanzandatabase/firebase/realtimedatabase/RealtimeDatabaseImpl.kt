@@ -414,19 +414,12 @@ open class RealtimeDatabaseImpl : RealtimeDatabase {
 
     private fun Task<Void>.handleTask(function: (pair: Pair<Boolean, String>) -> Unit) {
         this.addOnSuccessListener { function.invoke(Pair(true, "")) }
-            .addOnCompleteListener { function.invoke(Pair(true, "")) }
             .addOnFailureListener { it.message?.let { s -> function.invoke(Pair(false, s)) } }
             .addOnCanceledListener { function.invoke(Pair(false, "Task Canceled")) }
     }
 
     private fun Task<Void>.handleTaskBaseResponse(realtimeDatabaseImplType: RealtimeDatabaseImplType, function: (BaseResponse<String>) -> Unit) {
         this.addOnSuccessListener {
-            function.invoke(
-                BaseResponse.Success(
-                    handleTaskKanzanBaseResponseMessageSuccess(realtimeDatabaseImplType)
-                )
-            )
-        }.addOnCompleteListener {
             function.invoke(
                 BaseResponse.Success(
                     handleTaskKanzanBaseResponseMessageSuccess(realtimeDatabaseImplType)
