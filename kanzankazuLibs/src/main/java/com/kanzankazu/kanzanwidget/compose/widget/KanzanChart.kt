@@ -71,7 +71,7 @@ fun KanzanBarChart(
     items: List<KanzanChartItem>,
     modifier: Modifier = Modifier,
     barHeight: Dp = dp16,
-    barSpacing: Dp = dp12,
+    barSpacing: Dp = dp8,
     showLabels: Boolean = true,
     showValues: Boolean = true,
     labelStyle: TextStyle = AppTextStyle.nunito_regular_12,
@@ -99,7 +99,6 @@ fun KanzanBarChart(
                     Text(text = item.label, style = labelStyle, color = Color.DarkGray)
                     if (showValues) Text(text = item.value.toLong().toString(), style = valueStyle, color = Color.Black)
                 }
-                Spacer(modifier = Modifier.height(dp4))
             }
             Box(modifier = Modifier.fillMaxWidth().height(barHeight)) {
                 // Track
