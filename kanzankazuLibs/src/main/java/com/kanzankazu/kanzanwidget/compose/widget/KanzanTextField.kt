@@ -239,23 +239,12 @@ fun KanzanTextField(
     OutlinedTextField(
         value = value,
         onValueChange = { newValue ->
-            when {
-                kanzanInputType == KanzanInputType.EMAIL -> {
-                    val processedValue = processEmailInput(newValue, value)
-                    onValueChanged(processedValue)
-                }
-                kanzanInputType == KanzanInputType.NOMINAL -> {
-                    onValueChanged(newValue.filter { it.isDigit() })
-                }
-                kanzanInputType == KanzanInputType.PATTERNED -> {
-                    onValueChanged(newValue.filter { it.isDigit() })
-                }
-                kanzanInputType == KanzanInputType.PHONE_FORMATTED -> {
-                    onValueChanged(newValue.filter { it.isDigit() })
-                }
-                else -> {
-                    onValueChanged(newValue)
-                }
+            when (kanzanInputType) {
+                KanzanInputType.EMAIL -> onValueChanged(processEmailInput(newValue, value))
+                KanzanInputType.NOMINAL -> onValueChanged(newValue.filter { it.isDigit() })
+                KanzanInputType.PATTERNED -> onValueChanged(newValue.filter { it.isDigit() })
+                KanzanInputType.PHONE_FORMATTED -> onValueChanged(newValue.filter { it.isDigit() })
+                else -> onValueChanged(newValue)
             }
         },
         modifier = finalModifier,
