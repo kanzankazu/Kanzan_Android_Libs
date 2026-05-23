@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -226,77 +227,144 @@ fun KanzanTextField(
     }
 
     // Apply click handler for CLICKABLE type
-    val finalModifier = if (kanzanInputType == KanzanInputType.CLICKABLE && onClick != null) {
-        modifier.clickable { onClick() }
-    } else {
-        modifier
-    }
+    // For CLICKABLE, we disable the TextField and wrap click on the Box instead
+    // to prevent OutlinedTextField from consuming touch events
+    val finalModifier = modifier
+    val isClickableType = kanzanInputType == KanzanInputType.CLICKABLE && onClick != null
 
     LaunchedEffect(isFocused) {
         onFocusChange(isFocused)
     }
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = { newValue ->
-            when (kanzanInputType) {
-                KanzanInputType.EMAIL -> onValueChanged(processEmailInput(newValue, value))
-                KanzanInputType.NOMINAL -> onValueChanged(newValue.filter { it.isDigit() })
-                KanzanInputType.PATTERNED -> onValueChanged(newValue.filter { it.isDigit() })
-                KanzanInputType.PHONE_FORMATTED -> onValueChanged(newValue.filter { it.isDigit() })
-                else -> onValueChanged(newValue)
-            }
-        },
-        modifier = finalModifier,
-        enabled = finalEnabled,
-        readOnly = finalReadOnly,
-        textStyle = textStyle,
-        label = {
-            Text(
-                text = label,
-                style = labelStyle
+    // For CLICKABLE type: wrap in Box with clickable overlay so touch events
+    // are not consumed by the OutlinedTextField's internal focus handling
+    if (isClickableType) {
+        Box(modifier = finalModifier) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                enabled = false,
+                readOnly = true,
+                textStyle = textStyle,
+                label = {
+                    Text(
+                        text = label,
+                        style = labelStyle
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = placeholder,
+                        style = placeholderStyle
+                    )
+                },
+                leadingIcon = finalLeadingIcon,
+                trailingIcon = finalTrailingIcon,
+                prefix = finalPrefix,
+                suffix = finalSuffix,
+                supportingText = if (errorMessage != null) {
+                    {
+                        Text(
+                            text = errorMessage,
+                            style = errorTextStyle,
+                            color = Color.Red
+                        )
+                    }
+                } else supportingText?.let { text ->
+                    {
+                        Text(
+                            text = text,
+                            style = supportingTextStyle
+                        )
+                    }
+                },
+                isError = finalIsError,
+                visualTransformation = finalVisualTransformation,
+                singleLine = finalSingleLine,
+                maxLines = finalMaxLines,
+                minLines = minLines,
+                shape = shape ?: Shapes.medium,
+                colors = colors ?: OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledSupportingTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
             )
-        },
-        placeholder = {
-            Text(
-                text = placeholder,
-                style = placeholderStyle
+            // Invisible clickable overlay
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { onClick!!() }
             )
-        },
-        leadingIcon = finalLeadingIcon,
-        trailingIcon = finalTrailingIcon,
-        prefix = finalPrefix,
-        suffix = finalSuffix,
-        supportingText = if (errorMessage != null) {
-            {
+        }
+    } else {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { newValue ->
+                when (kanzanInputType) {
+                    KanzanInputType.EMAIL -> onValueChanged(processEmailInput(newValue, value))
+                    KanzanInputType.NOMINAL -> onValueChanged(newValue.filter { it.isDigit() })
+                    KanzanInputType.PATTERNED -> onValueChanged(newValue.filter { it.isDigit() })
+                    KanzanInputType.PHONE_FORMATTED -> onValueChanged(newValue.filter { it.isDigit() })
+                    else -> onValueChanged(newValue)
+                }
+            },
+            modifier = finalModifier,
+            enabled = finalEnabled,
+            readOnly = finalReadOnly,
+            textStyle = textStyle,
+            label = {
                 Text(
-                    text = errorMessage,
-                    style = errorTextStyle,
-                    color = Color.Red
+                    text = label,
+                    style = labelStyle
                 )
-            }
-        } else supportingText?.let { text ->
-            {
+            },
+            placeholder = {
                 Text(
-                    text = text,
-                    style = supportingTextStyle
+                    text = placeholder,
+                    style = placeholderStyle
                 )
-            }
-        },
-        isError = finalIsError,
-        visualTransformation = finalVisualTransformation,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = finalKeyboardType,
-            imeAction = finalImeAction
-        ),
-        keyboardActions = keyboardActions,
-        singleLine = finalSingleLine,
-        maxLines = finalMaxLines,
-        minLines = minLines,
-        shape = shape ?: Shapes.medium,
-        colors = colors ?: OutlinedTextFieldDefaults.colors(),
-        interactionSource = interactionSource
-    )
+            },
+            leadingIcon = finalLeadingIcon,
+            trailingIcon = finalTrailingIcon,
+            prefix = finalPrefix,
+            suffix = finalSuffix,
+            supportingText = if (errorMessage != null) {
+                {
+                    Text(
+                        text = errorMessage,
+                        style = errorTextStyle,
+                        color = Color.Red
+                    )
+                }
+            } else supportingText?.let { text ->
+                {
+                    Text(
+                        text = text,
+                        style = supportingTextStyle
+                    )
+                }
+            },
+            isError = finalIsError,
+            visualTransformation = finalVisualTransformation,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = finalKeyboardType,
+                imeAction = finalImeAction
+            ),
+            keyboardActions = keyboardActions,
+            singleLine = finalSingleLine,
+            maxLines = finalMaxLines,
+            minLines = minLines,
+            shape = shape ?: Shapes.medium,
+            colors = colors ?: OutlinedTextFieldDefaults.colors(),
+            interactionSource = interactionSource
+        )
+    }
 }
 
 /**

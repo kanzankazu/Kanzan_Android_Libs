@@ -16,6 +16,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,6 +92,7 @@ fun <T> KanzanSpinner(
     var expanded by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val arrowRotation by animateFloatAsState(if (expanded) 180f else 0f, label = "arrow")
+    val searchFocusRequester = remember { FocusRequester() }
 
     val filteredItems = remember(items, searchQuery) {
         if (searchQuery.isBlank()) items.mapIndexed { i, item -> i to item }
@@ -146,11 +150,16 @@ fun <T> KanzanSpinner(
                         label = "",
                         value = searchQuery,
                         onValueChanged = { searchQuery = it },
-                        modifier = Modifier.fillMaxWidth().padding(dp8),
+                        modifier = Modifier.fillMaxWidth().padding(dp8).focusRequester(searchFocusRequester),
                         placeholder = searchPlaceholder,
                         kanzanInputType = KanzanInputType.SEARCH,
                         singleLine = true,
                     )
+
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(100)
+                        searchFocusRequester.requestFocus()
+                    }
                 }
 
                 filteredItems.forEach { (originalIndex, item) ->
