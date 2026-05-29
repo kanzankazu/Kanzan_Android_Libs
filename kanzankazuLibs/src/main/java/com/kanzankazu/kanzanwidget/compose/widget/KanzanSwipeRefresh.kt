@@ -43,7 +43,10 @@ fun KanzanSwipeRefresh(
         content()
         if (isRefreshing) {
             Box(
-                modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(dp16),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .padding(dp16),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(color = indicatorColor)

@@ -87,12 +87,14 @@ enum class KanzanSelectionMode { NONE, SINGLE, MULTI }
  * @param icon composable icon yang tampil di belakang item.
  * @param threshold persentase lebar item untuk trigger action (0f-1f).
  * @param onAction callback saat swipe melewati threshold.
+ * @param canSwipeAtIndex lambda untuk menentukan apakah item di index tertentu bisa di-swipe. Default: semua bisa.
  */
 data class KanzanSwipeAction(
     val backgroundColor: Color,
     val icon: @Composable () -> Unit,
     val threshold: Float = 0.3f,
     val onAction: (index: Int) -> Unit,
+    val canSwipeAtIndex: ((index: Int) -> Boolean)? = null,
 )
 
 /**
@@ -156,6 +158,8 @@ data class KanzanLazyState<T>(
  * @param onSelectionChanged callback saat seleksi berubah.
  * @param selectedColor warna background item terpilih.
  * @param showSelectionIndicator tampilkan radio/checkbox di kiri item.
+ * @param itemBackgroundColor warna background default untuk semua item (non-selected).
+ * @param itemBackgroundColorProvider lambda opsional untuk override background per item (index, item) -> Color. Prioritas: selected > provider > default.
  */
 @Composable
 fun <T> KanzanBaseLazy(
@@ -198,6 +202,9 @@ fun <T> KanzanBaseLazy(
     onSelectionChanged: ((Set<Int>) -> Unit)? = null,
     selectedColor: Color = Color(0xFFE3F2FD),
     showSelectionIndicator: Boolean = true,
+    // Item background
+    itemBackgroundColor: Color = Color.Transparent,
+    itemBackgroundColorProvider: ((index: Int, item: T) -> Color)? = null,
 ) {
     // Scroll listener
     if (onScrollStateChanged != null) {
@@ -271,12 +278,17 @@ fun <T> KanzanBaseLazy(
             contentType = if (itemContentType != null) { index, item -> itemContentType(index, item) } else { _, _ -> null },
         ) { index, item ->
             val isSelected = index in selectedIndices
+            val bgColor = when {
+                isSelected -> selectedColor
+                itemBackgroundColorProvider != null -> itemBackgroundColorProvider(index, item)
+                else -> itemBackgroundColor
+            }
 
             val itemRow: @Composable () -> Unit = {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(if (isSelected) selectedColor else Color.Transparent)
+                        .background(bgColor)
                         .then(
                             if (selectionMode != KanzanSelectionMode.NONE) {
                                 Modifier.clickable { handleSelection(selectionMode, index, selectedIndices, onSelectionChanged) }
@@ -314,11 +326,14 @@ fun <T> KanzanBaseLazy(
             }
 
             // Wrap with swipe if needed
-            if (hasSwipe) {
+            val canSwipeLeft = swipeLeftAction?.canSwipeAtIndex?.invoke(index) ?: true
+            val canSwipeRight = swipeRightAction?.canSwipeAtIndex?.invoke(index) ?: true
+            val itemHasSwipe = hasSwipe && (canSwipeLeft || canSwipeRight)
+            if (itemHasSwipe) {
                 KanzanSwipeableItem(
                     index = index,
-                    swipeLeftAction = swipeLeftAction,
-                    swipeRightAction = swipeRightAction,
+                    swipeLeftAction = if (canSwipeLeft) swipeLeftAction else null,
+                    swipeRightAction = if (canSwipeRight) swipeRightAction else null,
                     content = itemRow,
                 )
             } else {
@@ -395,6 +410,9 @@ fun <T> KanzanBaseLazy(
     itemKey: ((index: Int, item: T) -> Any)? = null,
     itemContentType: ((index: Int, item: T) -> Any?)? = null,
     stickyHeaderContent: (LazyListScope.() -> Unit)? = null,
+    // Item background
+    itemBackgroundColor: Color = Color.Transparent,
+    itemBackgroundColorProvider: ((index: Int, item: T) -> Color)? = null,
 ) {
     KanzanBaseLazy(
         state = state,
@@ -423,6 +441,8 @@ fun <T> KanzanBaseLazy(
         itemKey = itemKey,
         itemContentType = itemContentType,
         stickyHeaderContent = stickyHeaderContent,
+        itemBackgroundColor = itemBackgroundColor,
+        itemBackgroundColorProvider = itemBackgroundColorProvider,
     )
 }
 // endregion
@@ -442,8 +462,6 @@ private fun KanzanSwipeableItem(
     swipeRightAction: KanzanSwipeAction?,
     content: @Composable () -> Unit,
 ) {
-    var isRemoved by remember { mutableStateOf(false) }
-
     val directions = mutableSetOf<DismissDirection>()
     if (swipeLeftAction != null) directions.add(DismissDirection.EndToStart)
     if (swipeRightAction != null) directions.add(DismissDirection.StartToEnd)
@@ -452,62 +470,45 @@ private fun KanzanSwipeableItem(
         confirmStateChange = { dismissValue ->
             when (dismissValue) {
                 DismissValue.DismissedToStart -> {
-                    // Swipe left (end-to-start)
+                    // Swipe left (end-to-start) — trigger action but don't dismiss
                     if (swipeLeftAction != null) {
-                        isRemoved = true
-                        true
-                    } else false
+                        swipeLeftAction.onAction.invoke(index)
+                    }
+                    false // Return false to reset swipe position
                 }
                 DismissValue.DismissedToEnd -> {
-                    // Swipe right (start-to-end)
+                    // Swipe right (start-to-end) — trigger action but don't dismiss
                     if (swipeRightAction != null) {
-                        isRemoved = true
-                        true
-                    } else false
+                        swipeRightAction.onAction.invoke(index)
+                    }
+                    false // Return false to reset swipe position
                 }
                 else -> false
             }
         }
     )
 
-    // Trigger action after dismiss animation completes + shrink animation
-    LaunchedEffect(isRemoved) {
-        if (isRemoved) {
-            delay(300) // Wait for AnimatedVisibility shrink
-            when (dismissState.currentValue) {
-                DismissValue.DismissedToStart -> swipeLeftAction?.onAction?.invoke(index)
-                DismissValue.DismissedToEnd -> swipeRightAction?.onAction?.invoke(index)
-                else -> {}
+    SwipeToDismiss(
+        state = dismissState,
+        directions = directions,
+        dismissThresholds = { direction ->
+            val threshold = when (direction) {
+                DismissDirection.EndToStart -> swipeLeftAction?.threshold ?: 0.3f
+                DismissDirection.StartToEnd -> swipeRightAction?.threshold ?: 0.3f
             }
+            FractionalThreshold(threshold)
+        },
+        background = {
+            SwipeDismissBackground(
+                dismissState = dismissState,
+                swipeLeftAction = swipeLeftAction,
+                swipeRightAction = swipeRightAction,
+            )
+        },
+        dismissContent = {
+            content()
         }
-    }
-
-    AnimatedVisibility(
-        visible = !isRemoved,
-        exit = shrinkVertically(animationSpec = tween(300)) + fadeOut(tween(300))
-    ) {
-        SwipeToDismiss(
-            state = dismissState,
-            directions = directions,
-            dismissThresholds = { direction ->
-                val threshold = when (direction) {
-                    DismissDirection.EndToStart -> swipeLeftAction?.threshold ?: 0.3f
-                    DismissDirection.StartToEnd -> swipeRightAction?.threshold ?: 0.3f
-                }
-                FractionalThreshold(threshold)
-            },
-            background = {
-                SwipeDismissBackground(
-                    dismissState = dismissState,
-                    swipeLeftAction = swipeLeftAction,
-                    swipeRightAction = swipeRightAction,
-                )
-            },
-            dismissContent = {
-                content()
-            }
-        )
-    }
+    )
 }
 
 /**
@@ -948,6 +949,47 @@ private fun PreviewLazyMultiSelectSwipe() {
                 selected = selected.filter { it != index }.map { if (it > index) it - 1 else it }.toSet()
             }
         ),
+        showDivider = true,
+        modifier = Modifier.height(350.dp)
+    )
+}
+
+@Preview(showBackground = true, name = "Lazy 15. Item background color (semua sama)")
+@Composable
+private fun PreviewLazyItemBackgroundColor() {
+    val items = (1..6).map { "Item $it" }
+    KanzanBaseLazy(
+        state = KanzanLazyState(items = items),
+        itemContent = { index, item ->
+            Text(
+                text = "$item (index: $index)",
+                style = AppTextStyle.nunito_regular_14,
+                color = Color.White,
+                modifier = Modifier.fillMaxWidth().padding(dp16)
+            )
+        },
+        itemBackgroundColor = Color.Blue,
+        showDivider = false,
+        modifier = Modifier.height(350.dp)
+    )
+}
+
+@Preview(showBackground = true, name = "Lazy 16. Item background per item (alternating)")
+@Composable
+private fun PreviewLazyItemBackgroundProvider() {
+    val items = (1..6).map { "Item $it" }
+    KanzanBaseLazy(
+        state = KanzanLazyState(items = items),
+        itemContent = { index, item ->
+            Text(
+                text = "$item (index: $index)",
+                style = AppTextStyle.nunito_regular_14,
+                modifier = Modifier.fillMaxWidth().padding(dp16)
+            )
+        },
+        itemBackgroundColorProvider = { index, _ ->
+            if (index % 2 == 0) Color(0xFFE3F2FD) else Color.White
+        },
         showDivider = true,
         modifier = Modifier.height(350.dp)
     )

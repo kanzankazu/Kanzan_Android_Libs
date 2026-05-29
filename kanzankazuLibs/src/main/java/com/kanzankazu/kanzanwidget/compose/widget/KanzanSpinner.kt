@@ -40,6 +40,120 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp12
 import com.kanzankazu.kanzanwidget.compose.ui.dp14
 import com.kanzankazu.kanzanwidget.compose.ui.dp16
 
+// region ==================== KanzanSpinnerColors ====================
+
+/**
+ * Data class untuk mengatur warna KanzanSpinner secara granular.
+ * Gunakan [Color.Unspecified] untuk menggunakan default bawaan.
+ *
+ * Contoh penggunaan:
+ * ```
+ * KanzanSpinner(
+ *     kanzanColors = KanzanSpinnerColors(
+ *         borderColor = Color.Blue,
+ *         selectedItemBackgroundColor = Color(0xFFE8F5E9),
+ *     )
+ * )
+ * ```
+ *
+ * Atau pakai preset:
+ * ```
+ * KanzanSpinner(kanzanColors = KanzanSpinnerColors.error())
+ * KanzanSpinner(kanzanColors = KanzanSpinnerColors.success())
+ * ```
+ */
+data class KanzanSpinnerColors(
+    // Border
+    val borderColor: Color = Color.Unspecified,
+    val errorBorderColor: Color = Color.Unspecified,
+    val disabledBorderColor: Color = Color.Unspecified,
+
+    // Background / Container
+    val containerColor: Color = Color.Unspecified,
+    val dropdownBackgroundColor: Color = Color.Unspecified,
+
+    // Text
+    val textColor: Color = Color.Unspecified,
+    val placeholderColor: Color = Color.Unspecified,
+    val disabledTextColor: Color = Color.Unspecified,
+
+    // Label
+    val labelColor: Color = Color.Unspecified,
+
+    // Icon
+    val leadingIconColor: Color = Color.Unspecified,
+    val trailingIconColor: Color = Color.Unspecified,
+
+    // Item
+    val selectedItemBackgroundColor: Color = Color.Unspecified,
+    val selectedItemTextColor: Color = Color.Unspecified,
+    val unselectedItemTextColor: Color = Color.Unspecified,
+
+    // Divider
+    val dividerColor: Color = Color.Unspecified,
+
+    // Error
+    val errorTextColor: Color = Color.Unspecified,
+
+    // Supporting / helper
+    val supportingTextColor: Color = Color.Unspecified,
+) {
+    companion object {
+        /** Default — pakai warna bawaan */
+        fun defaults() = KanzanSpinnerColors()
+
+        /** Preset error — border & label merah */
+        fun error(
+            borderColor: Color = Color.Red,
+            errorTextColor: Color = Color.Red,
+        ) = KanzanSpinnerColors(
+            borderColor = borderColor,
+            errorBorderColor = borderColor,
+            errorTextColor = errorTextColor,
+        )
+
+        /** Preset success — border hijau */
+        fun success(
+            borderColor: Color = Color(0xFF4CAF50),
+            selectedItemBackgroundColor: Color = Color(0xFFE8F5E9),
+        ) = KanzanSpinnerColors(
+            borderColor = borderColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+        )
+
+        /** Preset dark mode manual */
+        fun dark(
+            borderColor: Color = Color(0xFF90CAF9),
+            containerColor: Color = Color(0xFF1E1E1E),
+            dropdownBackgroundColor: Color = Color(0xFF2C2C2C),
+            textColor: Color = Color.White,
+            placeholderColor: Color = Color(0xFF757575),
+            labelColor: Color = Color(0xFFBBDEFB),
+            selectedItemBackgroundColor: Color = Color(0xFF37474F),
+            selectedItemTextColor: Color = Color.White,
+            unselectedItemTextColor: Color = Color(0xFFE0E0E0),
+            dividerColor: Color = Color(0xFF424242),
+        ) = KanzanSpinnerColors(
+            borderColor = borderColor,
+            containerColor = containerColor,
+            dropdownBackgroundColor = dropdownBackgroundColor,
+            textColor = textColor,
+            placeholderColor = placeholderColor,
+            labelColor = labelColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+            selectedItemTextColor = selectedItemTextColor,
+            unselectedItemTextColor = unselectedItemTextColor,
+            dividerColor = dividerColor,
+        )
+    }
+}
+
+/** Helper: return this color if specified, otherwise fallback */
+private fun Color.takeOrDefault(default: Color): Color =
+    if (this != Color.Unspecified) this else default
+
+// endregion
+
 // region ==================== KanzanSpinner ====================
 
 /**
@@ -88,6 +202,7 @@ fun <T> KanzanSpinner(
     trailingIcon: @Composable (() -> Unit)? = null,
     errorMessage: String? = null,
     itemContent: @Composable ((index: Int, item: T, isSelected: Boolean) -> Unit)? = null,
+    kanzanColors: KanzanSpinnerColors = KanzanSpinnerColors.defaults(),
 ) {
     var expanded by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -103,10 +218,33 @@ fun <T> KanzanSpinner(
     val itemHeightDp = 48.dp
     val maxHeight = itemHeightDp * maxVisibleItems
 
+    // Resolve colors from kanzanColors — user-supplied params take priority
+    val finalBorderColor = if (errorMessage != null) {
+        kanzanColors.errorBorderColor.takeOrDefault(Color.Red)
+    } else {
+        kanzanColors.borderColor.takeOrDefault(borderColor)
+    }
+    val finalTextColor = kanzanColors.textColor.takeOrDefault(Color.Black)
+    val finalPlaceholderColor = kanzanColors.placeholderColor.takeOrDefault(Color.Gray)
+    val finalLabelColor = kanzanColors.labelColor.takeOrDefault(Color.Unspecified)
+    val finalContainerColor = kanzanColors.containerColor.takeOrDefault(Color.Transparent)
+    val finalDropdownBgColor = kanzanColors.dropdownBackgroundColor.takeOrDefault(Color.White)
+    val finalSelectedItemBgColor = kanzanColors.selectedItemBackgroundColor.takeOrDefault(selectedColor)
+    val finalSelectedItemTextColor = kanzanColors.selectedItemTextColor.takeOrDefault(Color.Unspecified)
+    val finalUnselectedItemTextColor = kanzanColors.unselectedItemTextColor.takeOrDefault(Color.Unspecified)
+    val finalDividerColor = kanzanColors.dividerColor.takeOrDefault(Color.LightGray.copy(alpha = 0.3f))
+    val finalErrorTextColor = kanzanColors.errorTextColor.takeOrDefault(Color.Red)
+    val finalTrailingIconColor = kanzanColors.trailingIconColor.takeOrDefault(Color.Gray)
+
     Column(modifier = modifier) {
         // Label
         if (label != null) {
-            Text(text = label, style = labelStyle, modifier = Modifier.padding(bottom = dp4))
+            Text(
+                text = label,
+                style = labelStyle,
+                color = if (finalLabelColor != Color.Unspecified) finalLabelColor else Color.Unspecified,
+                modifier = Modifier.padding(bottom = dp4)
+            )
         }
 
         // Anchor box — dropdown floats relative to this
@@ -116,7 +254,8 @@ fun <T> KanzanSpinner(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(Shapes.medium)
-                    .border(dp1, if (errorMessage != null) Color.Red else borderColor, Shapes.medium)
+                    .background(finalContainerColor)
+                    .border(dp1, finalBorderColor, Shapes.medium)
                     .clickable(enabled = enabled) { expanded = !expanded }
                     .padding(horizontal = dp12, vertical = dp14),
                 verticalAlignment = Alignment.CenterVertically
@@ -125,11 +264,11 @@ fun <T> KanzanSpinner(
                 Text(
                     text = if (selectedIndex in items.indices) itemToString(items[selectedIndex]) else placeholder,
                     style = textStyle,
-                    color = if (selectedIndex in items.indices) Color.Black else Color.Gray,
+                    color = if (selectedIndex in items.indices) finalTextColor else finalPlaceholderColor,
                     modifier = Modifier.weight(1f).padding(horizontal = dp4)
                 )
                 Box(modifier = Modifier.rotate(arrowRotation)) {
-                    trailingIcon?.invoke() ?: Text(text = "▼", style = AppTextStyle.nunito_regular_12, color = Color.Gray)
+                    trailingIcon?.invoke() ?: Text(text = "▼", style = AppTextStyle.nunito_regular_12, color = finalTrailingIconColor)
                 }
             }
 
@@ -143,7 +282,7 @@ fun <T> KanzanSpinner(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .heightIn(max = maxHeight)
-                    .background(Color.White)
+                    .background(finalDropdownBgColor)
             ) {
                 if (searchable) {
                     KanzanTextField(
@@ -168,7 +307,7 @@ fun <T> KanzanSpinner(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(if (isSelected) selectedColor else Color.Transparent)
+                                .background(if (isSelected) finalSelectedItemBgColor else Color.Transparent)
                                 .clickable {
                                     onItemSelected(originalIndex)
                                     expanded = false
@@ -181,9 +320,12 @@ fun <T> KanzanSpinner(
                         Text(
                             text = itemToString(item),
                             style = if (isSelected) AppTextStyle.nunito_medium_14 else textStyle,
+                            color = if (isSelected && finalSelectedItemTextColor != Color.Unspecified) finalSelectedItemTextColor
+                                    else if (!isSelected && finalUnselectedItemTextColor != Color.Unspecified) finalUnselectedItemTextColor
+                                    else Color.Unspecified,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(if (isSelected) selectedColor else Color.Transparent)
+                                .background(if (isSelected) finalSelectedItemBgColor else Color.Transparent)
                                 .clickable {
                                     onItemSelected(originalIndex)
                                     expanded = false
@@ -193,7 +335,7 @@ fun <T> KanzanSpinner(
                         )
                     }
                     if (originalIndex < items.lastIndex) {
-                        Divider(color = Color.LightGray.copy(alpha = 0.3f))
+                        Divider(color = finalDividerColor)
                     }
                 }
             }
@@ -201,7 +343,7 @@ fun <T> KanzanSpinner(
 
         // Error
         if (errorMessage != null) {
-            Text(text = errorMessage, style = AppTextStyle.nunito_regular_12, color = Color.Red, modifier = Modifier.padding(top = dp4))
+            Text(text = errorMessage, style = AppTextStyle.nunito_regular_12, color = finalErrorTextColor, modifier = Modifier.padding(top = dp4))
         }
     }
 }
@@ -271,6 +413,68 @@ private fun PreviewSpinnerCustomIcon() {
         onItemSelected = { selected = it },
         label = "Mata Uang",
         leadingIcon = { Text(text = "💱", style = AppTextStyle.nunito_regular_16, modifier = Modifier.padding(end = dp4)) }
+    )
+}
+
+// endregion
+
+// region ==================== Preview: Custom Colors ====================
+
+@Preview(showBackground = true, name = "Spinner 6. Custom Colors (Blue)")
+@Composable
+private fun PreviewSpinnerCustomColors() {
+    var selected by remember { mutableStateOf(1) }
+    KanzanSpinner(
+        items = listOf("Makanan", "Transportasi", "Hiburan", "Belanja"),
+        selectedIndex = selected,
+        onItemSelected = { selected = it },
+        label = "Kategori",
+        kanzanColors = KanzanSpinnerColors(
+            borderColor = Color.Blue,
+            selectedItemBackgroundColor = Color(0xFFE3F2FD),
+            labelColor = Color.Blue,
+            trailingIconColor = Color.Blue,
+        )
+    )
+}
+
+@Preview(showBackground = true, name = "Spinner 7. Preset Success")
+@Composable
+private fun PreviewSpinnerSuccess() {
+    var selected by remember { mutableStateOf(0) }
+    KanzanSpinner(
+        items = listOf("Tunai", "Transfer", "E-Wallet"),
+        selectedIndex = selected,
+        onItemSelected = { selected = it },
+        label = "Metode Pembayaran",
+        kanzanColors = KanzanSpinnerColors.success()
+    )
+}
+
+@Preview(showBackground = true, name = "Spinner 8. Preset Error")
+@Composable
+private fun PreviewSpinnerErrorColors() {
+    var selected by remember { mutableStateOf(-1) }
+    KanzanSpinner(
+        items = listOf("Tunai", "Transfer", "E-Wallet"),
+        selectedIndex = selected,
+        onItemSelected = { selected = it },
+        label = "Metode Pembayaran",
+        errorMessage = "Wajib dipilih",
+        kanzanColors = KanzanSpinnerColors.error()
+    )
+}
+
+@Preview(showBackground = true, name = "Spinner 9. Preset Dark")
+@Composable
+private fun PreviewSpinnerDark() {
+    var selected by remember { mutableStateOf(2) }
+    KanzanSpinner(
+        items = listOf("Jakarta", "Surabaya", "Bandung", "Medan"),
+        selectedIndex = selected,
+        onItemSelected = { selected = it },
+        label = "Kota",
+        kanzanColors = KanzanSpinnerColors.dark()
     )
 }
 

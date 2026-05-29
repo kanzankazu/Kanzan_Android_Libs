@@ -50,6 +50,121 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.kanzankazu.kanzanwidget.compose.ui.AppTextStyle
 import com.kanzankazu.kanzanwidget.compose.ui.Shapes
 
+/**
+ * Data class untuk mengatur warna KanzanTextField secara granular.
+ * Gunakan [Color.Unspecified] untuk menggunakan default dari MaterialTheme.
+ *
+ * Contoh penggunaan:
+ * ```
+ * KanzanTextField(
+ *     kanzanColors = KanzanTextFieldColors(
+ *         focusedBorderColor = Color.Blue,
+ *         unfocusedBorderColor = Color.Gray,
+ *     )
+ * )
+ * ```
+ *
+ * Atau pakai preset:
+ * ```
+ * KanzanTextField(kanzanColors = KanzanTextFieldColors.error())
+ * KanzanTextField(kanzanColors = KanzanTextFieldColors.success())
+ * ```
+ */
+data class KanzanTextFieldColors(
+    // Text colors
+    val textColor: Color = Color.Unspecified,
+    val disabledTextColor: Color = Color.Unspecified,
+    val errorTextColor: Color = Color.Unspecified,
+
+    // Cursor
+    val cursorColor: Color = Color.Unspecified,
+    val errorCursorColor: Color = Color.Unspecified,
+
+    // Border colors
+    val focusedBorderColor: Color = Color.Unspecified,
+    val unfocusedBorderColor: Color = Color.Unspecified,
+    val disabledBorderColor: Color = Color.Unspecified,
+    val errorBorderColor: Color = Color.Unspecified,
+
+    // Label colors
+    val focusedLabelColor: Color = Color.Unspecified,
+    val unfocusedLabelColor: Color = Color.Unspecified,
+    val disabledLabelColor: Color = Color.Unspecified,
+    val errorLabelColor: Color = Color.Unspecified,
+
+    // Placeholder
+    val placeholderColor: Color = Color.Unspecified,
+    val disabledPlaceholderColor: Color = Color.Unspecified,
+
+    // Icon colors
+    val leadingIconColor: Color = Color.Unspecified,
+    val disabledLeadingIconColor: Color = Color.Unspecified,
+    val errorLeadingIconColor: Color = Color.Unspecified,
+    val trailingIconColor: Color = Color.Unspecified,
+    val disabledTrailingIconColor: Color = Color.Unspecified,
+    val errorTrailingIconColor: Color = Color.Unspecified,
+
+    // Container / background
+    val focusedContainerColor: Color = Color.Unspecified,
+    val unfocusedContainerColor: Color = Color.Unspecified,
+    val disabledContainerColor: Color = Color.Unspecified,
+    val errorContainerColor: Color = Color.Unspecified,
+
+    // Supporting text
+    val supportingTextColor: Color = Color.Unspecified,
+    val disabledSupportingTextColor: Color = Color.Unspecified,
+    val errorSupportingTextColor: Color = Color.Unspecified,
+) {
+    companion object {
+        /** Default — semua pakai MaterialTheme */
+        fun defaults() = KanzanTextFieldColors()
+
+        /** Preset untuk state error — border & label merah */
+        fun error(
+            borderColor: Color = Color.Red,
+            labelColor: Color = Color.Red,
+            supportingColor: Color = Color.Red,
+        ) = KanzanTextFieldColors(
+            focusedBorderColor = borderColor,
+            unfocusedBorderColor = borderColor,
+            errorBorderColor = borderColor,
+            focusedLabelColor = labelColor,
+            unfocusedLabelColor = labelColor,
+            errorLabelColor = labelColor,
+            errorSupportingTextColor = supportingColor,
+        )
+
+        /** Preset untuk state success — border & label hijau */
+        fun success(
+            borderColor: Color = Color(0xFF4CAF50),
+            labelColor: Color = Color(0xFF4CAF50),
+        ) = KanzanTextFieldColors(
+            focusedBorderColor = borderColor,
+            unfocusedBorderColor = borderColor,
+            focusedLabelColor = labelColor,
+            unfocusedLabelColor = labelColor,
+        )
+
+        /** Preset untuk dark mode manual */
+        fun dark(
+            textColor: Color = Color.White,
+            borderColor: Color = Color(0xFF90CAF9),
+            labelColor: Color = Color(0xFFBBDEFB),
+            containerColor: Color = Color(0xFF1E1E1E),
+            placeholderColor: Color = Color(0xFF757575),
+        ) = KanzanTextFieldColors(
+            textColor = textColor,
+            focusedBorderColor = borderColor,
+            unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
+            focusedLabelColor = labelColor,
+            unfocusedLabelColor = labelColor.copy(alpha = 0.7f),
+            focusedContainerColor = containerColor,
+            unfocusedContainerColor = containerColor,
+            placeholderColor = placeholderColor,
+        )
+    }
+}
+
 enum class KanzanInputType(val value: String, val keyboardType: KeyboardType) {
     TEXT("Text", KeyboardType.Text),
     EMAIL("Email", KeyboardType.Email),
@@ -133,6 +248,7 @@ fun KanzanTextField(
     errorTextStyle: TextStyle = AppTextStyle.nunito_regular_12,
     shape: Shape? = null,
     colors: TextFieldColors? = null,
+    kanzanColors: KanzanTextFieldColors = KanzanTextFieldColors.defaults(),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onFocusChange: (Boolean) -> Unit = {},
     onClick: (() -> Unit)? = null,
@@ -155,6 +271,9 @@ fun KanzanTextField(
     }
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+
+    // Resolve final TextFieldColors: user-supplied `colors` param > kanzanColors > default
+    val finalColors: TextFieldColors = colors ?: kanzanColors.toTextFieldColors()
 
     // Auto-resolve behavior per input type — user-supplied params still take priority via function signature defaults
     val finalEnabled = if (kanzanInputType == KanzanInputType.DISABLED) false else enabled
@@ -285,15 +404,7 @@ fun KanzanTextField(
                 maxLines = finalMaxLines,
                 minLines = minLines,
                 shape = shape ?: Shapes.medium,
-                colors = colors ?: OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledSupportingTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
+                colors = if (colors != null) colors else kanzanColors.toClickableTextFieldColors(),
             )
             // Invisible clickable overlay
             Box(
@@ -361,11 +472,86 @@ fun KanzanTextField(
             maxLines = finalMaxLines,
             minLines = minLines,
             shape = shape ?: Shapes.medium,
-            colors = colors ?: OutlinedTextFieldDefaults.colors(),
+            colors = finalColors,
             interactionSource = interactionSource
         )
     }
 }
+
+/**
+ * Convert [KanzanTextFieldColors] to Material3 [TextFieldColors].
+ * Warna yang [Color.Unspecified] akan fallback ke default MaterialTheme.
+ */
+@Composable
+private fun KanzanTextFieldColors.toTextFieldColors(): TextFieldColors {
+    return OutlinedTextFieldDefaults.colors(
+        // Text
+        focusedTextColor = textColor.takeOrDefault(MaterialTheme.colorScheme.onSurface),
+        unfocusedTextColor = textColor.takeOrDefault(MaterialTheme.colorScheme.onSurface),
+        disabledTextColor = disabledTextColor.takeOrDefault(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+        errorTextColor = errorTextColor.takeOrDefault(MaterialTheme.colorScheme.onSurface),
+        // Cursor
+        cursorColor = cursorColor.takeOrDefault(MaterialTheme.colorScheme.primary),
+        errorCursorColor = errorCursorColor.takeOrDefault(MaterialTheme.colorScheme.error),
+        // Border
+        focusedBorderColor = focusedBorderColor.takeOrDefault(MaterialTheme.colorScheme.primary),
+        unfocusedBorderColor = unfocusedBorderColor.takeOrDefault(MaterialTheme.colorScheme.outline),
+        disabledBorderColor = disabledBorderColor.takeOrDefault(MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+        errorBorderColor = errorBorderColor.takeOrDefault(MaterialTheme.colorScheme.error),
+        // Label
+        focusedLabelColor = focusedLabelColor.takeOrDefault(MaterialTheme.colorScheme.primary),
+        unfocusedLabelColor = unfocusedLabelColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledLabelColor = disabledLabelColor.takeOrDefault(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+        errorLabelColor = errorLabelColor.takeOrDefault(MaterialTheme.colorScheme.error),
+        // Placeholder
+        focusedPlaceholderColor = placeholderColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        unfocusedPlaceholderColor = placeholderColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledPlaceholderColor = disabledPlaceholderColor.takeOrDefault(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+        errorPlaceholderColor = placeholderColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        // Leading icon
+        focusedLeadingIconColor = leadingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        unfocusedLeadingIconColor = leadingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledLeadingIconColor = disabledLeadingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+        errorLeadingIconColor = errorLeadingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        // Trailing icon
+        focusedTrailingIconColor = trailingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        unfocusedTrailingIconColor = trailingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledTrailingIconColor = disabledTrailingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+        errorTrailingIconColor = errorTrailingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        // Container
+        focusedContainerColor = focusedContainerColor.takeOrDefault(Color.Transparent),
+        unfocusedContainerColor = unfocusedContainerColor.takeOrDefault(Color.Transparent),
+        disabledContainerColor = disabledContainerColor.takeOrDefault(Color.Transparent),
+        errorContainerColor = errorContainerColor.takeOrDefault(Color.Transparent),
+        // Supporting text
+        focusedSupportingTextColor = supportingTextColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        unfocusedSupportingTextColor = supportingTextColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledSupportingTextColor = disabledSupportingTextColor.takeOrDefault(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+        errorSupportingTextColor = errorSupportingTextColor.takeOrDefault(MaterialTheme.colorScheme.error),
+    )
+}
+
+/**
+ * Convert [KanzanTextFieldColors] to [TextFieldColors] untuk CLICKABLE type.
+ * Disabled state tetap terlihat normal (tidak pudar).
+ */
+@Composable
+private fun KanzanTextFieldColors.toClickableTextFieldColors(): TextFieldColors {
+    return OutlinedTextFieldDefaults.colors(
+        disabledTextColor = textColor.takeOrDefault(MaterialTheme.colorScheme.onSurface),
+        disabledBorderColor = disabledBorderColor.takeOrDefault(MaterialTheme.colorScheme.outline),
+        disabledLabelColor = disabledLabelColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledPlaceholderColor = disabledPlaceholderColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledLeadingIconColor = disabledLeadingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledTrailingIconColor = disabledTrailingIconColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledSupportingTextColor = disabledSupportingTextColor.takeOrDefault(MaterialTheme.colorScheme.onSurfaceVariant),
+        disabledContainerColor = disabledContainerColor.takeOrDefault(Color.Transparent),
+    )
+}
+
+/** Helper: return this color if specified, otherwise fallback */
+private fun Color.takeOrDefault(default: Color): Color =
+    if (this != Color.Unspecified) this else default
 
 /**
  * Process email input by converting spaces to @ and . characters
@@ -1037,6 +1223,70 @@ private fun KanzanTextFieldWithIconPreview() {
         onValueChanged = { textValue = it },
         placeholder = "Cari sesuatu...",
         leadingIcon = { Text("🔍") }
+    )
+}
+
+// endregion
+
+// region ==================== Preview: 7. Custom Colors (KanzanTextFieldColors) ====================
+
+@Preview(showBackground = true, name = "7a. Custom Colors (Blue theme)")
+@Composable
+private fun KanzanTextFieldCustomColorsPreview() {
+    var textValue by remember { mutableStateOf("Hello World") }
+    KanzanTextField(
+        label = "Custom Blue",
+        value = textValue,
+        onValueChanged = { textValue = it },
+        placeholder = "Ketik sesuatu...",
+        kanzanColors = KanzanTextFieldColors(
+            focusedBorderColor = Color.Blue,
+            unfocusedBorderColor = Color.Blue.copy(alpha = 0.5f),
+            focusedLabelColor = Color.Blue,
+            unfocusedLabelColor = Color.Blue.copy(alpha = 0.7f),
+            cursorColor = Color.Blue,
+        ),
+        supportingText = "Border & label biru custom"
+    )
+}
+
+@Preview(showBackground = true, name = "7b. Preset Success")
+@Composable
+private fun KanzanTextFieldSuccessPreview() {
+    var textValue by remember { mutableStateOf("Valid input") }
+    KanzanTextField(
+        label = "Username",
+        value = textValue,
+        onValueChanged = { textValue = it },
+        kanzanColors = KanzanTextFieldColors.success(),
+        supportingText = "Username tersedia ✓"
+    )
+}
+
+@Preview(showBackground = true, name = "7c. Preset Error")
+@Composable
+private fun KanzanTextFieldErrorColorsPreview() {
+    var textValue by remember { mutableStateOf("bad") }
+    KanzanTextField(
+        label = "Password",
+        value = textValue,
+        onValueChanged = { textValue = it },
+        kanzanColors = KanzanTextFieldColors.error(),
+        errorMessage = "Password terlalu pendek",
+        isError = true
+    )
+}
+
+@Preview(showBackground = true, name = "7d. Preset Dark")
+@Composable
+private fun KanzanTextFieldDarkPreview() {
+    var textValue by remember { mutableStateOf("Dark mode text") }
+    KanzanTextField(
+        label = "Dark Theme",
+        value = textValue,
+        onValueChanged = { textValue = it },
+        kanzanColors = KanzanTextFieldColors.dark(),
+        supportingText = "Manual dark mode colors"
     )
 }
 
