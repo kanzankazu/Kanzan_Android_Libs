@@ -24,7 +24,7 @@ fun Throwable.sendCrashlytics(
     userid: String = "",
     tag: String = "",
     logMessage: String = "",
-    isForce: Boolean = true,
+    isForce: Boolean = false,
 ) {
     FirebaseCrashlytics.getInstance().apply {
         if (userid.isNotEmpty()) {
@@ -36,7 +36,6 @@ fun Throwable.sendCrashlytics(
         recordException(this@sendCrashlytics)
 
         if (isForce) {
-            setCrashlyticsCollectionEnabled(false)
             sendUnsentReports()
         }
     }
