@@ -1,7 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 
 package com.kanzankazu.kanzanwidget.compose.widget
 
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +28,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +37,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -219,7 +226,35 @@ fun KanzanBottomSheet(
         dragHandle = if (showDragHandle && !fullScreen) {
             { KanzanDragHandle() }
         } else null,
-    ) { ModalBottomSheetContent(headerContent, title, subtitle, showCloseButton, hideAndDismiss, showDivider, sheetType, onDismiss) }
+    ) {
+        // Fix keyboard not showing inside ModalBottomSheet:
+        // ModalBottomSheet creates a new window whose softInputMode may not be ADJUST_RESIZE.
+        // We try multiple approaches to ensure the keyboard can appear:
+        // 1. DialogWindowProvider (popup window dari ModalBottomSheet)
+        // 2. Fallback ke window dari View hierarchy
+        val needsKeyboard = sheetType is KanzanSheetType.ItemList && sheetType.searchable
+        if (needsKeyboard) {
+            val view = LocalView.current
+            LaunchedEffect(Unit) {
+                // Approach 1: Coba akses window dari DialogWindowProvider
+                val dialogWindow = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
+                if (dialogWindow != null) {
+                    dialogWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                } else {
+                    // Approach 2: Fallback — akses window dari View langsung
+                    view.context.let { ctx ->
+                        val activity = ctx as? android.app.Activity
+                            ?: (ctx as? android.content.ContextWrapper)?.baseContext as? android.app.Activity
+                        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                    }
+                }
+            }
+        }
+
+        Column(modifier = Modifier.imePadding()) {
+            ModalBottomSheetContent(headerContent, title, subtitle, showCloseButton, hideAndDismiss, showDivider, sheetType, onDismiss)
+        }
+    }
 }
 
 @Composable
@@ -282,18 +317,44 @@ private fun ColumnScope.ItemListBody(
     }
 
     if (type.searchable) {
+        val searchFocusRequester = remember { FocusRequester() }
+        val view = LocalView.current
+
         KanzanTextField(
             label = "",
             value = searchQuery,
             onValueChanged = { searchQuery = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = dp16, vertical = dp8),
+                .padding(horizontal = dp16, vertical = dp8)
+                .focusRequester(searchFocusRequester),
             placeholder = type.searchPlaceholder,
             kanzanInputType = KanzanInputType.SEARCH,
             imeAction = ImeAction.Done,
             singleLine = true,
         )
+
+        // Fix keyboard di ModalBottomSheet:
+        // LocalSoftwareKeyboardController sering null di window ModalBottomSheet.
+        // Pakai InputMethodManager langsung — lebih reliable di semua device.
+        LaunchedEffect(Unit) {
+            // Tunggu ModalBottomSheet selesai animasi expand
+            kotlinx.coroutines.delay(400)
+            try {
+                searchFocusRequester.requestFocus()
+            } catch (_: Exception) {
+                // FocusRequester belum attached, coba lagi
+                kotlinx.coroutines.delay(300)
+                try { searchFocusRequester.requestFocus() } catch (_: Exception) { }
+            }
+            // Tunggu focus ter-apply ke View
+            kotlinx.coroutines.delay(100)
+            // Force show keyboard via InputMethodManager
+            val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+            // findFocus() ambil view yang sedang fokus di window saat ini
+            val focusedView = view.rootView.findFocus() ?: view
+            imm?.showSoftInput(focusedView, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 
     val scrollModifier = if (type.searchable) {

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.kanzankazu.kanzanwidget.compose.widget
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,6 +30,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -295,9 +299,11 @@ fun <T> KanzanSpinner(
                         singleLine = true,
                     )
 
+                    val keyboardController = LocalSoftwareKeyboardController.current
                     LaunchedEffect(Unit) {
                         kotlinx.coroutines.delay(100)
                         searchFocusRequester.requestFocus()
+                        keyboardController?.show()
                     }
                 }
 
