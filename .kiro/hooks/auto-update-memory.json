@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "name": "Auto Update Memory",
+  "description": "Otomatis cek dan catat hal penting dari percakapan ke global memory di akhir setiap sesi agent",
+  "version": "1",
+  "when": { "type": "agentStop" },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Cek apakah ada hal penting dari percakapan ini yang perlu dicatat ke ~/.kiro/steering/memory.md (keputusan teknis, bug, fix, preferensi user, log percakapan). Jika ada, langsung update file-nya. Jika tidak ada hal baru yang perlu dicatat, skip saja."
+  }
+}
