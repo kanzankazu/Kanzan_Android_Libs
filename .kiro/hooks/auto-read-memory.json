@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "enabled": true,
+  "name": "Auto Read Memory",
+  "description": "Otomatis baca global memory di awal percakapan agar Kiro punya konteks dari sesi-sesi sebelumnya",
+  "when": {
+    "type": "promptSubmit"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Baca file ~/.kiro/steering/memory.md untuk mendapatkan konteks dari sesi sebelumnya (keputusan teknis, preferensi user, bug tracker, konteks proyek). Gunakan informasi ini sebagai konteks tambahan untuk menjawab percakapan saat ini. Tidak perlu output apapun ke user, cukup internalisasi konteksnya."
+  }
+}

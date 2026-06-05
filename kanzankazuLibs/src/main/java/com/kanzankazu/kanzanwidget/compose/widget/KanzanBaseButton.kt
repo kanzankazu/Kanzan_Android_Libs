@@ -100,7 +100,8 @@ enum class KanzanButtonGroupType {
  * @param containerColor warna background (filled).
  * @param contentColor warna konten (teks, icon).
  * @param disabledContainerColor warna background saat disabled.
- * @param disabledContentColor warna konten saat disabled.
+ * @param disabledContentColor warna konten (icon, border) saat disabled.
+ * @param disabledTextColor warna teks (title, subtitle, nominal) saat disabled. Default sama dengan disabledContentColor.
  * @param borderColor warna border (outlined).
  * @param borderWidth lebar border.
  * @param elevation elevasi (elevated).
@@ -133,6 +134,7 @@ fun KanzanBaseButton(
     contentColor: Color = Color.White,
     disabledContainerColor: Color = Color.LightGray,
     disabledContentColor: Color = Color.Gray,
+    disabledTextColor: Color = disabledContentColor,
     borderColor: Color = Color.Black,
     borderWidth: Dp = 1.dp,
     elevation: Dp = dp4,
@@ -206,6 +208,8 @@ fun KanzanBaseButton(
                 subtitleStyle = resolvedSubtitleStyle,
                 nominalStyle = resolvedNominalStyle,
                 badge = badge,
+                isEnabled = finalEnabled,
+                disabledTextColor = disabledTextColor,
             )
         }
     }
@@ -248,6 +252,8 @@ private fun KanzanButtonContent(
     subtitleStyle: TextStyle,
     nominalStyle: TextStyle,
     badge: @Composable (() -> Unit)?,
+    isEnabled: Boolean = true,
+    disabledTextColor: Color = Color.Gray,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         // Loading
@@ -272,16 +278,33 @@ private fun KanzanButtonContent(
                 if (nominal != null) Modifier.weight(1f)
                 else Modifier
         ) {
-            Text(text = title, style = titleStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                text = title,
+                style = titleStyle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = if (!isEnabled) disabledTextColor else Color.Unspecified,
+            )
             if (subtitle != null) {
-                Text(text = subtitle, style = subtitleStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = subtitle,
+                    style = subtitleStyle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = if (!isEnabled) disabledTextColor else Color.Unspecified,
+                )
             }
         }
 
         // Nominal
         if (nominal != null) {
             KanzanSpacerHorizontal(width = dp8)
-            Text(text = nominal, style = nominalStyle, textAlign = TextAlign.End)
+            Text(
+                text = nominal,
+                style = nominalStyle,
+                textAlign = TextAlign.End,
+                color = if (!isEnabled) disabledTextColor else Color.Unspecified,
+            )
         }
 
         // Trailing icon
@@ -434,7 +457,16 @@ private fun PreviewButtonSkeleton() {
 @Preview(showBackground = true, name = "Button 11. Disabled")
 @Composable
 private fun PreviewButtonDisabled() {
-    KanzanBaseButton(title = "Tidak Tersedia", onClick = {}, enabled = false, fullWidth = true)
+    Column(modifier = Modifier.padding(dp16), verticalArrangement = Arrangement.spacedBy(dp8)) {
+        KanzanBaseButton(title = "Tidak Tersedia", onClick = {}, enabled = false, fullWidth = true)
+        KanzanBaseButton(
+            title = "Custom Disabled Text",
+            onClick = {},
+            enabled = false,
+            fullWidth = true,
+            disabledTextColor = Color(0xFFBDBDBD),
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Button 12. Custom colors")
@@ -496,6 +528,10 @@ private fun PreviewButtonBadge() {
  * @param unselectedColor warna background button tidak aktif.
  * @param selectedContentColor warna teks button aktif.
  * @param unselectedContentColor warna teks button tidak aktif.
+ * @param disabledSelectedColor warna background button aktif saat disabled.
+ * @param disabledUnselectedColor warna background button tidak aktif saat disabled.
+ * @param disabledContentColor warna teks saat disabled.
+ * @param disabledBorderColor warna border saat disabled.
  * @param borderColor warna border.
  * @param borderWidth lebar border.
  * @param shape bentuk group (default: rounded).
@@ -517,6 +553,10 @@ fun KanzanButtonGroup(
     unselectedColor: Color = Color.Transparent,
     selectedContentColor: Color = Color.White,
     unselectedContentColor: Color = Color.Black,
+    disabledSelectedColor: Color = Color(0xFFE0E0E0),
+    disabledUnselectedColor: Color = Color.Transparent,
+    disabledContentColor: Color = Color(0xFFBDBDBD),
+    disabledBorderColor: Color = Color(0xFFE0E0E0),
     borderColor: Color = Color.Black,
     borderWidth: Dp = 1.dp,
     shape: Shape = RoundedCornerShape(dp8),
@@ -542,8 +582,17 @@ fun KanzanButtonGroup(
                 }
             } else shape
 
-            val containerColor = if (isSelected) selectedColor else unselectedColor
-            val contentColor = if (isSelected) selectedContentColor else unselectedContentColor
+            val containerColor = if (enabled) {
+                if (isSelected) selectedColor else unselectedColor
+            } else {
+                if (isSelected) disabledSelectedColor else disabledUnselectedColor
+            }
+            val contentColor = if (enabled) {
+                if (isSelected) selectedContentColor else unselectedContentColor
+            } else {
+                disabledContentColor
+            }
+            val resolvedBorderColor = if (enabled) borderColor else disabledBorderColor
 
             OutlinedButton(
                 onClick = {
@@ -567,8 +616,10 @@ fun KanzanButtonGroup(
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = containerColor,
                     contentColor = contentColor,
+                    disabledContainerColor = containerColor,
+                    disabledContentColor = contentColor,
                 ),
-                border = BorderStroke(borderWidth, borderColor),
+                border = BorderStroke(borderWidth, resolvedBorderColor),
             ) {
                 itemIcons?.invoke(index)
                 Text(text = label, style = textStyle, color = contentColor)
@@ -661,12 +712,22 @@ private fun PreviewTwoButtons() {
 @Preview(showBackground = true, name = "ButtonGroup 7. Disabled")
 @Composable
 private fun PreviewButtonGroupDisabled() {
-    KanzanButtonGroup(
-        items = listOf("A", "B", "C"),
-        modifier = Modifier.padding(dp16),
-        selectedIndices = setOf(1),
-        enabled = false,
-    )
+    Column(modifier = Modifier.padding(dp16), verticalArrangement = Arrangement.spacedBy(dp8)) {
+        KanzanButtonGroup(
+            items = listOf("A", "B", "C"),
+            selectedIndices = setOf(1),
+            enabled = false,
+        )
+        KanzanButtonGroup(
+            items = listOf("A", "B", "C"),
+            selectedIndices = setOf(0),
+            enabled = false,
+            disabledSelectedColor = Color(0xFFE0E0E0),
+            disabledUnselectedColor = Color.Transparent,
+            disabledContentColor = Color(0xFFBDBDBD),
+            disabledBorderColor = Color(0xFFE0E0E0),
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "ButtonGroup 8. Not full width")

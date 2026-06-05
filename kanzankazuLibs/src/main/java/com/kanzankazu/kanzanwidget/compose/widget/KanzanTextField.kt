@@ -1106,6 +1106,52 @@ private fun KanzanClickableInputPreview() {
     )
 }
 
+@Preview(showBackground = true, name = "6c2. Clickable Disabled (with value)")
+@Composable
+private fun KanzanClickableDisabledWithValuePreview() {
+    KanzanTextField(
+        label = "Dompet / Akun",
+        value = "💰 Dompet Tunai",
+        onValueChanged = { },
+        placeholder = "Pilih dompet",
+        kanzanInputType = KanzanInputType.CLICKABLE,
+        enabled = false,
+        onClick = null,
+        supportingText = "Clickable + disabled (ada value, tidak bisa klik)"
+    )
+}
+
+@Preview(showBackground = true, name = "6c3. Clickable Disabled (empty)")
+@Composable
+private fun KanzanClickableDisabledEmptyPreview() {
+    KanzanTextField(
+        label = "Kategori",
+        value = "",
+        onValueChanged = { },
+        placeholder = "Pilih kategori",
+        kanzanInputType = KanzanInputType.CLICKABLE,
+        enabled = false,
+        onClick = null,
+        supportingText = "Clickable + disabled (kosong, tidak bisa klik)"
+    )
+}
+
+@Preview(showBackground = true, name = "6c4. Clickable Disabled (with error)")
+@Composable
+private fun KanzanClickableDisabledWithErrorPreview() {
+    KanzanTextField(
+        label = "Tanggal",
+        value = "",
+        onValueChanged = { },
+        placeholder = "Pilih tanggal",
+        kanzanInputType = KanzanInputType.CLICKABLE,
+        enabled = false,
+        onClick = null,
+        isError = true,
+        errorMessage = "Tanggal wajib diisi"
+    )
+}
+
 @Preview(showBackground = true, name = "6d. Dropdown (Clickable)")
 @Composable
 private fun KanzanTextFieldDropdownPreview() {

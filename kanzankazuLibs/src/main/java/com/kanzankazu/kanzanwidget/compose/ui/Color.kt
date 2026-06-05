@@ -36,6 +36,16 @@ val PrimaryItungItungan = Color(0xFFFBE85F)
 val PrimaryLightItungItungan = Color(0xFFFFF5A9)
 val AccentItungItungan = Color(0xFFEDBC4D)
 
+/** Background button/group saat disabled */
+val DisabledContainer = Color(0xFFE0E0E0)
+/** Icon / content color saat disabled */
+val DisabledContent = Color(0xFF9E9E9E)
+/** Text color saat disabled (sedikit lebih terang dari content) */
+val DisabledText = Color(0xFFBDBDBD)
+/** Border color saat disabled */
+val DisabledBorder = Color(0xFFE0E0E0)
+
+
 /*Woof*/
 val md_theme_light_primary = Color(0xFF006C4C)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
