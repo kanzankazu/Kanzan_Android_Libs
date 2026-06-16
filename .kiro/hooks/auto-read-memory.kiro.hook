@@ -1,7 +1,6 @@
 {
-  "version": "1.0.0",
-  "enabled": true,
   "name": "Auto Read Memory",
+  "version": "1.0.0",
   "description": "Otomatis baca global memory di awal percakapan agar Kiro punya konteks dari sesi-sesi sebelumnya",
   "when": {
     "type": "promptSubmit"
