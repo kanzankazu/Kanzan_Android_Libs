@@ -1,22 +1,18 @@
-/*
 @file:Suppress("UNCHECKED_CAST")
 
-package com.kanzankazu.kanzanbase
+package com.kanzankazu.kanzanbase.activity
 
 import android.os.Bundle
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.kanzankazu.kanzannetwork.NetworkStatus
+import com.kanzankazu.kanzanbase.superall.BaseActivitySuper
 
-*/
 /**
  * Created by Faisal Bahri on 2020-02-11.
- *//*
-
+ */
 abstract class BaseActivityBindingData<out VDB : ViewDataBinding> : BaseActivitySuper() {
 
-    private var isNetworkAvailable: Boolean = true
     private lateinit var _binding: VDB
 
     val bindActivity: VDB
@@ -32,19 +28,10 @@ abstract class BaseActivityBindingData<out VDB : ViewDataBinding> : BaseActivity
         _binding.executePendingBindings()
 
         setActivityResult()
-        getBundleData()
+        parseIntentData()
         setContent()
         setListener()
         getData()
         setSubscribeToLiveData()
-        vmLoadDataRe(networkLiveData) {
-            isNetworkAvailable = when (it) {
-                is NetworkStatus.Available -> true
-                is NetworkStatus.Unavailable -> false
-                else -> false
-            }
-            handleConnection(isNetworkAvailable)
-        }
     }
 }
-*/
