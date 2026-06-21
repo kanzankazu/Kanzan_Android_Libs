@@ -72,6 +72,10 @@ import com.kanzankazu.kanzanwidget.compose.ui.dp48
 import com.kanzankazu.kanzanwidget.compose.ui.dp64
 import com.kanzankazu.kanzanwidget.compose.ui.dp80
 import kotlinx.coroutines.delay
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material3.LocalContentColor as M3LocalContentColor
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.lerp
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 // region ==================== Enums & Models ====================
@@ -95,6 +99,9 @@ data class KanzanSwipeAction(
     val threshold: Float = 0.3f,
     val onAction: (index: Int) -> Unit,
     val canSwipeAtIndex: ((index: Int) -> Boolean)? = null,
+    /** Warna content item saat di-swipe. Null = tidak berubah. */
+    val contentColorOnSwipe: Color? = null,
+
 )
 
 /**
@@ -506,7 +513,27 @@ private fun KanzanSwipeableItem(
             )
         },
         dismissContent = {
-            content()
+            // Animate content color based on swipe progress
+            val swipeDirection = dismissState.dismissDirection
+            val isSwiping = dismissState.currentValue != DismissValue.Default ||
+                dismissState.targetValue != DismissValue.Default
+            val targetContentColor = when (swipeDirection) {
+                DismissDirection.EndToStart -> swipeLeftAction?.contentColorOnSwipe
+                DismissDirection.StartToEnd -> swipeRightAction?.contentColorOnSwipe
+                else -> null
+            }
+            if (targetContentColor != null && isSwiping) {
+                val fraction = dismissState.progress.fraction.coerceIn(0f, 1f)
+                val animatedColor = lerp(LocalContentColor.current, targetContentColor, fraction)
+                CompositionLocalProvider(
+                        LocalContentColor provides animatedColor,
+                        M3LocalContentColor provides animatedColor,
+                    ) {
+                        content()
+                    }
+            } else {
+                content()
+            }
         }
     )
 }
