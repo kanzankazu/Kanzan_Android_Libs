@@ -36,6 +36,45 @@ val PrimaryItungItungan = Color(0xFFFBE85F)
 val PrimaryLightItungItungan = Color(0xFFFFF5A9)
 val AccentItungItungan = Color(0xFFEDBC4D)
 
+// ─── Surface & Background ────────────────────────────────────────────────────
+/** Abu sangat terang / putih keabu-abuan */
+val SurfaceDisabled = Color(0xFFF5F5F5)
+/** Abu terang / garis pemisah */
+val Divider = Color(0xFFE0E0E0)
+
+// ─── Text Colors ─────────────────────────────────────────────────────────────
+/** Hitam pekat (hampir hitam) */
+val TextPrimary = Color(0xFF212121)
+/** Abu sedang */
+val TextSecondary = Color(0xFF757575)
+/** Abu terang / placeholder */
+val TextHint = Color(0xFF9E9E9E)
+/** Abu sangat terang / disabled */
+val TextDisabled = Color(0xFFBDBDBD)
+/** Biru tua / link */
+val TextLink = Color(0xFF1565C0)
+
+// ─── Semantic / Status Colors ────────────────────────────────────────────────
+/** Hijau sedang / hijau daun */
+val Success = Color(0xFF4CAF50)
+/** Merah terang / merah cerah */
+val Error = Color(0xFFF44336)
+/** Oranye / jingga cerah */
+val Warning = Color(0xFFFF9800)
+/** Biru cerah / biru langit */
+val Info = Color(0xFF2196F3)
+/** Abu kebiruan / biru-abu gelap */
+val Neutral = Color(0xFF607D8B)
+
+// ─── Status Badge Backgrounds (Light) ────────────────────────────────────────
+val StatusSuccessBg = Color(0xFFE8F5E9)
+val StatusErrorBg = Color(0xFFFFEBEE)
+val StatusWarningBg = Color(0xFFFFF3E0)
+val StatusInfoBg = Color(0xFFE3F2FD)
+
+// ─── Snackbar ────────────────────────────────────────────────────────────────
+val SnackbarInfoBg = Color(0xFF323232)
+
 /** Background button/group saat disabled */
 val DisabledContainer = Color(0xFFE0E0E0)
 /** Icon / content color saat disabled */

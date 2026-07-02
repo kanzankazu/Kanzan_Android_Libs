@@ -1,12 +1,12 @@
 package com.kanzankazu.kanzanwidget.viewpager
 
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.kanzankazu.kanzanwidget.viewpager.base.BaseFragmentPagerStateAdapter
 import com.kanzankazu.kanzanwidget.viewpager.widget.NoSwipeViewPager
+import timber.log.Timber
 
 class KanzanViewPagerTabLayout(
     private val viewPager: ViewPager,
@@ -16,7 +16,7 @@ class KanzanViewPagerTabLayout(
     private var isPagingEnabled: Boolean = true
 
     init {
-        Log.d("Lihat KanzanKazu", " KanzanViewPagerTabLayout ${tabLayout.parent}")
+        Timber.d(" KanzanViewPagerTabLayout ${tabLayout.parent}")
         if (tabLayout.parent is AppBarLayout) (tabLayout.parent as AppBarLayout).elevation = 0f
         viewPager.adapter = baseFragmentPagerStateAdapter
         tabLayout.setupWithViewPager(viewPager)
