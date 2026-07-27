@@ -41,6 +41,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.kanzankazu.kanzanwidget.compose.ui.DisabledBorder
+import com.kanzankazu.kanzanwidget.compose.ui.DisabledContainer
+import com.kanzankazu.kanzanwidget.compose.ui.DisabledContent
+import com.kanzankazu.kanzanwidget.compose.ui.DisabledText
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -742,5 +746,38 @@ private fun PreviewNotFullWidth() {
         fullWidth = false,
     )
 }
+
+// endregion
+
+// region ==================== Button Color Data Classes ====================
+
+/**
+ * Data class untuk warna KanzanBaseButton.
+ * Bisa langsung di-destructure saat memanggil KanzanBaseButton.
+ */
+data class KanzanButtonColors(
+    val containerColor: Color,
+    val contentColor: Color,
+    val disabledContainerColor: Color = DisabledContainer,
+    val disabledContentColor: Color = DisabledContent,
+    val disabledTextColor: Color = DisabledText,
+    val borderColor: Color = containerColor,
+)
+
+/**
+ * Data class untuk warna KanzanButtonGroup.
+ * Bisa langsung di-destructure saat memanggil KanzanButtonGroup.
+ */
+data class KanzanButtonGroupColors(
+    val selectedColor: Color,
+    val unselectedColor: Color,
+    val selectedContentColor: Color,
+    val unselectedContentColor: Color,
+    val borderColor: Color,
+    val disabledSelectedColor: Color = DisabledContainer,
+    val disabledUnselectedColor: Color = Color.Transparent,
+    val disabledContentColor: Color = DisabledText,
+    val disabledBorderColor: Color = DisabledBorder,
+)
 
 // endregion
